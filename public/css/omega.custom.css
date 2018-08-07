@@ -1,0 +1,53 @@
+body{
+	background-color : #f1f1f1;
+
+}
+blockquote {
+    font-size: 14px;
+}
+.wrapper{
+	margin-top : 20px;
+	margin-left : 20px;
+	margin-right : 20px;
+	margin-bottom : 20px;
+}
+.card {
+	padding: 10px 20px 20px 20px;
+	margin: 10px 0 20px 0;
+	border : 1px solid #ccc;
+	background-color: #ffffff;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+
+  	position:relative;
+}
+@media all and (max-width: 700px) {
+
+}
+.form-first {
+  margin-bottom: -1px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.form-last {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.form-middle {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+} 
+
+.code{
+	font-family : monospace;
+	-moz-tab-size: 2;
+    -o-tab-size:   2;
+    tab-size:      2;
+}

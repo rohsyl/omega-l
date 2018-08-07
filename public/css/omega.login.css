@@ -1,0 +1,44 @@
+.container-login {
+	max-width : 500px;
+	width : 100%;
+	margin : 0 auto;
+	margin-top : 150px;
+}
+.card-login {
+	padding: 10px 40px 30px 40px;
+	margin: 10px 0 20px 0;
+	background-color: #ffffff;
+	border: 1px solid #d8d8d8;
+	border-top-width: 0;
+	border-bottom-width: 2px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+@media all and (max-width: 720px)
+{
+	.container-login {
+		margin-top : 50px;
+	}
+}
+@media all and (max-width: 480px)
+{
+	.container-login {
+		margin-top : 0px;
+	}
+	.card-login {
+		margin-top : 0px;
+		border-radius : 0px;
+		border : none;
+	}
+	body{
+		background-color : #fff;
+		overflow-y : none;
+	}
+}
