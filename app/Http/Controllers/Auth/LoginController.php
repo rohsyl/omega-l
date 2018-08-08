@@ -27,8 +27,6 @@ class LoginController extends Controller
      */
     protected $redirectTo = '/admin';
 
-    protected $redirectAfterLogout = '/admin/login';
-
     /**
      * Create a new controller instance.
      *
@@ -39,6 +37,10 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * Override : force using the username for the login
+     * @return string The name of the field to use for the authentication
+     */
     public function username(){
         return 'username';
     }
