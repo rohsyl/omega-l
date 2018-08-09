@@ -12,21 +12,27 @@
 */
 
 
-
-
+/**
+ * Omega CMS must be installed to acces all these routes
+ * The *om_not_installed* middleware check if omega is installed,
+ * if it's not the case, it redirect the user to the installation
+ * page.
+ */
 Route::middleware('om_not_installed')->group(function(){
 
+    /**
+     * Public routes
+     */
     Route::get('/', 'PublicController@index')->name('public');
 
 
-    // Public admin routes
-    Route::prefix('/admin')->group(function(){
 
-        // login
+    /**
+     * Public admin routes
+     */
+    Route::prefix('/admin')->group(function(){
         Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
         Route::post('login', 'Auth\LoginController@login');
-
-        // password reset
         Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
         Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
         Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
@@ -35,21 +41,24 @@ Route::middleware('om_not_installed')->group(function(){
 
 
 
-    // Private admin routes
+    /**
+     * Private admin routes
+     */
     Route::group(['middleware' => 'auth'], function () {
-
         Route::prefix('admin')->group(function(){
-
             Route::get('/', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
-
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
             Route::get('settings', 'SettingsController@index')->name('admin.settings');
             Route::post('logout', 'Auth\LoginController@logout')->name('logout');
-
         });
     });
 });
 
+/**
+ * The installation must be done only one time.
+ * The *om_is_installed* middleware check if omega is installed,
+ * if it's the case all these route will return a 404 error.
+ */
 Route::middleware('om_is_installed')->group(function(){
     Route::prefix('/install')->group(function(){
 

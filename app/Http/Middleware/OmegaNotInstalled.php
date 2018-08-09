@@ -16,7 +16,7 @@ class OmegaNotInstalled
      */
     public function handle($request, Closure $next)
     {
-        // if omega is installed, return a 404
+        // if omega is not installed, redirect to installation
         if(!OmegaUtils::isInstalled()){
             return redirect(route('install.index'));
         }
