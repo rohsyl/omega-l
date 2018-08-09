@@ -3,6 +3,7 @@
 namespace Omega\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Omega\Http\Middleware\OmegaNotInstalled;
 
 class Kernel extends HttpKernel
 {
@@ -59,5 +60,7 @@ class Kernel extends HttpKernel
         'guest' => \Omega\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'om_not_installed' => \Omega\Http\Middleware\OmegaNotInstalled::class,
+        'om_is_installed' => \Omega\Http\Middleware\OmegaIsInstalled::class,
     ];
 }

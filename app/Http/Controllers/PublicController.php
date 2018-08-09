@@ -15,4 +15,5 @@ class PublicController extends Controller
     {
         return view('public');
     }
+
 }

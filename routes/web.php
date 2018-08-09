@@ -12,23 +12,54 @@
 */
 
 
-Route::get('/', 'PublicController@index')->name('public');
-
-Route::get('/admin/login', 'Auth\LoginController@showLoginForm')->name('login');
-Route::post('/admin/login', 'Auth\LoginController@login');
-Route::get('/admin/password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-Route::post('/admin/password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-Route::get('/admin/password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-Route::post('/admin/password/reset', 'Auth\ResetPasswordController@reset');
 
 
-Route::group(['middleware' => 'auth'], function () {
+Route::middleware('om_not_installed')->group(function(){
+
+    Route::get('/', 'PublicController@index')->name('public');
 
 
-    Route::get('/admin', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
+    // Public admin routes
+    Route::prefix('/admin')->group(function(){
 
-    Route::get('/admin/dashboard', 'DashboardController@index')->name('admin.dashboard');
-    Route::get('/admin/settings', 'SettingsController@index')->name('admin.settings');
-    Route::post('/admin/logout', 'Auth\LoginController@logout')->name('logout');
+        // login
+        Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+        Route::post('login', 'Auth\LoginController@login');
 
+        // password reset
+        Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+        Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+        Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+        Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+    });
+
+
+
+    // Private admin routes
+    Route::group(['middleware' => 'auth'], function () {
+
+        Route::prefix('admin')->group(function(){
+
+            Route::get('/', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
+
+            Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
+            Route::get('settings', 'SettingsController@index')->name('admin.settings');
+            Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+
+        });
+    });
+});
+
+Route::middleware('om_is_installed')->group(function(){
+    Route::prefix('/install')->group(function(){
+
+        Route::get('/', 'InstallController@index')->name('install.index');
+        Route::post('step1', 'InstallController@step1')->name('install.step1');
+        Route::get('siteanduser', 'InstallController@siteanduser')->name('install.siteanduser');
+        Route::post('step2', 'InstallController@step2')->name('install.step2');
+        Route::get('launch', 'InstallController@launch')->name('install.launch');
+        Route::post('do', 'InstallController@do')->name('install.do');
+        Route::get('finished', 'InstallController@finished')->name('install.finished');
+
+    });
 });

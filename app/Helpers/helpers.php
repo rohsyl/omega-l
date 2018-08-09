@@ -10,3 +10,4 @@ function add_action($url, $icon, $text, $condition = null) {
         ]);
     }
 }
+
