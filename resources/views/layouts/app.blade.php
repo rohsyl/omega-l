@@ -80,7 +80,6 @@
         <div id="app">
             @include('menu.admin')
             <div id="page-wrapper">
-
                 <div class="row">
                     <div class="col-lg-12">
                         @yield('content')

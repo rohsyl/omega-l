@@ -1,5 +1,5 @@
-@include('layouts.app')
+@extends('layouts.app')
 
 @section('content')
-    dashboard
+    settings
 @endsection

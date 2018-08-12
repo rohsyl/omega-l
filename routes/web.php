@@ -50,6 +50,9 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
             Route::get('settings', 'SettingsController@index')->name('admin.settings');
             Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+
+
+
         });
     });
 });

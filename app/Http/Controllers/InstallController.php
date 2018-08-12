@@ -88,6 +88,7 @@ class InstallController extends Controller
         om_config(['om_site_slogan' => session('install.slogan')]);
         om_config(['om_web_adress' => url('/')]);
         om_config(['om_lang' => session('install.lang')]);
+        om_config(['om_theme_name' => 'clean_blog']);
 
         // create the admin user
         $admin = new User();

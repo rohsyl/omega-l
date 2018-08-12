@@ -25,6 +25,6 @@ function om_config($arg){
         return $config->value;
     }
     else{
-        return \Omega\Config::where('key', $arg)->first();
+        return \Omega\Config::where('key', $arg)->first()->value;
     }
 }
