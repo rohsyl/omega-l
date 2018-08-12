@@ -32,3 +32,6 @@ php artisan make:migration create_positions_table --table=positions
 php artisan make:migration create_forms_table --table=forms
 php artisan make:migration create_formentries_table --table=formentries
 php artisan make:migration create_formentryvalues_table --table=formentryvalues
+
+
+php artisan make:model Config

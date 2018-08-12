@@ -6,14 +6,28 @@
 
 @section('content')
 
-    <h4>{{ __('Basic settings') }}</h4>
-    {{ __('Language') 			}} : <br />
-    {{ __('Site title') 			}} : <br />
-    <hr />
-    <h4>{{ __('First user settings') }}</h4>
-    {{ __('Login') 				}} : <br />
-    {{ __('Password') 			}} : {{ __('Hidden') }}<br />
-    {{ __('E-mail') 				}} : <br />
+
+    <h4 class="page-header">{{ __('Basic settings') }}</h4>
+    <dl class="dl-horizontal">
+        <dt>{{ __('Language') }}</dt>
+        <dd>{{ $lang }}</dd>
+        <dt>{{ __('Site title') }}</dt>
+        <dd>{{ $title }}</dd>
+        <dt>{{ __('Site slogan') }}</dt>
+        <dd>{{ $slogan }}</dd>
+    </dl>
+
+
+    <h4 class="page-header">{{ __('First user settings') }}</h4>
+    <dl class="dl-horizontal">
+        <dt>{{ __('E-mail') }}</dt>
+        <dd>{{ $email }}</dd>
+        <dt>{{ __('Username') }}</dt>
+        <dd>{{ $username }}</dd>
+        <dt>{{ __('Password') }}</dt>
+        <dd>{{ __('Hidden') }}</dd>
+    </dl>
+
     <hr />
 
     {{ Form::open(['route' => 'install.do', 'method' => 'POST', 'class' => 'form-horizontal']) }}

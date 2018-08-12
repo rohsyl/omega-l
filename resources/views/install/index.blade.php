@@ -16,7 +16,12 @@
         </p>
         <div class="form-group">
             <div class="col-sm-4 col-sm-offset-4">
-                {{ Form::select('lang', [ 'en' => 'Engish', 'fr' => 'French', 'German' => 'de'], 'en', ['class' => 'form-control']) }}
+                {{ Form::select('lang', [ 'en' => 'English', 'fr' => 'French', 'de' => 'German'], $lang, ['class' => 'form-control']) }}
+                @if ($errors->has('lang'))
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $errors->first('lang') }}</strong>
+                    </span>
+                @endif
             </div>
         </div>
         <div class="form-group">

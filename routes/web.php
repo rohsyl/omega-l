@@ -72,3 +72,4 @@ Route::middleware('om_is_installed')->group(function(){
 
     });
 });
+
