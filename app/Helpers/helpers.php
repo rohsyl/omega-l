@@ -28,3 +28,4 @@ function om_config($arg){
         return \Omega\Config::where('key', $arg)->first()->value;
     }
 }
+

@@ -14,6 +14,7 @@
 
     <div class="nav navbar-top-links navbar-right">
         <ul class="nav navbar-nav navbar-right">
+
             <li class="dropdown">
 
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -33,7 +34,7 @@
                     <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
-                    <li><a href=""><i class="fa fa-male"></i> {{ __('Profile') }}</a>
+                    <li><a href="{{ route('profile') }}"><i class="fa fa-male"></i> {{ __('Profile') }}</a>
                     </li>
                     <li>
                         <a href="{{ route('logout') }}"
@@ -53,6 +54,17 @@
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
 
+                <li class="sidebar-search" style="padding:0px">
+                    <a href="{{ route('profile') }}">
+                        <div class="userAvatarContainer-mini">
+                            {!! \Omega\Utils\OmegaUtils::GetCurrentUserAvatar() !!}
+                        </div>
+                        <span class="userAvatarContainer-mini-username">
+                        <span class="bold">{{ \Omega\Utils\OmegaUtils::GetCurrentUserFullName() }}</span><br />
+                        <span>{{ \Omega\Utils\OmegaUtils::GetCurrentUserName() }}</span>
+                    </span>
+                    </a>
+                </li>
 
                 {!! add_action(route('admin.dashboard'), 'glyphicon glyphicon-th', __('Dashboard')) !!}
                 {!! add_action(route('admin.settings'), 'glyphicon glyphicon-cog',  __('Settings')) !!}

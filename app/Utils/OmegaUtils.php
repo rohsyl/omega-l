@@ -3,41 +3,41 @@
 namespace Omega\Utils;
 
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class OmegaUtils{
 
-    public static function getCurrentUserAvatar()
+    public static function GetCurrentUserAvatar()
     {
-        /*$user = Dbs::select('userAvatar', 'userFirstName', 'userName')
-            ->from('om_user')
-            ->where('id', '=', $_SESSION['id'])
-            ->run()
-            ->getRowArray(0);
+        $user = Auth::user();
 
+        return self::GetUserAvatar($user);
+    }
 
-        $mediaId = $user['userAvatar'];
+    public static function GetUserAvatar($user){
+        $mediaId = $user->avatar;
         $hasAvatar = isset($mediaId) && !empty($mediaId);
 
         if ($hasAvatar) {
-            $media = new Media($mediaId);
-            return '<div class="userAvatarImage" style="background-image: url(\'' . $media->GetThumbnail(150, 150) . '\')"></div>';
-        } elseif (!empty($user['userFirstName']) && !empty($user['userName'])) {
-            $initial = strtoupper(substr($user['userFirstName'], 0, 1) . substr($user['userName'], 0, 1));
+            //$media = new Media($mediaId);
+            return '<div class="userAvatarImage" style="background-image: url()"></div>';
+        } elseif (!empty($user->fullname)) {
+            $initial = strtoupper(substr($user->fullname, 0, 1));
             return '<span class="userAvatarText">' . $initial . '</span>';
         } else {
             return '<span class="userAvatarIcon"><i class="fa fa-user fa-4x"></i></span>';
-        }*/
+        }
     }
 
-    public static function getCurrentUserName()
+    public static function GetCurrentUserName()
     {
-        /*$avatar = Dbs::select('userName', 'userFirstname')
-            ->from('om_user')
-            ->where('id', '=', $_SESSION['id'])
-            ->run();
+        return Auth::user()->username;
+    }
 
-        return $avatar->getString(0, 'userName') . ' ' . $avatar->getString(0, 'userFirstname');*/
+    public static function GetCurrentUserFullName()
+    {
+        return Auth::user()->fullname;
     }
 
     public static function getInstalledPlugin()

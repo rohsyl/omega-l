@@ -52,6 +52,7 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
 
+            Route::get('user/profile/{id?}', 'UserController@profile')->name('profile');
 
         });
     });

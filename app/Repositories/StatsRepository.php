@@ -4,7 +4,7 @@ namespace Omega\Repositories;
 use Omega\Page;
 use Omega\User;
 
-class StatsRepositories{
+class StatsRepository{
 
     private $user;
     private $page;
