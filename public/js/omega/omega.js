@@ -1,6 +1,6 @@
 // require jQuery
 function Omega(abspath){
-    this.abspath = abspath;
+    this.abspath = abspath + '/';
     this.html = new OmegaHtml(this);
     this.ajax = new OmegaAjax(this);
     this.modal = new OmegaModal(this);

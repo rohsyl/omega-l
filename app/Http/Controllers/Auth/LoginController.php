@@ -1,5 +1,4 @@
 <?php
-
 namespace Omega\Http\Controllers\Auth;
 
 use Omega\Http\Controllers\Controller;

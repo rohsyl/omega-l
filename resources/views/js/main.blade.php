@@ -1,0 +1,1 @@
+var omega = new Omega('{{ route('admin.home') }}');

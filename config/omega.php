@@ -44,5 +44,16 @@ return [
             'customSignup' => '',
             'customProfileInfo' => ''
         ]
-    ]
+    ],
+
+    'media' => [
+        'icons' => [
+            'folder_icon_class' => 'glyphicon glyphicon-folder-open',
+            'video_icon_class' => 'glyphicon glyphicon-facetime-video',
+            'picture_icon_class' => 'glyphicon glyphicon-picture',
+            'file_icon_class' => 'glyphicon glyphicon-file',
+            'music_icon_class' => 'glyphicon glyphicon-headphones',
+            'videoext_icon_class' => 'glyphicon glyphicon-play',
+        ],
+    ],
 ];

@@ -48,7 +48,23 @@ Route::middleware('om_not_installed')->group(function(){
         Route::prefix('admin')->group(function(){
             Route::get('/', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
-            Route::get('settings', 'SettingsController@index')->name('admin.settings');
+
+            Route::get('settings/general', 'SettingsController@index')->name('admin.settings');
+            Route::get('settings/flang', 'SettingsController@flang')->name('admin.settings.flang');
+            Route::get('settings/flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
+            Route::get('settings/seo', 'SettingsController@seo')->name('admin.settings.seo');
+            Route::get('settings/smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
+            Route::get('settings/member', 'SettingsController@member')->name('admin.settings.member');
+            Route::get('settings/advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
+            Route::post('settings/general', 'SettingsController@saveGeneral')->name('admin.settings.general.save');
+            Route::post('settings/flang', 'SettingsController@saveFlang')->name('admin.settings.flang.save');
+            Route::post('settings/seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
+            Route::post('settings/smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
+            Route::post('settings/member', 'SettingsController@saveMember')->name('admin.settings.member.save');
+            Route::post('settings/advanced', 'SettingsController@saveAdvanced')->name('admin.settings.advanced.save');
+
+            Route::get('js/loadmain', 'JsController@loadmain')->name('js.loadmain');
+
             Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
 

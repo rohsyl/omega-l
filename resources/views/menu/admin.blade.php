@@ -18,15 +18,16 @@
             <li class="dropdown">
 
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <img src="{{ asset('i18n/flags/fr.png') }}" title="" />&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
+                    <img src="{{ \Omega\Utils\Language\BackLangManager::getSessionLang()->getFlag() }}" title="" />&nbsp;&nbsp;<i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu lang">
-
+                    @foreach(\Omega\Utils\Language\BackLangManager::getAllLang() as $l)
                     <li>
                         <a href="#">
-                            <img src="{{ asset('i18n/flags/fr.png') }}" title="fr" />&nbsp;&nbsp;Francais
+                            <img src="{{ $l->getFlag() }}" title="{{ $l->getName() }}" />&nbsp;&nbsp;{{ $l->getName() }}
                         </a>
                     </li>
+                    @endforeach
                 </ul>
             </li>
             <li class="dropdown">
