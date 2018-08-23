@@ -69,6 +69,7 @@
 
                 {!! add_action(route('admin.dashboard'), 'glyphicon glyphicon-th', __('Dashboard')) !!}
                 {!! add_action(route('admin.settings'), 'glyphicon glyphicon-cog',  __('Settings')) !!}
+                {!! add_action(route('admin.pages'), 'fa fa-file-text',  __('Pages')) !!}
 
             </ul>
         </div>

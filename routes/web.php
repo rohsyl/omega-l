@@ -50,26 +50,40 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
 
             Route::get('settings/general', 'SettingsController@index')->name('admin.settings');
-            Route::get('settings/flang', 'SettingsController@flang')->name('admin.settings.flang');
-            Route::get('settings/flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
-            Route::get('settings/seo', 'SettingsController@seo')->name('admin.settings.seo');
-            Route::get('settings/smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
-            Route::get('settings/member', 'SettingsController@member')->name('admin.settings.member');
-            Route::get('settings/advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
             Route::post('settings/general', 'SettingsController@saveGeneral')->name('admin.settings.general.save');
+
+            Route::get('settings/flang', 'SettingsController@flang')->name('admin.settings.flang');
             Route::post('settings/flang', 'SettingsController@saveFlang')->name('admin.settings.flang.save');
+            Route::get('settings/flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
+            Route::get('settings/langfadd', 'SettingsController@langfadd')->name('admin.settings.flang.langfadd');
+            Route::post('settings/langfadded', 'SettingsController@langfadded')->name('admin.settings.flang.langfadded');
+            Route::get('settings/langfedit', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
+            Route::post('settings/langfedited', 'SettingsController@langfedited')->name('admin.settings.flang.langfedited');
+
+            Route::get('settings/seo', 'SettingsController@seo')->name('admin.settings.seo');
             Route::post('settings/seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
+
+            Route::get('settings/smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
             Route::post('settings/smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
+
+            Route::get('settings/member', 'SettingsController@member')->name('admin.settings.member');
             Route::post('settings/member', 'SettingsController@saveMember')->name('admin.settings.member.save');
-            Route::post('settings/advanced', 'SettingsController@saveAdvanced')->name('admin.settings.advanced.save');
+
+            Route::get('settings/advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
+            Route::get('settings/clearcache', 'SettingsController@clearCache')->name('admin.settings.advanced.clearCache');
 
             Route::get('js/loadmain', 'JsController@loadmain')->name('js.loadmain');
+            Route::get('language/loadforjs', 'LanguageController@loadforjs')->name('language.loadforjs');
 
             Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
 
             Route::get('user/profile/{id?}', 'UserController@profile')->name('profile');
 
+            Route::get('pages/getTable', 'PagesController@getTable');
+            Route::get('pages/{lang?}', 'PagesController@index')->name('admin.pages');
+            Route::post('pages/chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
+            Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');
         });
     });
 });

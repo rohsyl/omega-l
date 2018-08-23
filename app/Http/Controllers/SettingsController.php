@@ -3,6 +3,7 @@
 namespace Omega\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Omega\Http\Requests\Settings\FlangSettingsRequest;
 use Omega\Http\Requests\Settings\GeneralSettingsRequest;
 use Omega\Http\Requests\Settings\MemberSettingsRequest;
@@ -153,14 +154,35 @@ class SettingsController extends Controller
         return view('settings.advanced');
     }
 
-    public function saveAdvanced() {
+    public function clearCache(){
+        Artisan::call('cache:clear');
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:cache');
 
+        toast()->success('Cache cleared !');
+        return redirect()->back();
     }
-
 
     public function langftable(){
         return view('settings.flangtable')
             ->with('fallLang', $this->langRepository->all());
+    }
+
+    public function langfadd(){
+        return view('settings.flangadd');
+    }
+
+    public function langfedit(){
+
+    }
+
+    public function langfadded(){
+
+    }
+
+    public function langfedited(){
+
     }
 
 }

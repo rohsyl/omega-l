@@ -68,6 +68,7 @@
     <script src="{{ asset('js/omega/omegaPlugin.js') }}" defer></script>
     <script src="{{ asset('js/omega/omegaPluginMvc.js') }}" defer></script>
 
+    <script src="{{ route('language.loadforjs') }}" defer></script>
     <script src="{{ route('js.loadmain') }}" defer></script>
     @stack('scripts')
 
