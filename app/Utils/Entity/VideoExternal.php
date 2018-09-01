@@ -36,7 +36,7 @@ class VideoExternal
     }
 
     public function readUrl(){
-        $url = $this->path;
+        $url = $this->media->path;
         if($this->is(self::TYPE_YOUTUBE, $url)){
             $queryString = parse_url($url, PHP_URL_QUERY);
             parse_str($queryString, $params);
@@ -101,14 +101,14 @@ class VideoExternal
             $path_parts = pathinfo(parse_url($thumbnail, PHP_URL_PATH));
             $ext = $path_parts['extension'];
 
-            $mediaFolder = Path::Combine(public_path('media'), $this->id);
+            $mediaFolder = Path::Combine(public_path('media'), $this->media->id);
             if(!file_exists($mediaFolder)){
                 Path::MkDir($mediaFolder);
             }
-            $destPath = Path::Combine($mediaFolder, $this->id.'.'.$ext);
+            $destPath = Path::Combine($mediaFolder, $this->media->id.'.'.$ext);
 
             file_put_contents($destPath, file_get_contents($thumbnail));
-            $this->ext = $ext;
+            $this->media->ext = $ext;
         }
 
         $this->media->name = $title;
@@ -124,13 +124,13 @@ class VideoExternal
         $path_parts = pathinfo($sourcePath);
         $ext = $path_parts['extension'];
 
-        $mediaFolder = Path::Combine(public_path('media'), $this->id);
+        $mediaFolder = Path::Combine(public_path('media'), $this->media->id);
 
         if(!file_exists($mediaFolder)){
             Path::MkDir($mediaFolder);
         }
 
-        $destPath = Path::Combine($mediaFolder, $this->id.'.'.$ext);
+        $destPath = Path::Combine($mediaFolder, $this->media->id.'.'.$ext);
 
         $ret = copy($sourcePath, $destPath);
 
@@ -144,6 +144,6 @@ class VideoExternal
     public function getVideoThumbnail(){
         if(!isset($this->ext) && empty($this->ext))
             return null;
-        return Url::CombAndAbs(url('/'), 'media', $this->id, $this->id.'.'.$this->ext);
+        return Url::CombAndAbs(url('/'), 'media', $this->media->id, $this->media->id.'.'.$this->ext);
     }
 }

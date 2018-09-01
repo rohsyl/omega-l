@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Omega\Repositories\MediametaRepository;
 use Omega\Repositories\MediaRepository;
 use Omega\Utils\Interfaces\InterfaceMediaConstant;
+use Omega\Utils\Url;
 
 class Media extends Model implements InterfaceMediaConstant
 {
+
+    protected $table = 'medias';
 
     private static $mediaRepository;
     private static $mediametaRepository;

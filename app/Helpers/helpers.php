@@ -111,3 +111,76 @@ if (!function_exists('class_active_route')) {
         return Route::currentRouteName() == $routeName ? ' class="active"' : '';
     }
 }
+
+if (!function_exists('media_path')) {
+    /**
+     * Get the full path to the public/media directory
+     * @return string The full path
+     */
+    function media_path(){
+        return public_path('media');
+    }
+}
+
+
+
+
+
+if (!function_exists('humanReadableBytes')) {
+    /**
+     * Convert bytes to human readable string
+     * @param $size int The size in bytes
+     * @param string $unit automatic or GB, MB, KB
+     * @return string The human readable string
+     */
+    function humanReadableBytes($size,$unit="") {
+        if( (!$unit && $size >= 1<<30) || $unit == "GB")
+            return number_format($size/(1<<30),2)." GB";
+        if( (!$unit && $size >= 1<<20) || $unit == "MB")
+            return number_format($size/(1<<20),2)." MB";
+        if( (!$unit && $size >= 1<<10) || $unit == "KB")
+            return number_format($size/(1<<10),2)." KB";
+        return number_format($size)." bytes";
+    }
+}
+
+if (!function_exists('getMaximumFileUploadSize')) {
+    /**
+     * Get the maxmimum allowed upload size
+     * @return int In bytes, The size
+     */
+    function getMaximumFileUploadSize()
+    {
+        return min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
+    }
+}
+
+if (!function_exists('convertPHPSizeToBytes')) {
+    /**
+     * This function transforms the php.ini notation for numbers (like '2M') to an integer (2*1024*1024 in this case)
+     * @param $sSize The string size
+     * @return bool|int|string The size in bytes
+     */
+    function convertPHPSizeToBytes($sSize)
+    {
+        if ( is_numeric( $sSize) ) {
+            return $sSize;
+        }
+        $sSuffix = substr($sSize, -1);
+        $iValue = substr($sSize, 0, -1);
+        switch(strtoupper($sSuffix)){
+            case 'P':
+                $iValue *= 1024;
+            case 'T':
+                $iValue *= 1024;
+            case 'G':
+                $iValue *= 1024;
+            case 'M':
+                $iValue *= 1024;
+            case 'K':
+                $iValue *= 1024;
+                break;
+        }
+        return $iValue;
+    }
+}

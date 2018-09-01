@@ -70,7 +70,7 @@
                 {!! add_action(route('admin.dashboard'), 'glyphicon glyphicon-th', __('Dashboard')) !!}
                 {!! add_action(route('admin.settings'), 'glyphicon glyphicon-cog',  __('Settings')) !!}
                 {!! add_action(route('admin.pages'), 'fa fa-file-text',  __('Pages')) !!}
-
+                {!! add_action(route('media.library'), 'glyphicon glyphicon-picture',  __('Media Library')) !!}
             </ul>
         </div>
     </div>

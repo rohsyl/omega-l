@@ -31,7 +31,7 @@ var rsExplorerInstance = 0;
 			text: __('Add folder'),
 			action: function(_this){
 				omega.modal.prompt(__("Create a new folder"), "", "", function(newfolder){
-                    $this._action('addfolder', {
+                    $this._action('mkdir', {
                             parent: $this.parent,
                             newfolder: newfolder
                         },
@@ -69,49 +69,50 @@ var rsExplorerInstance = 0;
 				var $selected = $this.$main.find('.selected');
 				if($selected.length == 1)
 				{
-					var yes = confirm(__('Do you really want to delete this element ?'));
-				    if (yes) {
-				    	$this._action('delete', {
-					        	parent: $this.parent,
-					        	media: {
-									id: $selected.data('id'),
-									type: $selected.data('type')
-								},
-					        	multi: false
-					        },
-					        __("Item succefully deleted"),
-							__("Error while deleting this item")
-				        );
-				    }
+					omega.modal.confirm(__('Do you really want to delete this element ?'), function(yes){
+                        if (yes) {
+                            $this._action('delete', {
+                                    parent: $this.parent,
+                                    media: {
+                                        id: $selected.data('id'),
+                                        type: $selected.data('type')
+                                    },
+                                    multi: 0
+                                },
+                                __("Item succefully deleted"),
+                                __("Error while deleting this item")
+                            );
+                        }
+					});
 				}
 				else if($selected.length > 1)
 				{
-					var yes = confirm(__('Do you really want to delete these elements ?') + ' ('+$selected.length+')');
-					
-				    if (yes) {	
-				    	
-						var files = [];
-						
-						$selected.each(function(i){
-							files.push({
-								id: $(this).data('id'),
-								type: $(this).data('type')
-							});
-						});
-						
-				    	$this._action('delete', {
-					        	parent: $this.parent,
-					        	media: JSON.stringify(files),
-					        	multi: true
-					        },
-                            __('Items succefully deleted') + ' ('+$selected.length+')',
-							__('Error while deleting these items') + ' ('+$selected.length+')'
-				        );
-				    }
+					omega.modal.confirm(__('Do you really want to delete these elements ?') + ' ('+$selected.length+')', function(yes){
+                        if (yes) {
+
+                            var files = [];
+
+                            $selected.each(function(i){
+                                files.push({
+                                    id: $(this).data('id'),
+                                    type: $(this).data('type')
+                                });
+                            });
+
+                            $this._action('delete', {
+                                    parent: $this.parent,
+                                    media: JSON.stringify(files),
+                                    multi: 1
+                                },
+                                __('Items succefully deleted') + ' ('+$selected.length+')',
+                                __('Error while deleting these items') + ' ('+$selected.length+')'
+                            );
+                        }
+					});
 				}
 				else
 				{
-					$.growl({ title: "", message: __("Please select an element") });
+					omega.notice.warning(undefined, __("Please select an element"));
 				}
 			}
 		},
@@ -138,7 +139,7 @@ var rsExplorerInstance = 0;
 				}
                 else
                 {
-                    $.growl({ title: "", message: __("Please select an element") });
+                    omega.notice.warning(undefined, __("Please select an element"));
                 }
 			}
 		},
@@ -264,7 +265,7 @@ var rsExplorerInstance = 0;
     	var divCol4 	= $('<div></div>');
 			
 		actionDiv
-			.attr('class', 'action')
+			.attr('class', 'action rs-action')
 			.attr('id', 'rsexaction'+rsExplorerInstance);
 		
     	$.each(this.actionButton, function(key, value){
@@ -566,7 +567,7 @@ var rsExplorerInstance = 0;
     	$this.$rightPane.empty();
 		$this.$rightPane.css('visibility', 'hidden');
     	$.ajax({
-    		url : omega.mvc.url('media', 'getDirectoryContent'),
+    		url : omega.mvc.url('media', 'dc'),
 	        type: 'POST',
 	        dataType: 'json',
 	        data: { parent: $this.parent }
@@ -624,9 +625,9 @@ var rsExplorerInstance = 0;
 	        data: _data
     	}).done(function(){
     		$this._load();
-    		$.growl.notice({ title: "", message: _successMessage });
+            omega.notice.success(undefined, _successMessage);
     	}).fail(function(){
-    		$.growl.error({ title: "", message: _errorMessage });
+            omega.notice.error(undefined, _errorMessage);
     	});
     },
     
@@ -658,7 +659,7 @@ var rsExplorerInstance = 0;
     _uploader: function() {
     	var $this = this;
 		var url = this.settings.uploaderUrl;
-		omega.ajax.query(url, { parent : $this.parent }, 'GET', function(html){
+		omega.ajax.query(url, { parent : $this.parent, isModal: 1 }, 'GET', function(html){
 			omega.modal.open(__('Upload'), html, undefined, undefined, 'modal-lg');
 			omega.modal.onHide(function(){
 				$this._load();
@@ -692,7 +693,7 @@ var rsExplorerInstance = 0;
 		}
 		else
 		{
-			$.growl({ title: "", message: __("Nothing in clipboard") });
+            omega.notice.warning(undefined, __("Nothing in clipboard"));
 		}
     }
   };

@@ -2,7 +2,10 @@
 //				OM_PAGE > ADD, EDIT
 //-------------------------------------------------------------------------------------
 $(function(){
-	
+
+    /**
+	 * Pass the csrf token to each ajax query
+     */
 
 	$('.btn-tooltip').tooltip({
         placement: 'bottom'

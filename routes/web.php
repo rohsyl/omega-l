@@ -84,6 +84,16 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('pages/{lang?}', 'PagesController@index')->name('admin.pages');
             Route::post('pages/chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
             Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');
+
+            Route::get('media/library', 'MediasController@library')->name('media.library');
+            Route::get('media/uploader', 'MediasController@uploader')->name('media.uploader');
+            Route::post('media/uploadhandler', 'MediasController@uploadHandler')->name('media.uploadhandler');
+            Route::post('media/dc', 'MediasController@getDirectoryContent')->name('media.dc');
+            Route::post('media/mkdir', 'MediasController@addfolder')->name('media.mkdir');
+            Route::post('media/delete', 'MediasController@delete')->name('media.delete');
+            Route::post('media/rn', 'MediasController@rn')->name('media.rn');
+            Route::post('media/mkvideo', 'MediasController@mkvideo')->name('media.mkvideo');
+            Route::post('media/copyormove', 'MediasController@copyormove')->name('media.copyormove');
         });
     });
 });

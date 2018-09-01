@@ -64,6 +64,15 @@ return [
             'url' => env('AWS_URL'),
         ],
 
+        /**
+         * media disks to store all OmegaCMS media
+         */
+        'media' => [
+            'driver' => 'local',
+            'root' => public_path('media'),
+            'visibility' => 'public',
+        ],
+
     ],
 
 ];

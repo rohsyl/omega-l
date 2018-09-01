@@ -100,6 +100,25 @@ class Path{
 	        return false;
     }
 
+    public static function RRmdir($dir)
+    {
+
+        $dir_content = scandir($dir);
+        if ($dir_content !== false) {
+            foreach ($dir_content as $entry) {
+                if (!in_array($entry, array('.', '..'))) {
+                    $entry = $dir . '/' . $entry;
+                    if (!is_dir($entry)) {
+                        unlink($entry);
+                    } else {
+                        self::RRmdir($entry);
+                    }
+                }
+            }
+        }
+        return rmdir($dir);
+    }
+
     public static function GetFiles($pathToFolder)
     {
         if ($handle = opendir($pathToFolder)) {

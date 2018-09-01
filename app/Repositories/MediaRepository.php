@@ -1,6 +1,7 @@
 <?php
 namespace Omega\Repositories;
 
+use Illuminate\Http\UploadedFile;
 use Omega\Lang;
 use Omega\Media;
 use Omega\Utils\Entity\VideoExternal;
@@ -53,7 +54,7 @@ class MediaRepository implements InterfaceMediaConstant {
     /**
      * Get all child medias ordered
      * @param null|int $idParent If null, tank the root child
-     * @return array<Media>
+     * @return Media[]
      */
     public function GetMediasOrdered($idParent = null){
         if(!isset($idParent)){
@@ -170,7 +171,7 @@ class MediaRepository implements InterfaceMediaConstant {
     public function GetRealpath($media)
     {
         $fn = basename($media->path);
-        $p = Path::Combine(base_path(), 'media', $media->id);
+        $p = Path::Combine(media_path(), $media->id);
         $fp = Path::Combine($p, $fn);
         return $fp;
     }
@@ -196,17 +197,16 @@ class MediaRepository implements InterfaceMediaConstant {
      * @param $success bool True if success
      * @return null|Media
      */
-    public function UploadMedia(&$FILES, $parent = null, &$success)
+    public function UploadMedia(UploadedFile &$FILE, $parent = null, &$success)
     {
         $success = true;
 
-        $path_parts = pathinfo($FILES["file"]["name"]);
-        $name = str_slug($path_parts['filename']);
-        $ext  = strtolower($path_parts['extension']);
+        $name = pathinfo($FILE->getClientOriginalName(), PATHINFO_FILENAME);
+        $ext = strtolower(pathinfo($FILE->getClientOriginalName(), PATHINFO_EXTENSION));
 
         $media = self::CreateMedia($name, $ext, $parent);
 
-        $path = Path::Combine(public_path('media'), $media->id);
+        $path = Path::Combine(media_path(), $media->id);
 
         $filename = $name . '.' . $ext;
 
@@ -218,19 +218,12 @@ class MediaRepository implements InterfaceMediaConstant {
             return null;
         }
 
-        $fullPath = Path::Combine($path, $filename);
         $webPath = Url::Combine('media', $media->id, $filename);
 
         $media->path = $webPath;
-
         $this->Save($media);
 
-        $success = move_uploaded_file($_FILES["file"]["tmp_name"], $fullPath);
-
-        if(!$success) {
-            $this->Delete($media->id);
-            return null;
-        }
+        $FILE->move($path, $filename);
 
         return $media;
 
@@ -308,7 +301,12 @@ class MediaRepository implements InterfaceMediaConstant {
     public function RenameMedia($mediaId, $newName){
         $media = $this->GetMedia($mediaId);
 
-        $newName = str_slug($newName);
+        $newName = strip_tags($newName);
+
+        if($media->getType() != self::T_FOLDER){
+            $newName = str_slug($newName);
+        }
+
         $oldName = $media->name;
 
         $media->name = $newName;
@@ -319,9 +317,9 @@ class MediaRepository implements InterfaceMediaConstant {
 
         if($media->type == self::MEDIA)
         {
-            $old = Path::Combine(public_path(), 'media', $media->id, $oldName .'.'. $media->ext);
+            $old = Path::Combine(media_path(), $media->id, $oldName .'.'. $media->ext);
 
-            $new = Path::Combine(public_path(), 'media', $media->id, $newName .'.'. $media->ext);
+            $new = Path::Combine(media_path(), $media->id, $newName .'.'. $media->ext);
             $result = rename($old, $new);
             if(!$result) return false;
         }
@@ -470,8 +468,8 @@ class MediaRepository implements InterfaceMediaConstant {
                 $newMedia->path = Url::Combine('media', $newMedia->id, $fileName);
                 $this->Save($newMedia);
 
-                $oldPath = Path::Combine(public_path(), 'media', $media->id);
-                $newPath = Path::Combine(public_path(), 'media', $newMedia->id);
+                $oldPath = Path::Combine(media_path(), $media->id);
+                $newPath = Path::Combine(media_path(), $newMedia->id);
 
                 if(!file_exists($newPath))
                     mkdir($newPath);
@@ -479,10 +477,33 @@ class MediaRepository implements InterfaceMediaConstant {
                 $source = Path::Combine($oldPath, $fileName);
                 $destin = Path::Combine($newPath, $fileName);
 
-                copy($source, $destin);
+                $result = copy($source, $destin);
+            }
+            else if($media->type == self::EXTERNAL_VIDEO){
+
+                $newVideo = $this->CreateVideoInDb($media->path, $newParent);
+                $newVideo->name = $media->name;
+                $newVideo->ext = $media->ext;
+                $this->Save($newVideo);
+
+                $fileNameSrc = $media->id . '.' . $media->ext;
+                $fileNameDst = $newVideo->id . '.' . $newVideo->ext;
+
+                $oldPath = Path::Combine(media_path(), $media->id);
+                $newPath = Path::Combine(media_path(), $newVideo->id);
+
+
+                if(!file_exists($newPath))
+                    mkdir($newPath);
+
+
+                $source = Path::Combine($oldPath, $fileNameSrc);
+                $destin = Path::Combine($newPath, $fileNameDst);
+
+                $result = copy($source, $destin);
             }
         }
-        return true;
+        return $result;
     }
     #endregion
 }

@@ -17,10 +17,12 @@ class CreateMediasTable extends Migration
             $table->increments('id');
             $table->string('type');
             $table->string('name');
-            $table->string('ext');
-            $table->string('path');
-            $table->string('title');
-            $table->text('description');
+            $table->string('ext')->nullable();
+            $table->string('path')->nullable();
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+
+            $table->timestamps();
 
             $table->integer('fkParent')->unsigned()->nullable();
 
