@@ -13,7 +13,7 @@ class CreateModuleareasTable extends Migration
      */
     public function up()
     {
-        Schema::create('moduleareas', function (Blueprint $table) {
+        Schema::create('module_areas', function (Blueprint $table) {
 
             $table->increments('id');
             $table->string('name')->unique();

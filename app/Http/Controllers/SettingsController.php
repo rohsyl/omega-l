@@ -52,7 +52,7 @@ class SettingsController extends Controller
         return view('settings.flang')
             ->with('defaultFrontLanguage', om_config('om_default_front_langauge'))
             ->with('enableFrontLanguage', om_config('om_enable_front_langauge'))
-            ->with('fallLang', $this->langRepository->allEnabledForSelect())
+            ->with('fallLang', to_select($this->langRepository->allEnabled(), 'name', 'slug'))
             ->with('langftable', '');
     }
 

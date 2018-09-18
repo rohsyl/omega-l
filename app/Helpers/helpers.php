@@ -184,3 +184,57 @@ if (!function_exists('convertPHPSizeToBytes')) {
         return $iValue;
     }
 }
+
+if(!function_exists('to_select')) {
+    /**
+     * Convert a collection of object to a key/value array
+     * @param $collection array The collection
+     * @param string $keyValue The name of the property value
+     * @param string $keyKey The name of the property key
+     * @return array The key value array
+     */
+    function to_select($collection, $keyValue = 'title', $keyKey = 'id', $append = []){
+        $l = [];
+        foreach($collection as $item){
+            $l[strval($item->{$keyKey})] = $item->{$keyValue};
+        }
+        return $append + $l;
+    }
+}
+
+
+if(!function_exists('unique_slug')) {
+    /**
+     * Generate a slug and ensure it is unique in the database
+     * @param $model object
+     * @param $input string
+     * @param string $key The key
+     * @return string The slug
+     */
+    function unique_slug($model, $input, $key = 'slug' ){
+        $i = null;
+        $slug = str_slug($input);
+        while($model->where($key, $slug.$i)->exists()){
+            if(!isset($i))
+                $i = 1;
+            else
+                $i++;
+        }
+        return $slug.$i;
+    }
+}
+
+
+if(!function_exists('clean_text')) {
+    /**
+     * Create a user friendly text from a slug
+     * @param $text
+     * @return mixed|null|string|string[]
+     */
+    function clean_text($text){
+        $text = preg_replace('/\.[^.]+$/','',$text);	//Remove extention
+        $text = str_replace("_", " ", $text);
+        $text = ucfirst($text);
+        return $text;
+    }
+}

@@ -20,8 +20,8 @@ class CreateMembersTable extends Migration
             $table->string('password');
             $table->string('validationHash')->nullable();
             $table->string('lostPasswordHash')->nullable();
-            $table->boolean('isValid');
-            $table->boolean('isEnabled');
+            $table->boolean('isValid')->default(false);
+            $table->boolean('isEnabled')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

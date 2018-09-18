@@ -17,7 +17,8 @@ class CreateMediametasTable extends Migration
             $table->increments('id');
             $table->string('lang', 2);
             $table->string('title');
-            $table->text('description');
+            $table->text('description')->nullable();
+            $table->timestamps();
 
             $table->integer('fkMedia')->unsigned();
             $table->foreign('fkMedia')

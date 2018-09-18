@@ -21,8 +21,4 @@ class LangRepository{
         return $this->lang->where('isEnabled', true)->get();
     }
 
-
-    public function allEnabledForSelect(){
-        return $this->lang->where('isEnabled', true)->pluck('name', 'id');
-    }
 }

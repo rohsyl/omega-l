@@ -17,7 +17,7 @@ class CreateLangsTable extends Migration
             $table->increments('id');
             $table->string('slug', 2)->unique();
             $table->string('name');
-            $table->boolean('isEnabled');
+            $table->boolean('isEnabled')->default(true);
 
             $table->integer('fkMediaFlag')->unsigned()->nullable();
 

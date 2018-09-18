@@ -1,10 +1,10 @@
 <?php
 
-namespace Omega\Http\Requests\Settings;
+namespace Omega\Http\Requests\Page;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FlangSettingsRequest extends FormRequest
+class CreatePageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,9 @@ class FlangSettingsRequest extends FormRequest
     public function rules()
     {
         return [
-            'flang_enable' => 'required|boolean',
-            'flang_default' => 'required|exists:langs,slug'
+            'name' => 'required|string',
+            'lang' => 'nullable|string|in:langs,slug',
+            'parent' => 'nullable',
         ];
     }
 }

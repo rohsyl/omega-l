@@ -54,94 +54,77 @@ $dateFormat 		= 'd/m/Y H:i:s';
     </tr>
 
     @else
-        {{--
-    <?php foreach($pages as $page) : ?>
+        @foreach($pages as $page)
+            <tr class="row-page" data-idPage="{{ $page->id }}" data-title="{{ $page->name }}">
 
-    <tr class="row-page" data-idPage="<?php echo $page->id ?>" data-title="<?php echo $page->pageName ?>">
-        <td><a href="<?php echo Url::Action('page', 'edit', array('id' => $page->id)) ?>"><?php echo $page->pageName ?></a></td>
-        <td><?php echo $page->owner->userLogin ?></td>
-        <td><?php echo date($dateFormat, strtotime($page->pageDateUpdated)) ?></td>
-        <td><?php echo Util::toTextClean($page->pageModel) ?></td>
+                <td><a href="{{ route('admin.pages.edit', ['id' => $page->id]) }}">{{ $page->name }}</a></td>
+                <td>{{ $page->owner->username }}</td>
+                <td>{{ $page->updated_at }}</td>
+                <td>{{ isset($page->model) ? $page->model : __('Default') }}</td>
 
-        <?php if($enabledLang): ?>
-        <td>
-            <?php
-            $pageLang = $page->pageLang;
-            if(isset($pageLang)) {
-                $lang = new Lang($pageLang);
-                echo $lang->name;
-            }
-            else{
-                __('Any');
-            }
-            ?>
-        </td>
-        <?php endif ?>
+                @if($enabledLang)
+                    <td>{{ isset($page->lang) ? $page->lang : __('Any')}}</td>
+                @endif
 
-        <td>
-				<span class="action-img-page-list">
-					<a  href="<?php echo Url::Action('page', 'edit', array('id' => $page->id)) ?>"
-                        title="<?php Library\__('Edit') ?>"><?php Library\__('Edit') ?></a>
-					|
-					<a  href="<?php echo Url::Action('page', 'delete', array('id' => $page->id)) ?>"
-                        title="<?php echo $lTitleLinkDelete ?>"
-                        data-url="<?php echo Url::Action('page', 'delete', array('id' => $page->id, 'confirmed' => true)) ?>"
-                        class="delete text-danger"><?php echo $lTitleLinkDelete ?></a>
-					|
-                    <?php if($page->pageIsEnabled == true) { ?>
-                    <a href="<?php echo Url::Action('page', 'disable', array('id' => $page->id)) ?>" title="<?php echo $lTitleLinkDisable ?>"><?php Library\__('Disable') ?></a>
-                    <?php } else { ?>
-                    <a href="<?php echo Url::Action('page', 'enable', array('id' => $page->id)) ?>" title="<?php echo $lTitleLinkEnable ?>"><?php Library\__('Enable') ?></a>
-                    <?php } ?>
+                <td>
+                    <span class="action-img-page-list">
+                        <a  href="{{ route('admin.pages.edit', ['id' => $page->id]) }}"
+                            title="{{ __('Edit') }}">{{ __('Edit') }}</a>
+                        |
+                        <a  href="{{ route('admin.pages.delete', ['id' => $page->id]) }}"
+                            title="{{ __('Delete') }}"
+                            data-url="{{ route('admin.pages.delete', ['id' => $page->id, 'confirmed' => true]) }}"
+                            class="delete text-danger">{{ __('Delete') }}</a>
+                        |
+                        @if($page->isEnabled)
+                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => false]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
+                        @else
+                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => true]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
+                        @endif
 
-				</span>
-        </td>
-    </tr>
-    <?php if($page->children != null && sizeof($page->children) > 0) : ?>
-    <?php foreach($page->children as $child) : ?>
-    <tr>
-        <td><i class="fa fa-minus"></i> <a href="<?php echo Url::Action('page', 'edit', array('id' => $child->id)) ?>"><?php echo $child->pageName ?></a></td>
-        <td><?php echo $child->owner->userLogin ?></td>
-        <td><?php echo date($dateFormat, strtotime($child->pageDateUpdated)) ?></td>
-        <td><?php echo Library\clean_text($child->pageModel) ?></td>
+                    </span>
+                </td>
 
-        <?php if($enabledLang): ?>
-        <td>
-            <?php
-            $pageLang = $child->pageLang;
-            if(isset($pageLang)) {
-                $lang = new Lang($pageLang);
-                echo $lang->name;
-            }
-            else{
-                __('Any');
-            }
-            ?>
-        </td>
-        <?php endif ?>
+            </tr>
 
-        <td>
-						<span class="action-img-page-list">
-							<a  href="<?php echo Url::Action('page', 'edit', array('id' => $child->id)) ?>"
-                                title="<?php Library\__('Edit'); ?>"><?php Library\__('Edit'); ?></a>
-							|
-							<a  href="<?php echo Url::Action('page', 'delete', array('id' => $child->id)) ?>"
-                                title="<?php echo $lTitleLinkDelete ?>"
-                                data-url="<?php echo Url::Action('page', 'delete', array('id' => $child->id, 'confirmed' => true)) ?>"
-                                class="delete text-danger"><?php echo $lTitleLinkDelete ?></a>
-							|
-                            <?php if($child->pageIsEnabled == true) : ?>
-                            <a href="<?php echo Url::Action('page', 'disable', array('id' => $child->id)) ?>" title="<?php echo $lTitleLinkDisable ?>"><?php Library\__('Disable') ?></a>
-                            <?php else : ?>
-                            <a href="<?php echo Url::Action('page', 'enable', array('id' => $child->id)) ?>" title="<?php echo $lTitleLinkEnable ?>"><?php Library\__('Enable') ?></a>
-                            <?php endif; ?>
-						</span>
-        </td>
-    </tr>
-    <?php endforeach; ?>
-    <?php endif; ?>
-    <?php endforeach; ?>
+            @if (sizeof($page->children) > 0)
+                @foreach($page->children as $child)
+                    <tr>
 
-    --}}
+                        <td><i class="fa fa-minus"></i> <a href="{{ route('admin.pages.edit', ['id' => $child->id]) }}">{{ $child->name }}</a></td>
+                        <td>{{ $child->owner->username }}</td>
+                        <td>{{ $child->updated_at }}</td>
+                        <td>{{ isset($child->model) ? $child->model : __('Default') }}</td>
+
+                        @if($enabledLang)
+                            <td>{{ isset($child->lang) ? $child->lang : __('Any')}}</td>
+                        @endif
+
+                        <td>
+                    <span class="action-img-page-list">
+                        <a  href="{{ route('admin.pages.edit', ['id' => $child->id]) }}"
+                            title="{{ __('Edit') }}">{{ __('Edit') }}</a>
+                        |
+                        <a  href="{{ route('admin.pages.delete', ['id' => $child->id]) }}"
+                            title="{{ __('Delete') }}"
+                            data-url="{{ route('admin.pages.delete', ['id' => $child->id, 'confirmed' => true]) }}"
+                            class="delete text-danger">{{ __('Delete') }}</a>
+                        |
+                        @if($child->isEnabled)
+                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => false]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
+                        @else
+                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => true]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
+                        @endif
+
+                    </span>
+                        </td>
+
+                    </tr>
+                @endforeach
+            @endif
+
+
+        @endforeach
+
     @endif
 </table>

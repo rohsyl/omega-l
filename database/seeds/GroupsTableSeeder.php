@@ -30,7 +30,6 @@ class GroupsTableSeeder extends Seeder
                 'name' => $group[1],
                 'description' => $group[2],
                 'isEnabled' => true,
-                'isDeleted' => false,
                 'isSystem' => true
             ]);
         }

@@ -235,7 +235,7 @@ var rsExplorerInstance = 0;
 			iconType: 'fa',
 			text: __('Paste'),
 			action: function(_this){
-				$('#rsexaction').find('a').css('background-color', 'transparent');
+				$('#rsexaction'+rsExplorerInstance).find('a').css('background-color', 'transparent');
 				$this._finalizedCopingOrMoving($this.parent);
 			}
 		}

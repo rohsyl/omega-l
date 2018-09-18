@@ -16,10 +16,11 @@ class CreateThemesTable extends Migration
         Schema::create('themes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('title');
-            $table->text('description');
-            $table->string('website');
-            $table->longText('color');
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->string('website')->nullable();
+            $table->longText('color')->nullable();
+            $table->timestamps();
             //
         });
     }

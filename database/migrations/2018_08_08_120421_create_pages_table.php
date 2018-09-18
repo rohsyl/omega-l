@@ -17,19 +17,21 @@ class CreatePagesTable extends Migration
             $table->increments('id');
             $table->string('slug')->unique();
             $table->string('name');
-            $table->string('subtitle');
-            $table->boolean('showName');
-            $table->boolean('showSubtitle');
-            $table->text('keyWords');
-            $table->string('model');
-            $table->string('cssTheme');
-            $table->integer('order');
-            $table->boolean('isEnabled');
-            $table->string('lang', 2);
+            $table->string('subtitle')->nullable();
+            $table->boolean('showName')->default(true);
+            $table->boolean('showSubtitle')->default(true);
+            $table->text('keyWords')->nullable();
+            $table->string('model')->nullable();
+            $table->string('cssTheme')->nullable();
+            $table->integer('order')->default(0);
+            $table->boolean('isEnabled')->default(true);
+            $table->string('lang', 2)->nullable();
 
-            $table->integer('fkPageParent')->unsigned();
+            $table->integer('fkPageParent')->unsigned()->nullable();
             $table->integer('fkUser')->unsigned()->nullable();
             $table->integer('fkMenu')->unsigned()->nullable();
+
+            $table->timestamps();
 
             $table->foreign('fkPageParent')
                 ->references('id')->on('pages')

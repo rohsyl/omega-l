@@ -81,9 +81,16 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('user/profile/{id?}', 'UserController@profile')->name('profile');
 
             Route::get('pages/getTable', 'PagesController@getTable');
+            Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');
+            Route::get('pages/getPagesLevelZeroBylang', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
+            Route::get('pages/moduleareaList/{pageId}', 'PagesController@moduleareaList')->name('admin.pages.moduleareaList');
+            Route::post('pages/create', 'PagesController@create')->name('admin.pages.create');
+            Route::get('pages/edit/{id}', 'PagesController@edit')->name('admin.pages.edit');
+            Route::get('pages/delete/{id}/{confirmed?}', 'PagesController@delete')->name('admin.pages.delete');
+            Route::get('pages/enable/{id}/{enable}', 'PagesController@enable')->name('admin.pages.enable');
+
             Route::get('pages/{lang?}', 'PagesController@index')->name('admin.pages');
             Route::post('pages/chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
-            Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');
 
             Route::get('media/library', 'MediasController@library')->name('media.library');
             Route::get('media/uploader', 'MediasController@uploader')->name('media.uploader');

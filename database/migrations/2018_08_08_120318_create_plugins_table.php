@@ -16,7 +16,8 @@ class CreatePluginsTable extends Migration
         Schema::create('plugins', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->boolean('isEnabled');
+            $table->boolean('isEnabled')->default(true);
+            $table->timestamps();
         });
     }
 

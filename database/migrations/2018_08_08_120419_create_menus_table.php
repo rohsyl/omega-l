@@ -16,14 +16,15 @@ class CreateMenusTable extends Migration
         Schema::create('menus', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->text('description');
-            $table->string('path');
-            $table->longText('json');
-            $table->boolean('isEnabled');
-            $table->boolean('isMain');
-            $table->string('lang', 2);
+            $table->text('description')->nullable();
+            $table->string('path')->nullable();
+            $table->longText('json')->nullable();
+            $table->boolean('isEnabled')->default(true);
+            $table->boolean('isMain')->default(false);
+            $table->string('lang', 2)->nullable();
 
             $table->integer('fkMemberGroup')->unsigned()->nullable();
+            $table->timestamps();
 
             $table->foreign('fkMemberGroup')
                 ->references('id')->on('medias')
