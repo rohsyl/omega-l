@@ -5,9 +5,9 @@
     @if(sizeof($moduleArea->positions) > 0)
 
         <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="module-area" data-areaname="{{ $moduleArea->areaName }}"  data-pageid="{{ $pageId }}">
+                <div class="module-area" data-areaname="{{ $moduleArea->name }}"  data-pageid="{{ $pageId }}">
                 <span class="glyphicon glyphicon-plus"></span>
-                    <h5 class="module-header">{{ clean_text($moduleArea->areaName) }}</h5>
+                    <h5 class="module-header">{{ clean_text($moduleArea->name) }}</h5>
                 <table class="table sortable">
 
                     @foreach ($moduleArea->positions as $position)
@@ -34,8 +34,8 @@
     @else
 
         <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="module-area empty" data-areaname="{{ $moduleArea->areaName }}"  data-pageid="{{ $pageId }}">
-                <h5 class="module-header">{{ clean_text($moduleArea->areaName) }}</h5>
+            <div class="module-area empty" data-areaname="{{ $moduleArea->name }}"  data-pageid="{{ $pageId }}">
+                <h5 class="module-header">{{ clean_text($moduleArea->name) }}</h5>
                 <div class="module-list">
                     <span class="glyphicon glyphicon-plus empty"></span>
                 </div>

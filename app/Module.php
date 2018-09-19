@@ -14,4 +14,8 @@ class Module extends Model
     public function page(){
         return $this->belongsTo('Omega\Page', 'fkPage', 'id');
     }
+
+    public function positions(){
+        return $this->hasMany('Omega\Position', 'fkModule', 'id');
+    }
 }

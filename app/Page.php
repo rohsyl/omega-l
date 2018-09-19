@@ -16,4 +16,8 @@ class Page extends Model
     public function children(){
         return $this->hasMany('Omega\Page', 'fkPageParent', 'id');
     }
+
+    public function modules(){
+        return $this->hasMany('Omega\Module', 'fkPage', 'id');
+    }
 }

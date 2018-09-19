@@ -101,6 +101,9 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('media/rn', 'MediasController@rn')->name('media.rn');
             Route::post('media/mkvideo', 'MediasController@mkvideo')->name('media.mkvideo');
             Route::post('media/copyormove', 'MediasController@copyormove')->name('media.copyormove');
+
+
+            Route::get('plugin', 'PluginController@index')->name('admin.plugins');
         });
     });
 });

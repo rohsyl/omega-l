@@ -2,13 +2,15 @@
 
 namespace Omega\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\CreatePageRequest;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\ModuleAreaRepository;
+use Omega\Repositories\ModuleRepository;
 use Omega\Repositories\PageRepository;
 use Omega\Repositories\PositionRepository;
 use Omega\Repositories\ThemeRepository;
+use Omega\Utils\Plugin\PluginMeta;
+use Omega\Utils\Plugin\Type;
 
 class PagesController extends AdminController
 {
@@ -18,18 +20,21 @@ class PagesController extends AdminController
     private $moduleAreaRepository;
     private $themeRepository;
     private $positionRepository;
+    private $moduleRepository;
 
     public function __construct(LangRepository $langRepository,
                                 PageRepository $pageRepository,
                                 ModuleAreaRepository $moduleAreaRepository,
                                 ThemeRepository $themeRepository,
-                                PositionRepository $positionRepository)
+                                PositionRepository $positionRepository,
+                                ModuleRepository $moduleRepository)
     {
         $this->langRepository = $langRepository;
         $this->pageRepository = $pageRepository;
         $this->moduleAreaRepository = $moduleAreaRepository;
         $this->themeRepository = $themeRepository;
         $this->positionRepository = $positionRepository;
+        $this->moduleRepository = $moduleRepository;
     }
 
     public function index($lang = null){
@@ -214,32 +219,28 @@ class PagesController extends AdminController
         ]);
     }
 
-    public function componentList(){
-        if(ParamUtil::IsValidUrlParamId('id')) {
-            $pageId = $_GET['id'];
-            $cs = ModuleManager::GetAllComponentsByPage($pageId);
+    public function componentList($pageId){
+            $cs = $this->moduleRepository->getAllComponentsByPage($pageId);
             $components = array();
             foreach ($cs as $c) {
-                $pluginName = PluginManager::GetPlugin($c->fkPlugin)->plugName;
-
                 $item['id'] = $c->id;
-                $item['pluginMeta'] = new PluginMeta($pluginName);
+                $item['pluginMeta'] = new PluginMeta($c->plugin->name);
                 $item['html'] = Type::FormRender($c->fkPlugin, $c->id, $pageId);
-                $item['args'] = json_decode($c->moduleParam, true);
+                $item['args'] = json_decode($c->param, true);
                 $components[] = $item;
             }
+            return view('pages.componentlist')->with([
+                'components' => $components
+            ]);
 
-            return $this->view->partialView('page', 'componentList', array('components' => $components));
-        }
     }
 
 
-    public function moduleList(){
-        if(ParamUtil::IsValidUrlParamId('id')) {
-            $pageId = $_GET['id'];
-            $modules = ModuleManager::GetAllModulesByPage($pageId);
-            return $this->view->partialView('page', 'moduleList', array('modules' => $modules));
-        }
+    public function moduleList($pageId){
+        $modules = $this->moduleRepository->getAllModulesByPage($pageId);
+        return view('pages.modulelist')->with([
+            'modules' => $modules
+        ]);
     }
 
 

@@ -8,6 +8,6 @@ class ModuleArea extends Model
 {
 
     public function positions(){
-        $this->hasMany('Omega\Position', 'fkModuleArea', 'id');
+        return $this->hasMany('Omega\Position', 'fkModuleArea', 'id');
     }
 }
