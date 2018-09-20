@@ -1,15 +1,9 @@
 <?php 
 namespace Omega\Utils\Plugin;
 
-use Exception;
-use Omega\Library\BLL\PluginManager;
-use Omega\Library\DTO\Plugin;
-use Omega\Library\Util\Header;
-use Omega\Library\Util\Html;
-use Omega\Library\Util\Path;
-use Omega\Library\Database\Dbs;
-use Omega\Library\Util\Url;
-use Omega\Library\Util\Util;
+use Illuminate\Support\Facades\DB;
+use Omega\Repositories\PluginRepository;
+use Omega\Utils\Path;
 
 class BController {
 
@@ -19,6 +13,8 @@ class BController {
 	protected $meta;
 	public $model;
 
+	private $pluginRepository;
+
 	public $idCurrentComponent = null;
 
 	public function  __construct($name) {
@@ -26,8 +22,9 @@ class BController {
         $this->currentController = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
         $this->html = new Html();
 		$this->name = $name;
-		$this->root = Path::Combine(PLUGINPATH, $name);
+		$this->root = Path::Combine(plugin_path(), $name);
 		$this->meta = new PluginMeta($this->name);
+		$this->pluginRepository = new PluginRepository(new \Omega\Plugin());
 
 		if($this->isInstalled())
 			$this->id = $this->getIdFromDatabase();
@@ -36,7 +33,7 @@ class BController {
 	public static function getClassName($name)
 	{
 	    $nameF = ucfirst($name);
-		return 'Omega\\Plugin\\' . $nameF . '\\BController' . $nameF;
+		return 'OmegaPlugin\\' . $nameF . '\\BController' . $nameF;
 	}
 
 	public function getId(){
@@ -54,20 +51,12 @@ class BController {
 	}
 	
 	public function isInstalled() {
-		$plugin = PluginManager::GetPluginByName($this->name);
+		$plugin = $this->pluginRepository->getByName($this->name);
 		return $plugin != null;
 	}	
 	
 	public function install() {
-		if(!$this->isInstalled()) {
-		    $plugin = new Plugin();
-		    $plugin->plugName = $this->name;
-		    $plugin->plugEnabled = true;
-		    $result = PluginManager::Save($plugin);
-            $this->id = $plugin->id;
-            return $result;
-		}
-		return true;
+	    return true;
 	}
 	
 	public function uninstall() {
@@ -76,68 +65,24 @@ class BController {
 	
 	public function isEnabled() {
 		if($this->isInstalled()) {
-            $plugin = PluginManager::GetPlugin($this->id);
-            return $plugin->plugEnabled;
+            $plugin = $this->pluginRepository->get($this->id);
+            return $plugin->isEnabled;
 		}
 		return false;
 	}
 	
 	public function enable() {
 		if($this->isInstalled()) {
-            $plugin = PluginManager::GetPlugin($this->id);
-            $plugin->plugEnabled = true;
-            return PluginManager::Save($plugin);
+            return $this->pluginRepository->enable($this->id);
 		}
 		return true;
 	}
 	
 	public function disable() {
 		if($this->isInstalled()) {
-            $plugin = PluginManager::GetPlugin($this->id);
-            $plugin->plugEnabled = false;
-            return PluginManager::Save($plugin);
+            return $this->pluginRepository->disable($this->id);
 		}
 		return true;
-	}
-
-	public function partialView( $name, $m = array()) {
-		extract($m);
-		ob_start();
-		$path = Path::Combine($this->root, 'view', 'view-'.$name.'.php');
-		require($path);
-		return ob_get_clean();
-
-	}
-	
-	public function partialSharedPluginView($name, $m = array())
-	{
-		extract($m);
-		$filePath = APPPATH.'/view/plugin/view-'.$name.'.php';
-		//if(file_exists($filePath))
-		//{
-			ob_start();
-			require($filePath);
-			return ob_get_clean();
-		//}
-		// null;
-	}
-	
-	public function json($array) {
-        Header::SetContentType(Header::CONTENT_TYPE_JSON);
-		return json_encode($array);
-	}
-	
-	public static function staticIsInstalled($name) {
-        $plugin = PluginManager::GetPluginByName($name);
-        return $plugin != null;
-	}
-	
-	public static function staticGetAdminLink($name, $action, $param = array()) {
-        $param = array_merge($param, array(
-            'plugin' => $name,
-            'action' => $action
-        ));
-        return Url::Action('plugin', 'run', $param);
 	}
 	
 	protected function getAdminLink($action, $param = array()) {
@@ -150,7 +95,6 @@ class BController {
 	}
 
 	protected function runSql($sqlFileAbsPath) {
-		
 
 		$sql = file($sqlFileAbsPath);
 		
@@ -166,40 +110,18 @@ class BController {
 			try
 			{
 				if (trim($req) != '')
-				    Dbs::exec($req);
+				    DB::statement($req);
 			}
-			catch(Exception $e)
+			catch(\Exception $e)
 			{
 				die('ERROR : '.$req . '<br />'. $e->getMessage());
 			}
 		}
 	}
-	
-	public function view( $m = array() ) {
-        $m = $m == null ? array() : $m;
-		extract($m);
-		if(isset($_GET['action']))
-			$action = $_GET['action'];
-		else 
-			$action = 'display';
-		
-		ob_start();
-			require($this->root.'/view/view-'.$action.'.php');
-		return ob_get_clean();
-	}
 
 	private function getIdFromDatabase() {
-
-        $plugin = PluginManager::GetPluginByName($this->name);
+        $plugin = $this->pluginRepository->getByName($this->name);
         return $plugin->id;
-	}
-
-	public function fieldName($name)
-	{
-		$fn = $this->name;
-		if(isset($this->idCurrentComponent)) $fn .= '_'.$this->idCurrentComponent;
-		$fn .= '_'.$name;
-		return $fn;
 	}
 }
 

@@ -1,0 +1,12 @@
+ {
+        "pluginName" : "portfolio",
+        "pluginTitle" : "Portfolio",
+        "pluginVersion" : "1.0.0",
+        "author" : "Roh Sylvain",
+        "authorMail" : "support@omega-cms.org",
+        "authorWebsite" : "http://omega-cms.org",
+        "description" : "Display a projects list",
+        "options" : {
+                "displayInMenu" : 1
+        }
+} 

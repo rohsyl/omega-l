@@ -1,0 +1,12 @@
+{
+	"pluginName" : "imagealbum",
+	"pluginTitle" : "Images album",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "Images collection",
+	"options" : {
+		"displayInMenu" : 1
+	}
+}

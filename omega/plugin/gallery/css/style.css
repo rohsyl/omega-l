@@ -1,0 +1,43 @@
+.plugin-gallery .links {
+    width: 100%;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* or space-around */
+}
+
+.plugin-gallery .links a {
+    display: inline-block;
+    margin-bottom: 8px;
+    width: calc(25% - 4px);
+}
+.plugin-gallery .links a img {
+    width: 100%;
+}
+
+@media all and (max-width: 786px){
+    .plugin-gallery .links a {
+        display: inline-block;
+        margin-bottom: 8px;
+        width: calc(50% - 4px);
+    }
+}
+
+
+.plugin-gallery .carousel-nav{
+    position: absolute;
+    top: 50%;
+    height: 50px;
+    width : 50px;
+    margin-top: -25px;
+}
+.plugin-gallery .carousel-nav i{
+    color: #fff;
+    text-shadow: 0 0 5px #000;
+}
+.plugin-gallery .carousel-nav.left{
+    left : 10px;
+}
+.plugin-gallery .carousel-nav.right{
+    right : 20px;
+}

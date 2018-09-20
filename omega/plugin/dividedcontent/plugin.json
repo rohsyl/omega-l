@@ -1,0 +1,9 @@
+{
+	"pluginName" : "dividedcontent",
+	"pluginTitle" : "Divided Content",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "Insert components in tabs, column or collapse"
+}

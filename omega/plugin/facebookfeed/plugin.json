@@ -1,0 +1,12 @@
+{
+	"pluginName" : "facebookfeed",
+	"pluginTitle" : "Facebook Feed",
+	"pluginVersion" : "0.0.1",
+	"author" : "Huser Gaétan",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "Display Facebook Feed in module areas",
+	"options" : {
+		"displayInMenu" : 1
+	}
+}

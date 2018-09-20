@@ -22,14 +22,16 @@
     },
     "autoload": {
         "files": [
-            "app/Helpers/helpers.php"
+            "app/Helpers/helpers.php",
+            "app/Helpers/plugins.php"
         ],
         "classmap": [
             "database/seeds",
             "database/factories"
         ],
         "psr-4": {
-            "Omega\\": "app/"
+            "Omega\\": "app/",
+            "OmegaPlugin\\": "omega/plugin/"
         }
     },
     "autoload-dev": {

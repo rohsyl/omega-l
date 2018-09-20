@@ -1,0 +1,242 @@
+/*!
+ * Start Bootstrap - Clean Blog v3.3.7+1 (http://startbootstrap.com/template-overviews/clean-blog)
+ * Copyright 2013-2016 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
+ */
+
+@font-face {
+  font-family: BebasKai;
+  src: url('../fonts/BebasKai-Regular.otf');
+  font-weight:400;
+}
+
+/* #423F3A */
+
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+    font-family: 'BebasKai', 'Times New Roman', serif;
+    font-size: 20px;
+    color: #fff;
+    background-color: #000;
+    height: 100%;
+}
+
+body.with-background{
+    background-image: url('../img/background.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #333;
+}
+p {
+  line-height: 1.5;
+  margin: 30px 0;
+}
+p a {
+  text-decoration: underline;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'BebasKai', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 800;
+}
+a {
+  color: #333333;
+}
+a:hover,
+a:focus {
+  color: #0085A1;
+}
+a img:hover,
+a img:focus {
+  cursor: zoom-in;
+}
+
+::-moz-selection {
+  color: white;
+  text-shadow: none;
+  background: #0085A1;
+}
+::selection {
+  color: white;
+  text-shadow: none;
+  background: #0085A1;
+}
+img::selection {
+  color: white;
+  background: transparent;
+}
+img::-moz-selection {
+  color: white;
+  background: transparent;
+}
+body {
+  -webkit-tap-highlight-color: #0085A1;
+}
+
+body > .container{
+    margin-bottom : 60px;
+}
+
+/* Updated by Sylvain Roh. 2016.10.18 */
+
+.navbar-custom .nav li a:hover{
+    color : #A8D3AF;
+}
+.navbar-custom .nav li ul li a,
+.navbar-custom .nav li ul li a:hover{
+  color: #fff;
+}
+nav .nav .open > a,
+nav .nav .open > a:focus,
+nav .nav .open > a:hover{
+  color: rgba(255,255,255,.8) !important;
+  background-color: transparent !important;;
+}
+.navbar.is-visible .nav .open > a,
+.navbar.is-visible .nav .open > a:focus,
+.navbar.is-visible .nav .open > a:hover{
+  color: #fff !important;
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #fff;
+}
+
+.plugin-sociallogo{
+  display: table;
+  margin: 0 auto;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
+    color: #A8D3AF;
+    background-color: #000000;
+}
+
+
+body.home{
+  background-color: #000;
+  color: #fff;
+}
+body { padding-bottom: 70px; }
+
+.logo{
+    position: relative;
+    top : 0;
+    left : 0;
+    background-image: url('../img/Yvon_Mab_CMYK_carre_white.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    max-width : 500px;
+    max-height: 500px;
+    width: 100%;
+    height: 100%;
+}
+
+.logo-centered {
+    max-width : 500px;
+    max-height: 500px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 0;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, 50%);
+    padding-left : 50px;
+    padding-right : 50px;
+    transition: opacitiy .5s ease-in-out;
+    padding-bottom : 60px;
+}
+
+.logo-title{
+    position: absolute;
+    bottom : 0px;
+    left: 50%;
+    width : 100%;
+    transform: translate(-50%, 0);
+    text-align: center;
+    opacity: 0;
+    color: #fff;
+    -webkit-transition: opacity .5s ease-in-out;
+    -moz-transition: opacity .5s ease-in-out;
+    -ms-transition: opacity .5s ease-in-out;
+    -o-transition: opacity .5s ease-in-out;
+    transition: opacity .5s ease-in-out;
+}
+
+.logo-centered:hover .logo-title{
+    -webkit-transition: opacity .5s ease-in-out;
+    -moz-transition: opacity .5s ease-in-out;
+    -ms-transition: opacity .5s ease-in-out;
+    -o-transition: opacity .5s ease-in-out;
+    transition: opacity .5s ease-in-out;
+    opacity: 1;
+    color: #fff;
+}
+
+@media all and (max-width: 768px) {
+    .logo-centered {
+        margin-top : 50px;
+        transform: translate(-50%, 0);
+    }
+    .navbar-brand{
+        padding-left : 30px;
+    }
+}
+
+.navbar-custom{
+  background-color: #000000;
+    border-color : #2A2C2E;
+}
+.navbar-top{
+  margin-bottom : 60px;
+}
+.navbar>.container-fluid .navbar-brand {
+    margin-left: -30px;
+}
+
+.box{
+    width : 100%;
+    margin-top : 5em;
+    padding : 15px 30px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-bottom : #A8D3AF 2px solid;
+    padding-bottom: 100px;
+}
+
+.box h1{
+    margin-bottom : 2em;
+}
+
+*:first-child > p{
+    margin-top : 0;
+}
+
+.article-description-meta{
+ color : #000;
+}
+.article-back-to {
+    color: #fff !important;
+}
+.article-back-to:hover {
+    color: #ddd !important;
+}
+
+.mabsols-poeple{
+    display : inline-block;
+    padding-top : 15px;
+}
+.navbar-brand-left{
+    padding-right : 0px;
+}

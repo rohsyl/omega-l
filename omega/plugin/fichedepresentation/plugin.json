@@ -1,0 +1,12 @@
+{
+	"pluginName" : "fichedepresentation",
+	"pluginTitle" : "Fiche de présentation",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "Description des fiches de matériel.",
+	"options" : {
+		"displayInMenu" : 1
+	}
+}

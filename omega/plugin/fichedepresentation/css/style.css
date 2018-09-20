@@ -1,0 +1,20 @@
+.fichedepresentation-image {
+    float:left;
+    margin-right: 15px;
+    margin-bottom : 15px;
+    width: 260px;
+    height: 90px;
+}
+.fichedepresentation-dmx-title{
+    font-weight: bold;
+    font-size: 1.8em;
+    border : 1px solid #fff;
+    text-align: center;
+    width: 90px;
+    line-height: 89px;
+    float:left;
+}
+.fichedepresentation-list{
+    height: 800px;
+    overflow-y: scroll;
+}

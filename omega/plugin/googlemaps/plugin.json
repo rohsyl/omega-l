@@ -1,0 +1,12 @@
+{
+	"pluginName" : "googlemaps",
+	"pluginTitle" : "Google Maps",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "https://maps.google.com/",
+	"description" : "Google Maps",
+	"options" : {
+		"displayInMenu" : 1
+	}
+}

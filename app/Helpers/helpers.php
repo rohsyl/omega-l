@@ -4,6 +4,7 @@
  * Some helpers functions usefull for Omega.
  */
 
+define('DS', DIRECTORY_SEPARATOR);
 define('SALT', '*#yolo#$%^&*fr0mage');
 
 // Authorized extensions for upload

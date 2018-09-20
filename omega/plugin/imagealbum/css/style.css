@@ -1,0 +1,51 @@
+.plugin-gallery .links {
+    width: 100%;
+    -webkit-column-count: 3; /* Chrome, Safari, Opera */
+    -moz-column-count: 3; /* Firefox */
+    column-count: 3;
+    -webkit-column-gap: 5px; /* Chrome, Safari, Opera */
+    -moz-column-gap: 5px; /* Firefox */
+    column-gap: 5px;
+}
+
+.plugin-gallery .links a {
+    display: inline-block;
+    /*width: 31%;*/
+    margin-bottom: 5px;
+}
+.plugin-gallery .links a img {
+    width: 100%;
+}
+
+@media all and (max-width: 900px){
+    .plugin-gallery .links {
+        width: 100%;
+        column-count: 2;
+        column-gap: 3%;
+    }
+
+    .plugin-gallery .links a {
+        display: inline-block;
+        width: 47%;
+        margin-bottom: 5px;
+    }
+}
+
+
+.plugin-gallery .carousel-nav{
+    position: absolute;
+    top: 50%;
+    height: 50px;
+    width : 50px;
+    margin-top: -25px;
+}
+.plugin-gallery .carousel-nav i{
+    color: #fff;
+    text-shadow: 0 0 5px #000;
+}
+.plugin-gallery .carousel-nav.left{
+    left : 10px;
+}
+.plugin-gallery .carousel-nav.right{
+    right : 20px;
+}

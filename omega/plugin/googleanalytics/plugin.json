@@ -1,0 +1,12 @@
+{
+	"pluginName" : "googleanalytics",
+	"pluginTitle" : "Google Analytics",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "https://analytics.google.com/",
+	"description" : "Google Analytics in your webpage",
+	"options" : {
+		"displayInMenu" : 1
+	}
+}

@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS alb_image;
+DROP TABLE IF EXISTS alb_album;
+DROP TABLE IF EXISTS alb_section;

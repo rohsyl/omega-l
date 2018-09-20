@@ -1,0 +1,9 @@
+{
+	"pluginName" : "document",
+	"pluginTitle" : "Documents",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "Display a documents list"
+}

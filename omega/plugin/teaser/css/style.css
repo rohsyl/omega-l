@@ -1,0 +1,25 @@
+.teaser{
+
+}
+
+    .teaser .teaser-image{
+        max-width: 100%;
+    }
+
+    .teaser .teaser-text{
+        margin-top : 5px;
+        font-size: 0.8em;
+    }
+
+        .teaser .teaser-text p:empty, .teaser-text p{
+            margin: 0;
+        }
+
+.teaser a:hover{
+    text-transform: none;
+    text-decoration: none;
+    cursor: pointer;
+}
+.teaser a:hover .teaser-image{
+    cursor: pointer;
+}

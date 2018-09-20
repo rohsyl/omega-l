@@ -17,7 +17,7 @@ class PluginMeta {
 	public function __construct($name) {
 		
 		$this->name = $name;
-		$path = Path::Combine(PLUGINPATH, $this->name);
+		$path = Path::Combine(plugin_path(), $this->name);
 		
 		$this->metadata = json_decode(file_get_contents($path.'/plugin.json'), true);
 		

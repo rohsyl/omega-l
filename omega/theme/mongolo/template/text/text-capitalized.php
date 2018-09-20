@@ -1,0 +1,1 @@
+<div class="text-capitalize"><?php echo $text ?></div>

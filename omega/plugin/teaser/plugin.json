@@ -1,0 +1,9 @@
+{
+	"pluginName" : "teaser",
+	"pluginTitle" : "Teaser",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "Teaser with an image and some text"
+}

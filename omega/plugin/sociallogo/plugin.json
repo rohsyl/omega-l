@@ -1,0 +1,12 @@
+{
+	"pluginName" : "sociallogo",
+	"pluginTitle" : "Social Logo",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "Display link to social network",
+	"options" : {
+		"displayInMenu" : 1
+	}
+}

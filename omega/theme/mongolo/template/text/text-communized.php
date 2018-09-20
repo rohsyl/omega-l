@@ -1,0 +1,1 @@
+<div class="" style="color: red"><?php echo $text ?></div>
