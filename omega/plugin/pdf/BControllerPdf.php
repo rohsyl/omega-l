@@ -1,8 +1,8 @@
 <?php
-namespace Omega\Plugin\Pdf;
+namespace OmegaPlugin\Pdf;
 
-use Omega\Library\Plugin\BController;
-use Omega\Library\Util\Redirect;
+
+use Omega\Utils\Plugin\BController;
 
 class BControllerPdf extends  BController {
     public function __construct() {
@@ -10,13 +10,11 @@ class BControllerPdf extends  BController {
     }
 
     public function install() {
-        if (!$this->isInstalled()) {
-            parent::install();
-            parent::runSql($this->root . '/sql/install.sql');
-        }
+        parent::runSql($this->root . '/sql/install.sql');
+        return true;
     }
 
     public function index() {
-        return 'Nothing to do here.';
+        return $this->view('index');
     }
 }

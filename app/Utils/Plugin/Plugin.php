@@ -12,6 +12,7 @@ namespace Omega\Utils\Plugin;
 class Plugin
 {
     public static function Call($name, $action){
+
         $className = BController::getClassName($name);
 
         if(!class_exists($className)){
@@ -25,7 +26,6 @@ class Plugin
         }
 
         return $pluginController->$action();
-
     }
 
 }

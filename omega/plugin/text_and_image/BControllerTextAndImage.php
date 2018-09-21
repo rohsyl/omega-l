@@ -1,13 +1,12 @@
 <?php
-namespace OmegaPlugin\Teaser;
+namespace OmegaPlugin\TextAndImage;
 
 use Omega\Utils\Plugin\BController;
 
-class BControllerTeaser extends  BController {
-
+class BControllerTextAndImage extends  BController {
 
     public function __construct() {
-        parent::__construct('teaser');
+        parent::__construct('text_and_image');
     }
 
     public function install() {

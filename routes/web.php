@@ -106,7 +106,7 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('plugin', 'PluginController@index')->name('admin.plugins');
             Route::get('plugin/install/{name}', 'PluginController@install')->name('admin.plugins.install');
             Route::get('plugin/uninstall/{name}', 'PluginController@uninstall')->name('admin.plugins.uninstall');
-            Route::get('plugin/run/{name}/{action}', 'PluginController@run')->name('admin.plugins.run');
+            Route::any('plugin/run/{name}/{action}', 'PluginController@run')->name('admin.plugins.run');
         });
     });
 });

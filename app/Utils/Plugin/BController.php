@@ -4,6 +4,7 @@ namespace Omega\Utils\Plugin;
 use Illuminate\Support\Facades\DB;
 use Omega\Repositories\PluginRepository;
 use Omega\Utils\Path;
+use Illuminate\Support\Facades\View;
 
 class BController {
 
@@ -115,6 +116,20 @@ class BController {
 			}
 		}
 	}
+
+	protected function view($name){
+        return View::file($this->root . DS . 'view' . DS . $name . '.blade.php')->with([
+            'meta' => $this->getMeta()
+        ]);
+    }
+
+    protected function json($data){
+	    return response()->json($data);
+    }
+
+    protected function redirect($action){
+	    return redirect(route_plugin($this->name, $action));
+    }
 
 	private function getIdFromDatabase() {
         $plugin = $this->pluginRepository->getByName($this->name);

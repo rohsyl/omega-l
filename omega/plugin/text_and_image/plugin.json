@@ -1,6 +1,6 @@
 {
-	"pluginName" : "textandimage",
-	"pluginTitle" : "Text and image",
+	"pluginName" : "text_and_image",
+	"pluginTitle" : "Text and Image",
 	"pluginVersion" : "1.0.0",
 	"author" : "Roh Sylvain",
 	"authorMail" : "support@omega-cms.org",

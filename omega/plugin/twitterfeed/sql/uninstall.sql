@@ -1,1 +1,0 @@
--- Place here sql query that must be executed when uninstalling the plugin

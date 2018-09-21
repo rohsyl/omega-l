@@ -9,13 +9,16 @@ class PluginController extends Controller
 {
     private $pluginRepository;
 
+    /**
+     * Register here all action that can be called with the run method
+     * @var array
+     */
     private $protectedAction = ['install', 'uninstall'];
 
     public function __construct(PluginRepository $pluginRepository){
         $this->pluginRepository = $pluginRepository;
     }
 
-    //
     public function index(){
         return view('plugin.index')->with([
             'installed' => to_meta($this->pluginRepository->getInstalledPlugin()),
@@ -26,28 +29,40 @@ class PluginController extends Controller
     public function install($name){
         $this->pluginRepository->create($name);
 
-        PluginUtils::Call($name, 'install');
+        $result = PluginUtils::Call($name, 'install');
 
-        toast()->success('Plugin ' . $name . ' installed succesfully.');
+        if(!$result){
+            $this->pluginRepository->destroy($name);
+            toast()->error(__('Action not found (Do an "composer dumpautoload")'));
+            return redirect()->route('admin.plugins');
+        }
+
+        toast()->success(__('Plugin installed succesfully.') . ' ' . camelize_plugin($name));
         return redirect()->route('admin.plugins');
     }
 
     public function uninstall($name){
+        PluginUtils::Call($name, 'uninstall');
 
         $this->pluginRepository->destroy($name);
 
-        PluginUtils::Call($name, 'install');
-
-        toast()->success('Plugin ' . $name . ' uninstalled succesfully.');
+        toast()->success(__('Plugin uninstalled succesfully.') . ' ' . camelize_plugin($name));
         return redirect()->route('admin.plugins');
     }
 
 
     public function run($name, $action){
         if(in_array($action, $this->protectedAction)){
-            toast()->error('This action can\'t be called directly...');
+            toast()->error(__('This action can\'t be called directly...'));
             return redirect()->route('admin.plugins');
         }
-        return PluginUtils::Call($name, $action);
+        $response = PluginUtils::Call($name, $action);
+
+        if(!$response){
+            toast()->error(__('Action not found (Do an "composer dumpautoload")'));
+            return redirect()->route('admin.plugins');
+        }
+
+        return $response;
     }
 }

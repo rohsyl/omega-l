@@ -65,8 +65,11 @@ class PluginRepository
         $folders = array();
         while($element = readdir($dir)) {
             if($element != '.' && $element != '..' && 0 !== strpos($element, '__')) {
-                if (is_dir($pluginPath . DS . $element) && file_exists($pluginPath . DS . $element . '/plugin.json'))
-                {$folders[] = strtolower($element);}
+                if (is_dir($pluginPath . DS . $element) && file_exists($pluginPath . DS . $element . '/plugin.json')) {
+                    $name = $element;
+                    if($this->getByName($name) == null)
+                        $folders[] = $element;
+                }
             }
         }
         return $folders;

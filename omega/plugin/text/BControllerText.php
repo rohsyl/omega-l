@@ -1,17 +1,16 @@
 <?php
-namespace OmegaPlugin\Teaser;
+namespace OmegaPlugin\Text;
 
 use Omega\Utils\Plugin\BController;
 
-class BControllerTeaser extends  BController {
-
+class BControllerText extends  BController {
 
     public function __construct() {
-        parent::__construct('teaser');
+        parent::__construct('text');
     }
 
     public function install() {
-        parent::runSql($this->root . '/sql/install.sql');
+        $this->runSql($this->root . '/sql/install.sql');
         return true;
     }
 

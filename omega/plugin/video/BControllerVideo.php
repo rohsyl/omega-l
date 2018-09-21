@@ -1,8 +1,7 @@
 <?php
-namespace Omega\Plugin\Video;
+namespace OmegaPlugin\Video;
 
-use Omega\Library\Plugin\BController;
-use Omega\Library\Util\Redirect;
+use Omega\Utils\Plugin\BController;
 
 class BControllerVideo extends  BController {
 
@@ -12,13 +11,11 @@ class BControllerVideo extends  BController {
     }
 
     public function install() {
-        if (!$this->isInstalled()) {
-            parent::install();
-            parent::runSql($this->root . '/sql/install.sql');
-        }
+        parent::runSql($this->root . '/sql/install.sql');
+        return true;
     }
 
     public function index() {
-        return 'Nothing to do here.';
+        return $this->view('index');
     }
 }

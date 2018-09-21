@@ -19,6 +19,32 @@ class ModuleRepository
         $this->module = $module;
     }
 
+    public function create($fkPlugin, $name, $param = [], $isComponant = false, $isEnabled = true){
+        $module = new Module();
+        $module->name = $name;
+        $module->fkPlugin = $fkPlugin;
+        $module->isEnabled = $isEnabled;
+        $module->param = json_encode($param);
+        $module->order = 0;
+        $module->isComponent = $isComponant;
+        $module->save();
+        return $module;
+    }
+
+    public function saveParam($module, $param){
+        $module->param = json_encode($param);
+        $module->save();
+        return $module;
+    }
+
+    public function destroyByName($name){
+        return $this->module->where('name', $name)->delete();
+    }
+
+    public function getByName($name){
+        return $this->module->where('name', $name)->first();
+    }
+
     public function getAllComponentsByPage($pageId){
         return $this->module->with('position')->where('position.fkPage', $pageId)->where('isComponent', 1)->get();
     }

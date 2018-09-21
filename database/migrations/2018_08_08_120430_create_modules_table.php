@@ -16,7 +16,7 @@ class CreateModulesTable extends Migration
         Schema::create('modules', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
-            $table->string('param');
+            $table->longText('param');
             $table->boolean('isEnabled');
             $table->boolean('isComponent');
             $table->integer('order' );
@@ -24,8 +24,10 @@ class CreateModulesTable extends Migration
             $table->integer('fkPlugin')->unsigned();
             $table->integer('fkPage')->unsigned()->nullable();
 
+            $table->timestamps();
+
             $table->foreign('fkPlugin')
-                ->references('id')->on('pages')
+                ->references('id')->on('plugins')
                 ->onDelete('cascade');
 
             $table->foreign('fkPage')
