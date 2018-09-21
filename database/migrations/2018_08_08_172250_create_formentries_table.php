@@ -19,9 +19,10 @@ class CreateFormentriesTable extends Migration
             $table->string('type');
             $table->longText('param');
             $table->string('title');
+            $table->string('heading')->nullable();
             $table->text('description');
-            $table->boolean('isModule');
-            $table->boolean('isComponent');
+            $table->boolean('mandatory');
+            $table->integer('order')->nullable();
 
             $table->integer('fkForm')->unsigned();
 

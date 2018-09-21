@@ -28,6 +28,10 @@ class PluginRepository
     }
 
     public function create($name){
+        $plugin = $this->getByName($name);
+        if(isset($plugin))
+            return $plugin;
+
         $plugin = new $this->plugin();
         $plugin->name = $name;
         $plugin->isEnabled = true;
@@ -62,7 +66,7 @@ class PluginRepository
         while($element = readdir($dir)) {
             if($element != '.' && $element != '..' && 0 !== strpos($element, '__')) {
                 if (is_dir($pluginPath . DS . $element) && file_exists($pluginPath . DS . $element . '/plugin.json'))
-                {$folders[] = $element;}
+                {$folders[] = strtolower($element);}
             }
         }
         return $folders;

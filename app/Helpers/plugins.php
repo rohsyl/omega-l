@@ -52,3 +52,16 @@ if(!function_exists('route_plugin')){
         return route('admin.plugins.run', array_merge(['name' => $name, 'action' => $action], $param));
     }
 }
+
+
+if(!function_exists('camelize_plugin')){
+    /**
+     * @param $input
+     * @param string $separator
+     * @return mixed
+     */
+    function camelize_plugin($input, $separator = '_')
+    {
+        return str_replace($separator, '', ucwords($input, $separator));
+    }
+}

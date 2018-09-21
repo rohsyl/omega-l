@@ -18,11 +18,9 @@ class BController {
 	public $idCurrentComponent = null;
 
 	public function  __construct($name) {
-        $this->currentAction = isset($_GET['function']) ? $_GET['function'] : 'index';
-        $this->currentController = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-        $this->html = new Html();
+        //$this->html = new Html();
 		$this->name = $name;
-		$this->root = Path::Combine(plugin_path(), $name);
+		$this->root = Path::Combine(plugin_path(), $this->name);
 		$this->meta = new PluginMeta($this->name);
 		$this->pluginRepository = new PluginRepository(new \Omega\Plugin());
 
@@ -32,7 +30,7 @@ class BController {
 
 	public static function getClassName($name)
 	{
-	    $nameF = ucfirst($name);
+	    $nameF = camelize_plugin($name);
 		return 'OmegaPlugin\\' . $nameF . '\\BController' . $nameF;
 	}
 
@@ -40,14 +38,13 @@ class BController {
 	    return $this->id;
     }
 
-	public function getMeta()
-	{
+	public function getMeta() {
 		return $this->meta;
 	}
 	
 	public function includeFile($filePath)
 	{
-		include_once ($this->root.'/'.$filePath);
+		include_once ($this->root . DS . $filePath);
 	}
 	
 	public function isInstalled() {

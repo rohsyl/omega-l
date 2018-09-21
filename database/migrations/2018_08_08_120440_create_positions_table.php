@@ -23,7 +23,7 @@ class CreatePositionsTable extends Migration
             $table->integer('fkPage')->unsigned()->nullable();
 
             $table->foreign('fkModuleArea')
-                ->references('id')->on('moduleareas')
+                ->references('id')->on('module_areas')
                 ->onDelete('cascade');
 
             $table->foreign('fkModule')

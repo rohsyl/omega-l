@@ -28,6 +28,6 @@ class CreateModuleareasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('moduleareas');
+        Schema::dropIfExists('module_areas');
     }
 }

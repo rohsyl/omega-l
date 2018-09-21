@@ -18,7 +18,7 @@ class Plugin
             return false;
         }
 
-        $pluginController = new $className;
+        $pluginController = new $className();
 
         if(!method_exists($pluginController, $action)){
             return false;
