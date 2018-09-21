@@ -1,8 +1,8 @@
 <?php
-namespace Omega\Plugin\Image;
+namespace OmegaPlugin\Image;
 
-use Omega\Library\Plugin\BController;
-use Omega\Library\Util\Redirect;
+
+use Omega\Utils\Plugin\BController;
 
 class BControllerImage extends  BController {
     public function __construct() {
@@ -10,13 +10,11 @@ class BControllerImage extends  BController {
     }
 
     public function install() {
-        if (!$this->isInstalled()) {
-            parent::install();
-            parent::runSql($this->root . '/sql/install.sql');
-        }
+        parent::runSql($this->root . '/sql/install.sql');
+        return true;
     }
 
     public function index() {
-        return 'Nothing to do here.';
+        return $this->meta_view();
     }
 }

@@ -11,19 +11,6 @@
             <th>{{ __('Actions') }}</th>
         </tr>
 
-        @foreach($uninstalled as $meta)
-            <tr class="warning">
-                <td>{{ $meta->getTitle() }}</td>
-                <td>{{ $meta->getAuthor() }}</td>
-                <td>{{ $meta->getVersion() }}</td>
-                <td>{{ $meta->getDescription() }}</td>
-                <td>
-                    <span class="actions">
-                        <a href="{{ route('admin.plugins.install', ['name' => $meta->getName() ]) }}">{{ __('Install') }}</a>
-                    </span>
-                </td>
-            </tr>
-        @endforeach
 
         @foreach($installed as $meta)
         <tr>
@@ -37,6 +24,20 @@
                 </span>
             </td>
         </tr>
+        @endforeach
+
+        @foreach($uninstalled as $meta)
+            <tr class="warning">
+                <td>{{ $meta->getTitle() }}</td>
+                <td>{{ $meta->getAuthor() }}</td>
+                <td>{{ $meta->getVersion() }}</td>
+                <td>{{ $meta->getDescription() }}</td>
+                <td>
+                    <span class="actions">
+                        <a href="{{ route('admin.plugins.install', ['name' => $meta->getName() ]) }}">{{ __('Install') }}</a>
+                    </span>
+                </td>
+            </tr>
         @endforeach
     </table>
 @endsection

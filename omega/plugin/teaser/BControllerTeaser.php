@@ -16,6 +16,6 @@ class BControllerTeaser extends  BController {
     }
 
     public function index() {
-        return $this->view('index');
+        return $this->meta_view();
     }
 }

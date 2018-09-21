@@ -11,7 +11,7 @@ class BController {
 	protected $name;
 	protected $id;
 	protected $root;
-	protected $meta;
+	private $meta;
 	public $model;
 
 	private $pluginRepository;
@@ -119,6 +119,12 @@ class BController {
 
 	protected function view($name){
         return View::file($this->root . DS . 'view' . DS . $name . '.blade.php')->with([
+            'meta' => $this->getMeta()
+        ]);
+    }
+
+    protected function meta_view(){
+	    return view('plugin.meta')->with([
             'meta' => $this->getMeta()
         ]);
     }
