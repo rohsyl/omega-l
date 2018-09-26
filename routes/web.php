@@ -49,7 +49,7 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('/', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
 
-            Route::get('settings/general', 'SettingsController@index')->name('admin.settings');
+            Route::get('settings', 'SettingsController@index')->name('admin.settings');
             Route::post('settings/general', 'SettingsController@saveGeneral')->name('admin.settings.general.save');
 
             Route::get('settings/flang', 'SettingsController@flang')->name('admin.settings.flang');
@@ -79,6 +79,14 @@ Route::middleware('om_not_installed')->group(function(){
 
 
             Route::get('user/profile/{id?}', 'UserController@profile')->name('profile');
+            Route::get('user', 'UserController@index')->name('user.index');
+            Route::get('user/add', 'UserController@add')->name('user.add');
+            Route::post('user/create', 'UserController@create')->name('user.create');
+            Route::get('user/edit/{id}', 'UserController@edit')->name('user.edit');
+            Route::get('user/delete/{id}/{confirm?}', 'UserController@delete')->name('user.delete');
+            Route::get('user/enable/{id}/{enable}', 'UserController@enable')->name('user.enable');
+            Route::get('group', 'GroupController@index')->name('group.index');
+            Route::get('group/add', 'GroupController@add')->name('group.add');
 
             Route::get('pages/getTable', 'PagesController@getTable');
             Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');

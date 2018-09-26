@@ -26,4 +26,13 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+
+    public function rights(){
+        return $this->belongsToMany('Omega\Right', 'userrights', 'fkUser', 'fkRight');
+    }
+
+    public function groups(){
+        return $this->belongsToMany('Omega\Group', 'usergroups', 'fkUser', 'fkGroup');
+    }
 }

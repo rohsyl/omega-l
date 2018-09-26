@@ -3,7 +3,7 @@
 @section('content')
    <h1 class="page-header">{{ __('Profile') }}</h1><br />
    <div class="row">
-       <div class=" col-md-offset-4 col-md-4 col-sm-12">
+       <div class="col-md-4 col-sm-12">
            <div class="well well-sm">
                <div class="row">
                    <div class="col-sm-7">
@@ -22,7 +22,7 @@
                        <br /><br />
                        <p class="text-right">
                            @if($displayUpdateButton)
-                           <a href="" class="btn btn-default" style="margin-right: 15px;">{{ __('Edit the profile') }}</a>
+                           <a href="{{ route('user.edit', ['id' => $user->id]) }}" class="btn btn-default" style="margin-right: 15px;">{{ __('Edit the profile') }}</a>
                            @endif
                        </p>
                    </div>
@@ -30,6 +30,4 @@
            </div>
        </div>
    </div>
-
-    
 @endsection

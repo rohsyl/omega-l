@@ -70,7 +70,15 @@
                 {!! add_action(route('admin.dashboard'), 'glyphicon glyphicon-th', __('Dashboard')) !!}
                 {!! add_action(route('admin.settings'), 'glyphicon glyphicon-cog',  __('Settings')) !!}
                 {!! add_action(route('admin.pages'), 'fa fa-file-text',  __('Pages')) !!}
-                {!! add_action(route('admin.plugins'), 'fa fa-cubes',  __('Plugins')) !!}
+                {!! add_action('#', 'fa fa-users',  __('Users & Groups'), [
+                    add_action(route('user.add'), 'fa fa-user-plus', __('Add user')),
+                    add_action(route('user.index'), 'fa fa-list-alt', __('Manage users')),
+                    add_action(route('group.index'), 'fa fa-plus', __('Add group')),
+                    add_action(route('group.index'), 'fa fa-list-alt', __('Manage groups'))
+                ]) !!}
+                {!! add_action(route('admin.plugins'), 'fa fa-cubes',  __('Plugins'), add_sub_actions_plugin()) !!}
+
+
                 {!! add_action(route('media.library'), 'glyphicon glyphicon-picture',  __('Media Library')) !!}
             </ul>
         </div>

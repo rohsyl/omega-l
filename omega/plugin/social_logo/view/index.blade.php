@@ -8,7 +8,7 @@
             <div class="col-sm-5">
                 {{ Form::text('title', $title, ['class' => 'form-control']) }}
                 @if ($errors->has('title'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('title') }}</strong>
                     </span>
                 @endif

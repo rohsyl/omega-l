@@ -1,36 +1,3 @@
-{{--
-use Omega\Library;
-use Omega\Library\Util\Util;
-use Omega\Library\Util\Url;
-use Omega\Library\Language\Front\Lang;
-use function Omega\Library\__;
-
-$lPageTitle 		= Library\__('Title', true);
-$lPageLastEditor 	= Library\__('Last editor', true);
-$lPageCreated 		= Library\__('Created', true);
-$lPageUpdated 		= Library\__('Updated', true);
-$lPageModel 		= Library\__('Model', true);
-$lLang 		        = Library\__('Language', true);
-$lPageCssTheme 		= Library\__('Style', true);
-$lAllPage 			= Library\__('All pages', true);
-$lAddNewPage 		= Library\__('Add new', true);
-$lNoPage 			= Library\__('No page', true);
-$lTitleLinkEdit 	= Library\__('Edit', true);
-$lTitleLinkDelete 	= Library\__('Delete', true);
-$lTitleLinkEnable 	= Library\__('Click to enable the page', true);
-$lTitleLinkDisable	= Library\__('Click to disable the page', true);
-
-$gIconFile 			= 'glyphicon glyphicon-file';
-$gIconPlus 			= 'glyphicon glyphicon-plus-sign';
-$gIconEdit	 		= 'glyphicon glyphicon-pencil';
-$gIconDelete 		= 'glyphicon glyphicon-trash';
-$gIconEnable 		= 'glyphicon glyphicon-ok';
-$gIconDisable 		= 'glyphicon glyphicon-remove';
-
-$dateFormat 		= 'd/m/Y H:i:s';
-
---}}
-
 <table class="table table-hover">
     <tr>
         <th>{{ __('Title') }}</th>

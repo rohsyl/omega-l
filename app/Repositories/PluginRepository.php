@@ -10,6 +10,7 @@ namespace Omega\Repositories;
 
 
 use Omega\Plugin;
+use Omega\Utils\Plugin\PluginMeta;
 
 class PluginRepository
 {
@@ -57,6 +58,18 @@ class PluginRepository
 
     public function getInstalledPlugin(){
         return $this->plugin->get();
+    }
+
+    public function getPluginInMenu(){
+        $plugins = $this->getInstalledPlugin();
+        $menuPlugins = [];
+        foreach($plugins as $plugin){
+            $meta = new PluginMeta($plugin->name);
+            if($meta->getOption('displayInMenu') == 1){
+                $menuPlugins[] = $plugin;
+            }
+        }
+        return $menuPlugins;
     }
 
     public function getUnstalledPlugins(){

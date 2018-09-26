@@ -67,12 +67,14 @@ if (!function_exists('add_action')) {
      * @param boolean|null $condition Display only if this condition is true
      * @return string The view
      */
-    function add_action($url, $icon, $text, $condition = null) {
+    function add_action($url, $icon, $text, $subaction = null, $condition = null) {
+        $subaction = is_null($subaction) ? [] : $subaction;
         if(is_null($condition) || ($condition)){
             return view('helpers.menuentry')->with([
                 'url' => $url,
                 'icon' => $icon,
-                'text' => $text
+                'text' => $text,
+                'subaction' => $subaction,
             ]);
         }
     }
@@ -237,5 +239,12 @@ if(!function_exists('clean_text')) {
         $text = str_replace("_", " ", $text);
         $text = ucfirst($text);
         return $text;
+    }
+}
+
+
+if(!function_exists('prettify_text')) {
+    function prettify_text($text){
+        return title_case(snake_case(camel_case($text), ' '));
     }
 }

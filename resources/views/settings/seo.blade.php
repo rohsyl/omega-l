@@ -9,7 +9,7 @@
             <div class="col-sm-5">
                 {{ Form::textarea('keywords', $om_seo_keyword, ['class' => 'form-control']) }}
                 @if ($errors->has('keywords'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('keywords') }}</strong>
                     </span>
                 @else
@@ -24,7 +24,7 @@
             <div class="col-sm-5">
                 {{ Form::textarea('description', $om_seo_description, ['class' => 'form-control']) }}
                 @if ($errors->has('description'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('description') }}</strong>
                     </span>
                 @else

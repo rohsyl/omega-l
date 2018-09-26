@@ -11,7 +11,7 @@
             <div class="col-sm-5">
                 {{ Form::text('title', $generalConfig['om_site_title'], ['class' => 'form-control']) }}
                 @if ($errors->has('title'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('title') }}</strong>
                     </span>
                 @else
@@ -26,7 +26,7 @@
             <div class="col-sm-5">
                 {{ Form::text('slogan', $generalConfig['om_site_slogan'], ['class' => 'form-control']) }}
                 @if ($errors->has('slogan'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('slogan') }}</strong>
                     </span>
                 @else
@@ -41,7 +41,7 @@
             <div class="col-sm-5">
                 {{ Form::text('web_adress', $generalConfig['om_web_adress'], ['class' => 'form-control']) }}
                 @if ($errors->has('web_adress'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('web_adress') }}</strong>
                     </span>
                 @else
@@ -59,7 +59,7 @@
 
                 </select>
                 @if ($errors->has('home'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('home') }}</strong>
                     </span>
                 @else
@@ -84,7 +84,7 @@
                     @endforeach
                 </div>
                 @if ($errors->has('lang'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('lang') }}</strong>
                     </span>
                 @else

@@ -65,3 +65,17 @@ if(!function_exists('camelize_plugin')){
         return str_replace($separator, '', ucwords($input, $separator));
     }
 }
+
+if(!function_exists('add_sub_actions_plugin')){
+    function add_sub_actions_plugin(){
+        $pluginRepository = new \Omega\Repositories\PluginRepository(new \Omega\Plugin());
+        $plugins = $pluginRepository->getPluginInMenu();
+        $actions = [];
+        $actions[] = add_action(route('admin.plugins'), 'glyphicon glyphicon-list-alt', __('Manage plugins'));
+        foreach($plugins as $plugin){
+            $meta = new \Omega\Utils\Plugin\PluginMeta($plugin->name);
+            $actions[] = add_action(route_plugin($plugin->name, 'index'), 'fa fa-cube', $meta->getTitle());
+        }
+        return $actions;
+    }
+}

@@ -18,7 +18,7 @@
             <div class="col-sm-4 col-sm-offset-4">
                 {{ Form::select('lang', [ 'en' => 'English', 'fr' => 'French', 'de' => 'German'], $lang, ['class' => 'form-control']) }}
                 @if ($errors->has('lang'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('lang') }}</strong>
                     </span>
                 @endif

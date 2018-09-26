@@ -10,7 +10,7 @@
             <div class="col-sm-5">
                 {{ Form::text('smtpHost', $smtp['smtpHost'], ['class' => 'form-control']) }}
                 @if ($errors->has('smtpHost'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('smtpHost') }}</strong>
                     </span>
                 @else
@@ -25,7 +25,7 @@
             <div class="col-sm-5">
                 {{ Form::text('smtpPort', $smtp['smtpPort'], ['class' => 'form-control']) }}
                 @if ($errors->has('smtpPort'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('smtpPort') }}</strong>
                     </span>
                 @else
@@ -54,7 +54,7 @@
             <div class="col-sm-5">
                 {{ Form::text('smtpAuthUser', $smtp['smtpAuthUser'], ['class' => 'form-control']) }}
                 @if ($errors->has('smtpAuthUser'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('smtpAuthUser') }}</strong>
                     </span>
                 @else
@@ -70,7 +70,7 @@
             <div class="col-sm-5">
                 {{ Form::input('password', 'smtpAuthPasswd', $smtp['smtpAuthPasswd'], ['class' => 'form-control']) }}
                 @if ($errors->has('smtpAuthPasswd'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('smtpAuthPasswd') }}</strong>
                     </span>
                 @else

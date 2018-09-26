@@ -17,7 +17,7 @@
             <div class="col-sm-5">
                 {{ Form::text('title', $title, ['class' => 'form-control']) }}
                 @if ($errors->has('title'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('title') }}</strong>
                     </span>
                 @endif
@@ -28,7 +28,7 @@
             <div class="col-sm-5">
                 {{ Form::text('slogan', $slogan, ['class' => 'form-control']) }}
                 @if ($errors->has('slogan'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                             <strong>{{ $errors->first('slogan') }}</strong>
                         </span>
                 @endif
@@ -42,7 +42,7 @@
             <div class="col-sm-5">
                 {{ Form::email('email', $email, ['class' => 'form-control']) }}
                 @if ($errors->has('email'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                             <strong>{{ $errors->first('email') }}</strong>
                         </span>
                 @endif
@@ -54,7 +54,7 @@
             <div class="col-sm-5">
                 {{ Form::text('username', $username, ['class' => 'form-control']) }}
                 @if ($errors->has('username'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('user') }}</strong>
                     </span>
                 @endif
@@ -70,7 +70,7 @@
             <div class="col-sm-5">
                 {{ Form::password('password', ['class' => 'form-control']) }}
                 @if ($errors->has('password'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('password') }}</strong>
                     </span>
                 @endif
@@ -80,7 +80,7 @@
             <div class="col-sm-offset-3 col-sm-5">
                 {{ Form::password('password2', ['class' => 'form-control']) }}
                 @if ($errors->has('password2'))
-                    <span class="invalid-feedback" role="alert">
+                    <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('password2') }}</strong>
                     </span>
                 @endif

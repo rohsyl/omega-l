@@ -20,7 +20,7 @@
                         {{ Form::label('name', __('Title')) }}
                         {{ Form::text('name', null, ['class' => 'form-control', 'id' => 'name', 'placeholder' => __('Title')]) }}
                         @if ($errors->has('name'))
-                            <span class="invalid-feedback" role="alert">
+                            <span class="text-danger" role="alert">
                                 <strong>{{ $errors->first('name') }}</strong>
                             </span>
                         @endif
@@ -30,7 +30,7 @@
                             {{ Form::label('lang', __('Language')) }}
                             {{ Form::select('lang', $langs, $selectedLang, ['class' => 'form-control', 'id' => 'lang']) }}
                             @if ($errors->has('lang'))
-                                <span class="invalid-feedback" role="alert">
+                                <span class="text-danger" role="alert">
                                 <strong>{{ $errors->first('lang') }}</strong>
                             </span>
                             @endif
@@ -40,7 +40,7 @@
                         {{ Form::label('parent', __('Parent')) }}
                         {{ Form::select('parent', $pages, null, ['class' => 'form-control', 'id' => 'parent']) }}
                         @if ($errors->has('parent'))
-                            <span class="invalid-feedback" role="alert">
+                            <span class="text-danger" role="alert">
                                 <strong>{{ $errors->first('parent') }}</strong>
                             </span>
                         @endif
