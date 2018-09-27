@@ -49,17 +49,19 @@ class UserRepository{
     }
 
     public function attachRights($user, $rights){
-        foreach($rights as $rightId){
-            $user->rights()->attach($rightId);
-        }
+        if(isset($rights))
+            foreach($rights as $rightId){
+                $user->rights()->attach($rightId);
+            }
     }
     public function clearGroups($user){
         $user->groups()->detach();
     }
 
     public function attachGroups($user, $groups){
-        foreach($groups as $groupId){
-            $user->groups()->attach($groupId);
-        }
+        if(isset($groups))
+            foreach($groups as $groupId){
+                $user->groups()->attach($groupId);
+            }
     }
 }

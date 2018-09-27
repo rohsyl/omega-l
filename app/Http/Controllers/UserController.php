@@ -64,7 +64,13 @@ class UserController extends AdminController
     }
 
     public function edit($id){
+        $user = $this->userRepository->getById($id);
 
+        return view('user.edit')->with([
+            'user' => $user,
+            'groups' => $this->groupRepository->all(),
+            'rights' => $this->rightRepository->all()
+        ]);
     }
 
     public function update(){

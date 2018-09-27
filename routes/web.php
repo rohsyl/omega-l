@@ -83,6 +83,7 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('user/add', 'UserController@add')->name('user.add');
             Route::post('user/create', 'UserController@create')->name('user.create');
             Route::get('user/edit/{id}', 'UserController@edit')->name('user.edit');
+            Route::get('user/edit/{id}/password', 'UserController@edit')->name('user.edit.passwd');
             Route::get('user/delete/{id}/{confirm?}', 'UserController@delete')->name('user.delete');
             Route::get('user/enable/{id}/{enable}', 'UserController@enable')->name('user.enable');
             Route::get('group', 'GroupController@index')->name('group.index');

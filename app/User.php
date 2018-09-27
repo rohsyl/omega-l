@@ -35,4 +35,11 @@ class User extends Authenticatable
     public function groups(){
         return $this->belongsToMany('Omega\Group', 'usergroups', 'fkUser', 'fkGroup');
     }
+
+    public function getAvatarMedia(){
+        if(isset($this->avatar)){
+            return new Media($this->avatar);
+        }
+        return null;
+    }
 }
