@@ -4,7 +4,10 @@ namespace Omega\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
+use Omega\Http\Requests\User\ChangePasswordRequest;
 use Omega\Http\Requests\User\CreateRequest;
+use Omega\Http\Requests\User\UpdateRequest;
 use Omega\Repositories\GroupRepository;
 use Omega\Repositories\RightRepository;
 use Omega\Repositories\UserRepository;
@@ -73,8 +76,33 @@ class UserController extends AdminController
         ]);
     }
 
-    public function update(){
+    public function update(UpdateRequest $request, $id){
+        $user = $this->userRepository->getById($id);
+        $user = $this->userRepository->update($user, $request->all());
 
+        $this->userRepository->clearRights($user);
+        $this->userRepository->clearGroups($user);
+        $this->userRepository->attachRights($user, $request->input('rights'));
+        $this->userRepository->attachGroups($user, $request->input('groups'));
+
+        toast()->success(__('User updated'));
+        return redirect()->route('user.edit', ['id' => $id]);
+    }
+
+    public function editPassword($id){
+        $user = $this->userRepository->getById($id);
+
+        return view('user.editPassword')->with([
+            'user' => $user
+        ]);
+    }
+
+    public function updatePassword(ChangePasswordRequest $request, $id){
+
+        $user = $this->userRepository->getById($id);
+        $user = $this->userRepository->changePassword($user, $request->all());
+        toast()->success(__('Password changed !'));
+        return redirect()->route('user.edit', ['id' => $id]);
     }
 
     public function delete($id, $confirm = false){
@@ -89,7 +117,10 @@ class UserController extends AdminController
         }
     }
 
-    public function enable($id, $isEnable){
-
+    public function enable($id, $enable){
+        $user = $this->userRepository->getById($id);
+        $this->userRepository->enable($user, $enable);
+        toast()->success($enable ? __('User enabled') : __('User disabled'));
+        return redirect()->back();
     }
 }

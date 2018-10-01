@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-{{ Form::open(['url' => route('user.edit', ['id' => $user->id]), 'method' => 'post', 'class' => 'form-horizontal']) }}
+{{ Form::open(['url' => route('user.update', ['id' => $user->id]), 'method' => 'post', 'class' => 'form-horizontal']) }}
     <div class="page-header">
         <h1>{{ __('Edit user') }}
             @if(!$user->isEnabled)
@@ -42,15 +42,14 @@
                     <div class="form-group">
                         {{ Form::label('username', __('Username'), ['class' => 'col-sm-3 control-label']) }}
                         <div class="col-sm-5">
-                            {{ Form::text('username', $user->username, ['class' => 'form-control']) }}
+                            {{ Form::text('username', $user->username, ['class' => 'form-control', 'disabled']) }}
                             @if ($errors->has('username'))
                                 <span class="text-danger" role="alert">
                                 <strong>{{ $errors->first('username') }}</strong>
                             </span>
                             @else
                                 <div class="help-block">
-                                    {{ __('You will use this to log in.') }}<br />
-                                    {{ __('Username can only include alphanumeric characters, underscores and at sign.') }}
+                                    {{ __('Username can\'t be changed.') }}
                                 </div>
                             @endif
                         </div>
@@ -86,7 +85,7 @@
             {{-- if(has_right('user_update_rights') && !has_right('super_admin', false, $userId)) { --}}
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    {{ __('Rigths') }}
+                    {{ __('Rights') }}
                 </div>
                 <div class="panel-body">
                     <div style="height : 200px; overflow-y : scroll">

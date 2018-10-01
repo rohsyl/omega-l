@@ -30,11 +30,11 @@
 					|
                     @if($user->isEnabled)
 
-                    <a href="{{ route('user.enable', ['id' => $user->id, 'enable' => false]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
+                    <a href="{{ route('user.enable', ['id' => $user->id, 'enable' => 0]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
 
                     @else
 
-                    <a href="{{ route('user.enable', ['id' => $user->id, 'enable' => false]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
+                    <a href="{{ route('user.enable', ['id' => $user->id, 'enable' => 1]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
 
                     @endif
                     | <a href="{{ route('user.delete', ['id' => $user->id]) }}" title="{{ __('Delete') }}"

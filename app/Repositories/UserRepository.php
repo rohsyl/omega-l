@@ -43,6 +43,24 @@ class UserRepository{
         $user->save();
         return $user;
     }
+    public function update($user, $inputs){
+        $user->email = $inputs['email'];
+        $user->fullname = $inputs['fullname'];
+        $user->save();
+        return $user;
+    }
+
+    public function changePassword($user, $inputs){
+        $user->password = Hash::make($inputs['password']);
+        $user->save();
+        return $user;
+    }
+
+    public function enable($user, $enable){
+        $user->isEnabled = $enable;
+        $user->save();
+        return $user;
+    }
 
     public function clearRights($user){
         $user->rights()->detach();
