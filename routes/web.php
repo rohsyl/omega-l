@@ -90,6 +90,11 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('user/enable/{id}/{enable}', 'UserController@enable')->name('user.enable');
             Route::get('group', 'GroupController@index')->name('group.index');
             Route::get('group/add', 'GroupController@add')->name('group.add');
+            Route::post('group/create', 'GroupController@create')->name('group.create');
+            Route::get('group/edit/{id}', 'GroupController@edit')->name('group.edit');
+            Route::post('group/edit/{id}', 'GroupController@update')->name('group.update');
+            Route::get('group/delete/{id}/{confirm?}', 'GroupController@delete')->name('group.delete');
+            Route::get('group/enable/{id}/{enable}', 'GroupController@enable')->name('group.enable');
 
             Route::get('pages/getTable', 'PagesController@getTable');
             Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');

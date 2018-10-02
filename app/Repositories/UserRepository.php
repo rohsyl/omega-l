@@ -15,10 +15,10 @@ class UserRepository{
     }
 
     public function getById($id){
-        return $this->user->where('id', $id)->first();
+        return $this->user->find($id);
     }
 
-    public function getAll(){
+    public function all(){
         return $this->user->get();
     }
 

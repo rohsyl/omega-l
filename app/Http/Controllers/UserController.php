@@ -41,7 +41,7 @@ class UserController extends AdminController
 
     public function index(){
         return view('user.index')->with([
-           'users' => $this->userRepository->getAll()
+           'users' => $this->userRepository->all()
         ]);
     }
 
