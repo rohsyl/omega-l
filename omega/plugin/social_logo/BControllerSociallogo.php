@@ -2,7 +2,7 @@
 namespace OmegaPlugin\SocialLogo;
 
 use Illuminate\Support\Facades\Validator;
-use Omega\Module;
+use Omega\Models\Module;
 use Omega\Repositories\ModuleRepository;
 use Omega\Utils\Plugin\BController;
 

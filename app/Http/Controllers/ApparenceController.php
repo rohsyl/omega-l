@@ -29,6 +29,7 @@ class ApparenceController extends AdminController
                                 MembergroupRepository $membergroupRepository,
                                 PageRepository $pageRepository,
                                 LangRepository $langRepository) {
+        parent::__construct();
 
         $this->themeRepository = $themeRepository;
         $this->moduleAreaRepository = $moduleAreaRepository;
@@ -185,6 +186,8 @@ class ApparenceController extends AdminController
     public function menu_delete($id, $confirm = null){
         if(isset($confirm) && $confirm){
             $this->menuRepository->delete($id);
+            toast()->success(__('Menu deleted'));
+            return redirect()->route('menu.index');
         }
         else{
             return view('apparence.menu.delete')

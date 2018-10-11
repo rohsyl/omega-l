@@ -10,6 +10,7 @@ class DashboardController extends AdminController
     private $statRepo;
 
     public function __construct(StatsRepository $statRepo) {
+        parent::__construct();
         $this->statRepo = $statRepo;
     }
 

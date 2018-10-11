@@ -5,7 +5,7 @@ namespace Omega\Http\Controllers;
 use Omega\Repositories\PluginRepository;
 use Omega\Utils\Plugin\Plugin as PluginUtils;
 
-class PluginController extends Controller
+class PluginController extends AdminController
 {
     private $pluginRepository;
 
@@ -16,6 +16,7 @@ class PluginController extends Controller
     private $protectedAction = ['install', 'uninstall'];
 
     public function __construct(PluginRepository $pluginRepository){
+        parent::__construct();
         $this->pluginRepository = $pluginRepository;
     }
 

@@ -51,7 +51,6 @@ Route::middleware('om_not_installed')->group(function(){
 
             Route::get('settings', 'SettingsController@index')->name('admin.settings');
             Route::post('settings/general', 'SettingsController@saveGeneral')->name('admin.settings.general.save');
-
             Route::get('settings/flang', 'SettingsController@flang')->name('admin.settings.flang');
             Route::post('settings/flang', 'SettingsController@saveFlang')->name('admin.settings.flang.save');
             Route::get('settings/flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
@@ -59,16 +58,12 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('settings/langfadded', 'SettingsController@langfadded')->name('admin.settings.flang.langfadded');
             Route::get('settings/langfedit', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
             Route::post('settings/langfedited', 'SettingsController@langfedited')->name('admin.settings.flang.langfedited');
-
             Route::get('settings/seo', 'SettingsController@seo')->name('admin.settings.seo');
             Route::post('settings/seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
-
             Route::get('settings/smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
             Route::post('settings/smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
-
             Route::get('settings/member', 'SettingsController@member')->name('admin.settings.member');
             Route::post('settings/member', 'SettingsController@saveMember')->name('admin.settings.member.save');
-
             Route::get('settings/advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
             Route::get('settings/clearcache', 'SettingsController@clearCache')->name('admin.settings.advanced.clearCache');
 
@@ -76,7 +71,6 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('language/loadforjs', 'LanguageController@loadforjs')->name('language.loadforjs');
 
             Route::post('logout', 'Auth\LoginController@logout')->name('logout');
-
 
             Route::get('user/profile/{id?}', 'UserController@profile')->name('profile');
             Route::get('user', 'UserController@index')->name('user.index');
@@ -88,6 +82,7 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('user/edit/{id}/password', 'UserController@updatePassword')->name('user.update.passwd');
             Route::get('user/delete/{id}/{confirm?}', 'UserController@delete')->name('user.delete');
             Route::get('user/enable/{id}/{enable}', 'UserController@enable')->name('user.enable');
+
             Route::get('group', 'GroupController@index')->name('group.index');
             Route::get('group/add', 'GroupController@add')->name('group.add');
             Route::post('group/create', 'GroupController@create')->name('group.create');
@@ -104,7 +99,6 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('pages/edit/{id}', 'PagesController@edit')->name('admin.pages.edit');
             Route::get('pages/delete/{id}/{confirmed?}', 'PagesController@delete')->name('admin.pages.delete');
             Route::get('pages/enable/{id}/{enable}', 'PagesController@enable')->name('admin.pages.enable');
-
             Route::get('pages/{lang?}', 'PagesController@index')->name('admin.pages');
             Route::post('pages/chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
 
@@ -118,14 +112,29 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('media/mkvideo', 'MediasController@mkvideo')->name('media.mkvideo');
             Route::post('media/copyormove', 'MediasController@copyormove')->name('media.copyormove');
 
+            Route::get('member', 'MemberController@index')->name('member.index');
+            Route::get('member/addmember', 'MemberController@member_add')->name('member.addmember');
+            Route::post('member/createmember', 'MemberController@member_create')->name('member.createmember');
+            Route::get('member/editmember/{id}', 'MemberController@member_edit')->name('member.editmember');
+            Route::get('member/editmember/{id}/password', 'MemberController@member_edit_password')->name('member.editmember.password');
+            Route::post('member/updatemember/{id}', 'MemberController@member_update')->name('member.updatemember');
+            Route::get('member/editmember/{id}/password', 'MemberController@member_edit_password')->name('member.editmember.password');
+            Route::post('member/editmember/{id}/password', 'MemberController@member_update_password')->name('member.editmember.updatepassword');
+            Route::get('member/deletemember/{id}/{confirm?}', 'MemberController@member_delete')->name('member.deletemember');
+
+            Route::get('member/addmembergroup', 'MemberController@membergroup_add')->name('member.addmembergroup');
+            Route::post('member/createmembergroup', 'MemberController@membergroup_create')->name('member.createmembergroup');
+            Route::get('member/editmembergroup/{id}', 'MemberController@membergroup_edit')->name('member.editmembergroup');
+            Route::post('member/updatemembergroup/{id}', 'MemberController@membergroup_update')->name('member.updatemembergroup');
+            Route::get('member/deletemembergroup/{id}/{confirm?}', 'MemberController@membergroup_delete')->name('member.deletemembergroup');
 
 
             Route::get('apparence/theme', 'ApparenceController@theme')->name('theme.index');
             Route::get('apparence/theme/detail/{name}', 'ApparenceController@theme_detail')->name('theme.detail');
-                Route::get('apparence/theme/detail/{name}/ma/list', 'ApparenceController@theme_ma_list')->name('theme.detail.ma.list');
-                Route::get('apparence/theme/detail/{name}/ma/add', 'ApparenceController@theme_ma_add')->name('theme.detail.ma.add');
-                Route::post('apparence/theme/detail/{name}/ma/create', 'ApparenceController@theme_ma_create')->name('theme.detail.ma.create');
-                Route::get('apparence/theme/detail/{name}/ma/delete/{area}', 'ApparenceController@theme_ma_delete')->name('theme.detail.ma.delete');
+            Route::get('apparence/theme/detail/{name}/ma/list', 'ApparenceController@theme_ma_list')->name('theme.detail.ma.list');
+            Route::get('apparence/theme/detail/{name}/ma/add', 'ApparenceController@theme_ma_add')->name('theme.detail.ma.add');
+            Route::post('apparence/theme/detail/{name}/ma/create', 'ApparenceController@theme_ma_create')->name('theme.detail.ma.create');
+            Route::get('apparence/theme/detail/{name}/ma/delete/{area}', 'ApparenceController@theme_ma_delete')->name('theme.detail.ma.delete');
             Route::get('apparence/theme/useit/{name}', 'ApparenceController@theme_useit')->name('theme.useit');
             Route::get('apparence/theme/install/{name}', 'ApparenceController@theme_install')->name('theme.install');
             Route::get('apparence/theme/uninstall/{name}', 'ApparenceController@theme_uninstall')->name('theme.uninstall');

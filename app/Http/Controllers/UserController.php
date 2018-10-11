@@ -19,6 +19,7 @@ class UserController extends AdminController
     private $rightRepository;
 
     public function __construct(UserRepository $userRepository, GroupRepository $groupRepository, RightRepository $rightRepository) {
+        parent::__construct();
         $this->userRepository = $userRepository;
         $this->groupRepository = $groupRepository;
         $this->rightRepository = $rightRepository;

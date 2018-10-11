@@ -29,6 +29,7 @@ class PagesController extends AdminController
                                 PositionRepository $positionRepository,
                                 ModuleRepository $moduleRepository)
     {
+        parent::__construct();
         $this->langRepository = $langRepository;
         $this->pageRepository = $pageRepository;
         $this->moduleAreaRepository = $moduleAreaRepository;

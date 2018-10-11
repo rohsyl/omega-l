@@ -3,6 +3,7 @@ namespace Omega\Utils\Plugin;
 
 use Illuminate\Support\Facades\DB;
 use Omega\Repositories\PluginRepository;
+use Omega\Models\Plugin as PluginModel;
 use Omega\Utils\Path;
 use Illuminate\Support\Facades\View;
 
@@ -23,7 +24,7 @@ class BController {
 		$this->name = $name;
 		$this->root = Path::Combine(plugin_path(), $this->name);
 		$this->meta = new PluginMeta($this->name);
-		$this->pluginRepository = new PluginRepository(new \Omega\Plugin());
+		$this->pluginRepository = new PluginRepository(new PluginModel());
 
 		if($this->isInstalled())
 			$this->id = $this->getIdFromDatabase();

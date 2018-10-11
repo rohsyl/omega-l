@@ -13,12 +13,12 @@ use Omega\Repositories\LangRepository;
 use Omega\Utils\Crypto;
 use Omega\Utils\Language\BackLangManager;
 
-class SettingsController extends Controller
+class SettingsController extends AdminController
 {
     private $langRepository;
 
-    public function __construct(LangRepository $langRepository)
-    {
+    public function __construct(LangRepository $langRepository) {
+        parent::__construct();
         $this->langRepository = $langRepository;
     }
 

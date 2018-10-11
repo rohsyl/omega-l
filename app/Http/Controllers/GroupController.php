@@ -9,13 +9,14 @@ use Omega\Repositories\GroupRepository;
 use Omega\Repositories\RightRepository;
 use Omega\Repositories\UserRepository;
 
-class GroupController extends Controller
+class GroupController extends AdminController
 {
     private $groupRepository;
     private $rightRepository;
     private $userRepository;
 
     public function __construct(GroupRepository $groupRepository, RightRepository $rightRepository, UserRepository $userRepository) {
+        parent::__construct();
         $this->groupRepository = $groupRepository;
         $this->rightRepository = $rightRepository;
         $this->userRepository = $userRepository;

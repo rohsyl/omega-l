@@ -20,8 +20,7 @@ class MediasController extends AdminController
 {
     private $mediaRepository;
 
-    public function __construct(MediaRepository $mediaRepository)
-    {
+    public function __construct(MediaRepository $mediaRepository) {
         parent::__construct();
 
         $this->mediaRepository = $mediaRepository;
