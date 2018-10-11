@@ -22,4 +22,24 @@ class ModuleAreaRepository
     public function getAllModuleAreaByThemeName($themeName){
         return $this->moduleArea->where('theme', $themeName)->get();
     }
+
+    public function exists($areaName, $themeName){
+        return $this->moduleArea->where('name', $areaName)->where('theme', $themeName)->exists();
+    }
+
+    public function create($areaName, $themeName){
+        $ma = new ModuleArea();
+        $ma->name = $areaName;
+        $ma->theme = $themeName;
+        $ma->save();
+        return $ma;
+    }
+
+    public function deleteByName($areaName, $themeName){
+        return $this->moduleArea->where('name', $areaName)->where('theme', $themeName)->delete();
+    }
+
+    public function deleteByTheme($themeName){
+        return $this->moduleArea->where('theme', $themeName)->delete();
+    }
 }

@@ -16,7 +16,7 @@ class CreateModuleareasTable extends Migration
         Schema::create('module_areas', function (Blueprint $table) {
 
             $table->increments('id');
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('theme');
         });
     }

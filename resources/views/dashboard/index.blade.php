@@ -17,7 +17,7 @@
                         </div>
                     </div>
                 </div>
-                <a href="">
+                <a href="{{ route('admin.pages.add') }}">
                     <div class="panel-footer">
                         <span class="pull-left">{{ __('Add page') }}</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-                <a href="">
+                <a href="{{ route('user.add') }}">
                     <div class="panel-footer">
                         <span class="pull-left">{{ __('Add user') }}</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -80,14 +80,14 @@
                             <i class="fa fa-picture-o fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <a href="" style="color : #fff;" class="link-home">
+                            <a href="{{ route('media.uploader') }}" style="color : #fff;" class="link-home">
                                 <div class="huge"><i class="fa fa-upload"></i></div>
                                 <div>Upload files</div>
                             </a>
                         </div>
                     </div>
                 </div>
-                <a href="">
+                <a href="{{ route('media.library') }}">
                     <div class="panel-footer">
                         <span class="pull-left">{{ __('Media library') }}</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>

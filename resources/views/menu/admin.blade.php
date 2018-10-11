@@ -76,6 +76,11 @@
                     add_action(route('group.add'), 'fa fa-plus', __('Add group')),
                     add_action(route('group.index'), 'fa fa-list-alt', __('Manage groups'))
                 ]) !!}
+                {!! add_action('#', 'glyphicon glyphicon-text-width',  __('Apparences'), [
+                    add_action(route('theme.index'), 'fa fa-paint-brush', __('Theme')),
+                    //add_action(route('editor.index'), 'fa fa-code', __('File editor')),
+                    add_action(route('menu.index'), 'glyphicon glyphicon-list-alt', __('Menus'))
+                ]) !!}
                 {!! add_action(route('admin.plugins'), 'fa fa-cubes',  __('Plugins'), add_sub_actions_plugin()) !!}
 
 

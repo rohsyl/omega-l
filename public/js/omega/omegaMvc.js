@@ -10,6 +10,10 @@ OmegaMvc.prototype = {
 			url += '&' + key + '=' + value;
 		});
 		return url;
+	},
+
+	url_manual: function(url){
+		return this.root.abspath + url;
 	}
 	//---- Private method ----//
 };

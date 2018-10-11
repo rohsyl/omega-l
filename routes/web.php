@@ -119,6 +119,30 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('media/copyormove', 'MediasController@copyormove')->name('media.copyormove');
 
 
+
+            Route::get('apparence/theme', 'ApparenceController@theme')->name('theme.index');
+            Route::get('apparence/theme/detail/{name}', 'ApparenceController@theme_detail')->name('theme.detail');
+                Route::get('apparence/theme/detail/{name}/ma/list', 'ApparenceController@theme_ma_list')->name('theme.detail.ma.list');
+                Route::get('apparence/theme/detail/{name}/ma/add', 'ApparenceController@theme_ma_add')->name('theme.detail.ma.add');
+                Route::post('apparence/theme/detail/{name}/ma/create', 'ApparenceController@theme_ma_create')->name('theme.detail.ma.create');
+                Route::get('apparence/theme/detail/{name}/ma/delete/{area}', 'ApparenceController@theme_ma_delete')->name('theme.detail.ma.delete');
+            Route::get('apparence/theme/useit/{name}', 'ApparenceController@theme_useit')->name('theme.useit');
+            Route::get('apparence/theme/install/{name}', 'ApparenceController@theme_install')->name('theme.install');
+            Route::get('apparence/theme/uninstall/{name}', 'ApparenceController@theme_uninstall')->name('theme.uninstall');
+            Route::get('apparence/theme/delete/{name}', 'ApparenceController@theme_delete')->name('theme.delete');
+
+            Route::get('apparence/editor', 'ApparenceController@editor')->name('editor.index');
+
+            Route::get('apparence/menu', 'ApparenceController@menu')->name('menu.index');
+            Route::get('apparence/menu/add', 'ApparenceController@menu_add')->name('menu.add');
+            Route::post('apparence/menu/create', 'ApparenceController@menu_create')->name('menu.create');
+            Route::get('apparence/menu/edit/{id}', 'ApparenceController@menu_edit')->name('menu.edit');
+            Route::get('apparence/menu/edit/{id}/pages/{lang?}', 'ApparenceController@menu_edit_pages')->name('menu.edit.pages');
+            Route::post('apparence/menu/update/{id}', 'ApparenceController@menu_update')->name('menu.update');
+            Route::get('apparence/menu/delete/{id}/{confirm?}', 'ApparenceController@menu_delete')->name('menu.delete');
+            Route::get('apparence/menu/enable/{id}/{enable}', 'ApparenceController@menu_enable')->name('menu.enable');
+
+
             Route::get('plugin', 'PluginController@index')->name('admin.plugins');
             Route::get('plugin/install/{name}', 'PluginController@install')->name('admin.plugins.install');
             Route::get('plugin/uninstall/{name}', 'PluginController@uninstall')->name('admin.plugins.uninstall');

@@ -248,3 +248,8 @@ if(!function_exists('prettify_text')) {
         return title_case(snake_case(camel_case($text), ' '));
     }
 }
+if(!function_exists('without_ext')) {
+    function without_ext($filename){
+        return pathinfo($filename, PATHINFO_FILENAME);
+    }
+}

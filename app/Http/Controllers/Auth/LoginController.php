@@ -1,6 +1,7 @@
 <?php
 namespace Omega\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use Omega\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -42,5 +43,9 @@ class LoginController extends Controller
      */
     public function username(){
         return 'username';
+    }
+
+    protected function credentials(Request $request) {
+        return array_merge($request->only($this->username(), 'password'), ['isEnabled' => 1]);
     }
 }

@@ -21,6 +21,15 @@ class PageRepository
         $this->page = $page;
     }
 
+    public function all($langSlug = null){
+        if(isset($langSlug)){
+            return $this->page->where('lang', $langSlug)->get();
+        }
+        else{
+            return $this->page->get();
+        }
+    }
+
     public function getPagesWithParent($idPageParent = null){
         if(!isset($idPageParent))
             $query = $this->page->whereNull('fkPageParent');

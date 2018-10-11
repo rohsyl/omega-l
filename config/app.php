@@ -163,6 +163,8 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         Grimthorr\LaravelToast\ServiceProvider::class,
 
+        //https://github.com/tightenco/ziggy
+        Tightenco\Ziggy\ZiggyServiceProvider::class,
     ],
 
     /*
