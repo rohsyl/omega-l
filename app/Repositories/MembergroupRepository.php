@@ -9,7 +9,7 @@
 namespace Omega\Repositories;
 
 
-use Omega\Membergroup;
+use Omega\Models\Membergroup;
 
 class MembergroupRepository
 {

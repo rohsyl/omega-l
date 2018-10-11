@@ -8,8 +8,7 @@
 
 namespace Omega\Repositories;
 
-
-use Omega\Position;
+use Omega\Models\Position;
 
 class PositionRepository
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Omega;
+namespace Omega\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,11 +12,11 @@ class Group extends Model
     }
 
     public function users(){
-        return $this->belongsToMany('Omega\User', 'usergroups', 'fkGroup', 'fkUser' );
+        return $this->belongsToMany('Omega\Models\User', 'usergroups', 'fkGroup', 'fkUser' );
     }
 
     public function rights(){
-        return $this->belongsToMany('Omega\Right', 'grouprights', 'fkGroup', 'fkRight');
+        return $this->belongsToMany('Omega\Models\Right', 'grouprights', 'fkGroup', 'fkRight');
     }
 
 }

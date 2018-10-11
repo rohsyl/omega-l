@@ -2,8 +2,7 @@
 namespace Omega\Repositories;
 
 use Illuminate\Support\Facades\Hash;
-use Omega\Page;
-use Omega\User;
+use Omega\Models\User;
 
 class UserRepository{
 

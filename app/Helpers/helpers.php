@@ -56,7 +56,7 @@ define('AUTHORIZED_FILE_TYPE_INLINE', trim($afti, '|'));
 
 use Illuminate\Support\Facades\Route;
 use Collective\Html\FormFacade;
-use Omega\Config;
+use Omega\Models\Config;
 
 if (!function_exists('add_action')) {
     /**

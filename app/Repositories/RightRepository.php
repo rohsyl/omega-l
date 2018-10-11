@@ -9,7 +9,7 @@
 namespace Omega\Repositories;
 
 
-use Omega\Right;
+use Omega\Models\Right;
 
 class RightRepository
 {

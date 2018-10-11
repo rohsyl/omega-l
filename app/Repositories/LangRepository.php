@@ -1,7 +1,7 @@
 <?php
 namespace Omega\Repositories;
 
-use Omega\Lang;
+use Omega\Models\Lang;
 
 class LangRepository{
 

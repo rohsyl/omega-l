@@ -9,7 +9,7 @@
 namespace Omega\Repositories;
 
 
-use Omega\Module;
+use Omega\Models\Module;
 
 class ModuleRepository
 {

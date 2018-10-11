@@ -8,8 +8,7 @@
 
 namespace Omega\Repositories;
 
-
-use Omega\Plugin;
+use Omega\Models\Plugin;
 use Omega\Utils\Plugin\PluginMeta;
 
 class PluginRepository

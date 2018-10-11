@@ -1,8 +1,8 @@
 <?php
 namespace Omega\Repositories;
 
-use Omega\Page;
-use Omega\User;
+use Omega\Models\Page;
+use Omega\Models\User;
 
 class StatsRepository{
 

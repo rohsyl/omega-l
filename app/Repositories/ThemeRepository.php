@@ -9,7 +9,7 @@
 namespace Omega\Repositories;
 
 
-use Omega\Theme;
+use Omega\Models\Theme;
 use Omega\Utils\Path;
 use Omega\Utils\Theme\Installer;
 

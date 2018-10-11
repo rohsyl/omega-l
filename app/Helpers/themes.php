@@ -5,6 +5,7 @@
  * Date: 02.10.18
  * Time: 11:46
  */
+use Omega\Utils\Path;
 
 if(!function_exists('theme_path')){
     /**
@@ -13,7 +14,7 @@ if(!function_exists('theme_path')){
     function theme_path($name = null){
         $path = base_path('omega/theme');
         if(isset($name)){
-            return \Omega\Utils\Path::Combine($path, $name);
+            return Path::Combine($path, $name);
         }
         return $path;
     }

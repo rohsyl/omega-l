@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Omega\Http\Requests\Install\LangRequest;
 use Omega\Http\Requests\Install\SiteAndUserRequest;
-use Omega\User;
+use Omega\Models\User;
 
 class InstallController extends Controller
 {

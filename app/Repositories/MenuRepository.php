@@ -8,7 +8,7 @@
 
 namespace Omega\Repositories;
 
-use Omega\Menu;
+use Omega\Models\Menu;
 
 class MenuRepository
 {

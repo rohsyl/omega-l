@@ -2,7 +2,7 @@
 namespace Omega\Repositories;
 
 
-use Omega\Mediameta;
+use Omega\Models\Mediameta;
 
 class MediametaRepository{
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Omega;
+namespace Omega\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

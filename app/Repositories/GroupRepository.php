@@ -1,7 +1,7 @@
 <?php
 namespace Omega\Repositories;
 
-use Omega\Group;
+use Omega\Models\Group;
 
 class GroupRepository{
 

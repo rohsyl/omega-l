@@ -2,8 +2,7 @@
 namespace Omega\Repositories;
 
 use Illuminate\Http\UploadedFile;
-use Omega\Lang;
-use Omega\Media;
+use Omega\Models\Media;
 use Omega\Utils\Entity\VideoExternal;
 use Omega\Utils\Interfaces\InterfaceMediaConstant;
 use Omega\Utils\Path;

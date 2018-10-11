@@ -67,7 +67,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => Omega\User::class,
+            'model' => Omega\Models\User::class,
         ],
 
         // 'users' => [

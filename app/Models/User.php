@@ -1,6 +1,6 @@
 <?php
 
-namespace Omega;
+namespace Omega\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,11 +29,11 @@ class User extends Authenticatable
 
 
     public function rights(){
-        return $this->belongsToMany('Omega\Right', 'userrights', 'fkUser', 'fkRight');
+        return $this->belongsToMany('Omega\Models\Right', 'userrights', 'fkUser', 'fkRight');
     }
 
     public function groups(){
-        return $this->belongsToMany('Omega\Group', 'usergroups', 'fkUser', 'fkGroup');
+        return $this->belongsToMany('Omega\Models\Group', 'usergroups', 'fkUser', 'fkGroup');
     }
 
     public function getAvatarMedia(){

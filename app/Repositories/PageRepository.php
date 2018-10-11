@@ -10,7 +10,7 @@ namespace Omega\Repositories;
 
 
 use Illuminate\Support\Facades\Auth;
-use Omega\Page;
+use Omega\Models\Page;
 
 class PageRepository
 {
