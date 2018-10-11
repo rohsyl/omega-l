@@ -157,6 +157,7 @@ class ApparenceController extends AdminController
         return view('apparence.menu.edit')->with([
             'menu' => $this->menuRepository->get($id),
             'membergroups' => to_select($this->membergroupRepository->all(), 'name', 'id'),
+            'langs' => to_select($this->langRepository->allEnabled(), 'name', 'slug'),
             'langEnabled' => om_config('om_enable_front_langauge')
         ]);
     }

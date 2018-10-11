@@ -22,6 +22,7 @@ class SettingsController extends AdminController
         $this->langRepository = $langRepository;
     }
 
+    #region general
     public function index(){
 
         return view('settings.index')
@@ -47,7 +48,9 @@ class SettingsController extends AdminController
         toast()->success('General settings saved !');
         return redirect(route('admin.settings'));
     }
+    #endregion
 
+    #region lang
     public function flang() {
         return view('settings.flang')
             ->with('defaultFrontLanguage', om_config('om_default_front_langauge'))
@@ -64,7 +67,9 @@ class SettingsController extends AdminController
         toast()->success('Front-end language settings saved !');
         return redirect(route('admin.settings.flang'));
     }
+    #endregion
 
+    #region seo
     public function seo() {
         return view('settings.seo')
             ->with('om_seo_keyword', om_config('om_seo_keyword'))
@@ -79,7 +84,9 @@ class SettingsController extends AdminController
         toast()->success('Seo settings saved !');
         return redirect(route('admin.settings.seo'));
     }
+    #endregion
 
+    #region smtp
     public function smtp() {
         $cryptedPassword = om_config('smtpAuthPasswd');
         $key = sha1(om_config('smtpAuthUser') . SALT);
@@ -133,7 +140,9 @@ class SettingsController extends AdminController
         toast()->success('SMTP settings saved !');
         return redirect(route('admin.settings.smtp'));
     }
+    #endregion
 
+    #region member
     public function member() {
         return view('settings.member')
             ->with('member', [
@@ -149,7 +158,9 @@ class SettingsController extends AdminController
         toast()->success('Member settings saved !');
         return redirect(route('admin.settings.member'));
     }
+    #endregion
 
+    #region advanced
     public function advanced() {
         return view('settings.advanced');
     }
@@ -163,6 +174,7 @@ class SettingsController extends AdminController
         toast()->success('Cache cleared !');
         return redirect()->back();
     }
+    #endregion
 
     public function langftable(){
         return view('settings.flangtable')
