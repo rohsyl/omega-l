@@ -57,7 +57,8 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('settings/langfadd', 'SettingsController@langfadd')->name('admin.settings.flang.langfadd');
             Route::post('settings/langfcreate', 'SettingsController@langfcreate')->name('admin.settings.flang.langfcreate');
             Route::get('settings/langfedit/{slug}', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
-            Route::post('settings/langfedited', 'SettingsController@langfedited')->name('admin.settings.flang.langfedited');
+            Route::post('settings/langfupdate/{slug}', 'SettingsController@langfupdate')->name('admin.settings.flang.langfupdate');
+            Route::get('settings/delete/{slug}', 'SettingsController@langfdelete')->name('admin.settings.flang.langfdelete');
             Route::get('settings/seo', 'SettingsController@seo')->name('admin.settings.seo');
             Route::post('settings/seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
             Route::get('settings/smtp', 'SettingsController@smtp')->name('admin.settings.smtp');

@@ -40,10 +40,10 @@ $(function(){
             var mid = omega.modal.open(__('Edit front-end language'), html, __('Save'), function(){
                 var args = {
                     name: $('#name').val(),
-                    enabled: $('#enabled-0').is(':checked') ? 1 : 0,
-                    fkMedia: $('#mediaIdLangf').val()
+                    enabled: $('#enabled').is(':checked') ? 1 : 0,
+                    fkMedia: $('#flag').val()
                 };
-                var url = omega.mvc.url('settings', 'langfedited', {slug: slug});
+                var url = route('admin.settings.flang.langfupdate', {slug: slug});
                 omega.ajax.query(url, args, omega.ajax.POST, function(json){
                     if(json.success){
                         omega.notice.success(__('Success'), json.message);
@@ -60,14 +60,11 @@ $(function(){
 
     $('body').delegate(btnDeleteLanf, 'click', function() {
         var slug = $(this).data('slug');
-        var url = omega.mvc.url('settings', 'langfdelete');
+        var url = route('admin.settings.flang.langfdelete', {slug: slug})
 
         omega.modal.confirm(__('Do you really want to delete this ?'), function(yes){
             if(yes){
-                var args = {
-                    slug: slug
-                };
-                omega.ajax.query(url, args, omega.ajax.GET, function(json){
+                omega.ajax.query(url, {}, omega.ajax.GET, function(json){
                     if(json.success){
                         omega.notice.success(__('Success'), json.message);
                         loadTable();

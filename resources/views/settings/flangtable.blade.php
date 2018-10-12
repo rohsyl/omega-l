@@ -16,7 +16,9 @@
         <td>{{ $fl->slug }}</td>
         <td>{{ $fl->name }}</td>
         <td>
-
+            @if(isset($fl->fkMediaFlag))
+                <img src="{{ asset($fl->media->path) }}" alt="{{ $fl->slug }}" />
+            @endif
         </td>
         <td>
             {{ $fl->isEnabled ? __('Yes') : __('No') }}

@@ -41,4 +41,7 @@ class LangRepository{
         return $lang;
     }
 
+    public function delete($slug){
+        return $this->lang->where('slug', $slug)->delete();
+    }
 }
