@@ -19,7 +19,7 @@
 
         </td>
         <td>
-            {{ $fl->enabled ? __('Yes') : __('No') }}
+            {{ $fl->isEnabled ? __('Yes') : __('No') }}
         </td>
         <td>
                 <span style="float:right">

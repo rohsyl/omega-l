@@ -4,6 +4,7 @@ namespace Omega\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Omega\Http\Requests\Settings\Flang\CreateFlangRequest;
 use Omega\Http\Requests\Settings\FlangSettingsRequest;
 use Omega\Http\Requests\Settings\GeneralSettingsRequest;
 use Omega\Http\Requests\Settings\MemberSettingsRequest;
@@ -185,8 +186,19 @@ class SettingsController extends AdminController
         return view('settings.flangadd');
     }
 
-    public function langfedit(){
+    public function langfcreate(CreateFlangRequest $request){
+        $this->langRepository->create($request->all());
 
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function langfedit($slug){
+        $lang = $this->langRepository->getBySlug($slug);
+
+        return view('settings.flangedit')
+            ->with('lang', $lang);
     }
 
     public function langfadded(){

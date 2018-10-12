@@ -9,24 +9,21 @@ $(function(){
 
 
     $('body').delegate(btnAddLang, 'click', function() {
-        var url = omega.mvc.url('settings', 'langfadd');
+        var url = route('admin.settings.flang.langfadd');
         omega.ajax.query(url, {}, omega.ajax.GET, function(html){
             var mid = omega.modal.open(__('Add front-end language'), html, __('Add'), function(){
                 var args = {
                     slug: $('#slug').val(),
                     name: $('#name').val(),
-                    enabled: $('#enabled-0').is(':checked') ? 1 : 0,
-                    fkMedia: $('#mediaIdLangf').val()
+                    enabled: $('#enabled').is(':checked') ? 1 : 0,
+                    fkMedia: $('#flag').val()
                 };
-                var url = omega.mvc.url('settings', 'langfadded');
+                var url = route('admin.settings.flang.langfcreate');
                 omega.ajax.query(url, args, omega.ajax.POST, function(json){
                     if(json.success){
                         omega.notice.success(__('Success'), json.message);
                         omega.modal.hide(mid);
-                        var url = omega.mvc.url('settings', 'langftable');
-                        omega.ajax.query(url, {}, omega.ajax.GET, function (html) {
-                            $containerLangf.empty().html(html);
-                        }, undefined, { dataType: 'html' });
+                        loadTable();
                     }
                     else{
                         omega.notice.error(__('Error'), json.message);
@@ -38,8 +35,8 @@ $(function(){
 
     $('body').delegate(btnEditLanf, 'click', function() {
         var slug = $(this).data('slug');
-        var url = omega.mvc.url('settings', 'langfedit');
-        omega.ajax.query(url, {slug: slug}, omega.ajax.GET, function(html){
+        var url = route('admin.settings.flang.langfedit', {slug: slug});
+        omega.ajax.query(url, {}, omega.ajax.GET, function(html){
             var mid = omega.modal.open(__('Edit front-end language'), html, __('Save'), function(){
                 var args = {
                     name: $('#name').val(),
@@ -101,7 +98,7 @@ $(function(){
     }
 
     function loadTable(){
-        var url = omega.mvc.url('settings', 'flangtable');
+        var url = route('admin.settings.flang.table');
         omega.ajax.query(url, {}, omega.ajax.GET, function (html) {
             $containerLangf.empty().html(html);
         }, undefined, { dataType: 'html' });

@@ -11,7 +11,7 @@ use Omega\Http\Requests\Medias\MakeVideoRequest;
 use Omega\Http\Requests\Medias\MkdirRequest;
 use Omega\Http\Requests\Medias\RenameRequest;
 use Omega\Http\Requests\Medias\UploaderRequest;
-use Omega\Media;
+use Omega\Models\Media;
 use Omega\Repositories\MediaRepository;
 use Omega\Utils\Path;
 use Omega\Utils\Url;
@@ -28,13 +28,22 @@ class MediasController extends AdminController
 
     public function library(){
 
-        $viewBag = [
+        return view('media.library')->with([
             'isAjax' => false,
             'uid' => uniqid(),
             'rootId' => 1,
             'inception' => false,
-        ];
-        return view('media.library')->with($viewBag);
+        ]);
+    }
+
+    public function library_modal(){
+
+        return view('media.library_ajax')->with([
+            'isAjax' => true,
+            'uid' => uniqid(),
+            'rootId' => 1,
+            'inception' => false,
+        ]);
     }
 
     public function uploader(UploaderRequest $request){

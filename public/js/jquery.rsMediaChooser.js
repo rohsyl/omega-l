@@ -16,7 +16,7 @@ var mediaChooserInstance = 0;
 		var $this = this;
 
 		if($this.settings.url == undefined)
-			$this.settings.url = omega.mvc.url('media', 'ajaxlibrary');
+			$this.settings.url = route('media.library.modal');
 
 		this.$button.click(function(e){
             e.preventDefault();

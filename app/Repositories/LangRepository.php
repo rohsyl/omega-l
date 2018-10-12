@@ -12,6 +12,12 @@ class LangRepository{
         $this->lang = $lang;
     }
 
+    public function get($id){
+        return $this->lang->find($id);
+    }
+    public function getBySlug($slug){
+        return $this->lang->where('slug', $slug)->first();
+    }
 
     public function all(){
         return $this->lang->all();
@@ -19,6 +25,20 @@ class LangRepository{
 
     public function allEnabled(){
         return $this->lang->where('isEnabled', true)->get();
+    }
+
+    public function create($inputs){
+        $lang = new Lang();
+        $lang->slug = $inputs['slug'];
+        return $this->update($lang, $inputs);
+    }
+
+    public function update($lang, $inputs){
+        $lang->name = $inputs['name'];
+        $lang->isEnabled = $inputs['enabled'];
+        $lang->fkMediaFlag = $inputs['fkMedia'];
+        $lang->save();
+        return $lang;
     }
 
 }

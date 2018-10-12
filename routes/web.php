@@ -55,8 +55,8 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('settings/flang', 'SettingsController@saveFlang')->name('admin.settings.flang.save');
             Route::get('settings/flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
             Route::get('settings/langfadd', 'SettingsController@langfadd')->name('admin.settings.flang.langfadd');
-            Route::post('settings/langfadded', 'SettingsController@langfadded')->name('admin.settings.flang.langfadded');
-            Route::get('settings/langfedit', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
+            Route::post('settings/langfcreate', 'SettingsController@langfcreate')->name('admin.settings.flang.langfcreate');
+            Route::get('settings/langfedit/{slug}', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
             Route::post('settings/langfedited', 'SettingsController@langfedited')->name('admin.settings.flang.langfedited');
             Route::get('settings/seo', 'SettingsController@seo')->name('admin.settings.seo');
             Route::post('settings/seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
@@ -103,6 +103,7 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('pages/chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
 
             Route::get('media/library', 'MediasController@library')->name('media.library');
+            Route::get('media/library/modal', 'MediasController@library_modal')->name('media.library.modal');
             Route::get('media/uploader', 'MediasController@uploader')->name('media.uploader');
             Route::post('media/uploadhandler', 'MediasController@uploadHandler')->name('media.uploadhandler');
             Route::post('media/dc', 'MediasController@getDirectoryContent')->name('media.dc');
