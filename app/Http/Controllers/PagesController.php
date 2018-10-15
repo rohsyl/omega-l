@@ -2,6 +2,7 @@
 
 namespace Omega\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\CreatePageRequest;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\ModuleAreaRepository;
@@ -46,7 +47,7 @@ class PagesController extends AdminController
 
         $currentLang = null;
         if($enabledLang){
-            $currentLang = isset($lang) ? $lang : $defaultLang;
+            $currentLang = isset($lang) ? $lang : null;
         }
 
         $viewBag = [
@@ -58,8 +59,8 @@ class PagesController extends AdminController
         return view('pages.index')->with($viewBag);
     }
 
-    public function chooseLang($lang = null){
-        return redirect()->route('admin.pages', ['lang' => $lang]);
+    public function chooseLang(Request $request){
+        return redirect()->route('admin.pages', ['lang' => $request->input('lang')]);
     }
 
     public function add($lang = null){
@@ -254,21 +255,18 @@ class PagesController extends AdminController
 
     }
 
-    public function getTable(){
+    public function getTable($lang = null){
         $enabledLang = om_config('om_enable_front_langauge');
-        $defaultLang = om_config('om_default_front_langauge');
-        $currentLang = isset($_GET['lang']) ? $_GET['lang'] : $defaultLang;
 
         $pages = !$enabledLang ?
             $this->pageRepository->getPagesWithParent(null) :
-            $this->pageRepository->getPageWithParentAndLang($currentLang, null);
+            $this->pageRepository->getPageWithParentAndLang($lang, null);
 
-        $viewBag = [
+        return view('pages.indextable')->with([
             'enabledLang' => $enabledLang,
-            'currentLang' => $currentLang,
+            'currentLang' => $lang,
             'pages' => $pages,
-        ];
-        return view('pages.indextable')->with($viewBag);
+        ]);
     }
 
     public function getPagesLevelZeroBylang(){

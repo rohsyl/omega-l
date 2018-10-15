@@ -9,7 +9,7 @@ $(function(){
 
         $('#tableContainer').find('tr.row-page').each(function(i){
             var pid = $(this).data('idpage');
-            var pname = $(this).data('title')
+            var pname = $(this).data('title');
             html += '<tr style="cusror:grab;" data-idpage="'+pid+'">' +
                 '<td>' +
                 pname +
@@ -41,7 +41,7 @@ $(function(){
             },
             placeholder: 'sortable-placeholder',
             update: function( event, ui ) {
-                var array = new Array();
+                var array = [];
                 $('.sortable > tbody  > tr').each(function(i) {
                     var idPage = $(this).data('idpage');
                     array.push({order: i, id: idPage});
@@ -58,8 +58,8 @@ $(function(){
 
     function updateTable()
     {
-        var url = omega.mvc.url('pages', 'getTable');
-        omega.ajax.loadHtml($tableContainer, url);
+        var url = !$tableContainer.data('lang-enabled') ? route('admin.pages.index.table') : route('admin.pages.index.table', {lang: $tableContainer.data('lang-current')});
+        omega.ajax.loadHtml($tableContainer, url.url());
     }
     updateTable();
 });

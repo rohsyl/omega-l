@@ -25,7 +25,7 @@ class CreatePageRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'lang' => 'nullable|string|in:langs,slug',
+            'lang' => 'nullable|string|exists:langs,slug',
             'parent' => 'nullable',
         ];
     }

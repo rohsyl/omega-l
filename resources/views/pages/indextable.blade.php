@@ -13,10 +13,6 @@
     <tr>
         <td colspan="@if($enabledLang) 5 @else 4 @endif" align="center">
             {{ __('No page') }}
-            @php $args = $enabledLang ? ['lang' => $currentLang] : []; @endphp
-            <a href="{{ route('admin.pages.add', $args) }}" class="btn btn-primary btn-xs">
-                <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
-            </a>
         </td>
     </tr>
 

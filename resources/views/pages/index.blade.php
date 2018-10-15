@@ -26,7 +26,7 @@
     </p>
 
 
-    <div id="tableContainer">
+    <div id="tableContainer" data-lang-current="{{ $currentLang }}" data-lang-enabled="{{ $enabledLang }}">
 
     </div>
 
