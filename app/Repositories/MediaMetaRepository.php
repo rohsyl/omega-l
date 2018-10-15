@@ -2,13 +2,13 @@
 namespace Omega\Repositories;
 
 
-use Omega\Models\Mediameta;
+use Omega\Models\MediaMeta;
 
 class MediametaRepository{
 
     private $mediameta;
 
-    public function __construct(Mediameta $mediameta) {
+    public function __construct(MediaMeta $mediameta) {
 
         $this->mediameta = $mediameta;
     }

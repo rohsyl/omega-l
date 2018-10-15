@@ -16,7 +16,7 @@ class CreateMediametasTable extends Migration
         Schema::create('mediametas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('lang', 2);
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
 
