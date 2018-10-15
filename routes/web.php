@@ -113,6 +113,9 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('media/rn', 'MediasController@rn')->name('media.rn');
             Route::post('media/mkvideo', 'MediasController@mkvideo')->name('media.mkvideo');
             Route::post('media/copyormove', 'MediasController@copyormove')->name('media.copyormove');
+            Route::get('media/edit/{id}', 'MediasController@editMedia')->name('media.edit');
+            Route::post('media/update/{id}', 'MediasController@updateMedia')->name('media.update');
+            Route::post('media/update/{id}/thumbnail', 'MediasController@updateMediaThumbnail')->name('media.update.thumbnail');
 
             Route::get('member', 'MemberController@index')->name('member.index');
             Route::get('member/addmember', 'MemberController@member_add')->name('member.addmember');

@@ -4,7 +4,7 @@ namespace Omega\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Mediameta extends Model
+class MediaMeta extends Model
 {
     //
 }

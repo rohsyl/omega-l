@@ -4,7 +4,7 @@ namespace Omega\Repositories;
 
 use Omega\Models\MediaMeta;
 
-class MediametaRepository{
+class MediaMetaRepository{
 
     private $mediameta;
 
@@ -15,5 +15,12 @@ class MediametaRepository{
 
     public function GetAllForMedia($idMedia){
         return $this->mediameta->where('fkMedia', $idMedia)->get();
+    }
+
+    public function getOrNew($id){
+        if(isset($id)){
+            return $this->mediameta->find($id);
+        }
+        return new $this->mediameta;
     }
 }

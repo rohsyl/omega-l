@@ -500,11 +500,11 @@ var rsExplorerInstance = 0;
 
 			$('.btn-edit-meta').click(function(){
 				var id = $(this).data('media-id');
-				var url = omega.mvc.url('media', 'editMedia');
-				omega.ajax.query(url, { id : id }, 'GET', function(html){
+				var url = route('media.edit', { id : id });
+				omega.ajax.query(url, {}, 'GET', function(html){
 					var modalId = omega.modal.open(__('Edit Media'), html, __('Save'), function(){
                         var $form = $('#editMediaForm');
-						url = omega.mvc.url('media', 'updateMediaMeta', { id : id });
+						url = route('media.update', { id : id });
 						var args = $form.serialize();
 						console.log(args);
 						omega.ajax.query(url, args, 'POST', function(){
@@ -524,7 +524,7 @@ var rsExplorerInstance = 0;
 					allowedMedia: ['picture'],
 					doneFunction: function (data, button) {
 						var id = button.data('media-id');
-						url = omega.mvc.url('media', 'updateMediaThumbnail', { id : id });
+						url = route('media.update.thumbnail', { id : id });
 						var mediaId = data.id;
 						omega.ajax.query(url, { mediaId : mediaId }, 'POST', function(){
 							$this._load(function(){

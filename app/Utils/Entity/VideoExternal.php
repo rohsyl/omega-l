@@ -27,7 +27,7 @@ class VideoExternal
     public function __construct($media, $loadMeta = false)
     {
         $this->media = $media;
-        if ($this->media->exists) {
+        if ($this->media->id == null) {
             $this->readUrl();
             if($loadMeta){
                 $this->fetchDetail();
@@ -118,8 +118,7 @@ class VideoExternal
     }
 
     public function setVideoThumbnail($mediaId){
-        $media = new Media($mediaId);
-        $sourcePath = $media->getRealpath();
+        $sourcePath = Media::Get($mediaId)->getRealpath();
 
         $path_parts = pathinfo($sourcePath);
         $ext = $path_parts['extension'];

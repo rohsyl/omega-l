@@ -10,20 +10,26 @@ use Omega\Http\Requests\Medias\GetDCRequest;
 use Omega\Http\Requests\Medias\MakeVideoRequest;
 use Omega\Http\Requests\Medias\MkdirRequest;
 use Omega\Http\Requests\Medias\RenameRequest;
+use Omega\Http\Requests\Medias\UpdateMediaRequest;
+use Omega\Http\Requests\Medias\UpdateMediaThumbnailRequest;
 use Omega\Http\Requests\Medias\UploaderRequest;
 use Omega\Models\Media;
+use Omega\Repositories\LangRepository;
 use Omega\Repositories\MediaRepository;
+use Omega\Utils\Entity\VideoExternal;
 use Omega\Utils\Path;
 use Omega\Utils\Url;
 
 class MediasController extends AdminController
 {
     private $mediaRepository;
+    private $langRepository;
 
-    public function __construct(MediaRepository $mediaRepository) {
+    public function __construct(MediaRepository $mediaRepository, LangRepository $langRepository) {
         parent::__construct();
 
         $this->mediaRepository = $mediaRepository;
+        $this->langRepository = $langRepository;
     }
 
     public function library(){
@@ -235,6 +241,63 @@ class MediasController extends AdminController
         return response()->json([
             'success' => $result
         ]);
+    }
+
+
+
+    public function editMedia($id) {
+
+        $media = $this->mediaRepository->GetMedia($id);
+        return view('media.edit')->with([
+            'media' => $media,
+            'langs' => $this->langRepository->allEnabled(),
+            'langEnabled' => om_config('om_enable_front_langauge')
+        ]);
+    }
+
+    public function updateMedia(UpdateMediaRequest $request, $id)
+    {
+        $title = !empty($request->input('title')) ? $request->input('title') : null;
+        $description = !empty($request->input('description')) ? $request->input('description') : null;
+
+        if($request->has('titles')) {
+            $titles = $request->input('titles');
+        }
+        if($request->has('descriptions')) {
+            $descriptions = $request->input('descriptions');
+        }
+
+        $media = $this->mediaRepository->GetMedia($id);
+        $media->title = $title;
+        $media->description = $description;
+        if(isset($titles)){
+            foreach($titles as $lang => $title){
+                $media->setTitle($title, $lang);
+            }
+        }
+        if(isset($descriptions)){
+            foreach($descriptions as $lang => $description){
+                $media->setDescription($description, $lang);
+            }
+        }
+        $media->saveMeta();
+        $media->save();
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function updateMediaThumbnail(UpdateMediaThumbnailRequest $request, $id){
+        $mediaId = !empty($request->input('mediaId')) ? $request->input('mediaId') : null;
+        $media = $this->mediaRepository->GetMedia($id);
+        $video = new VideoExternal($media);
+        $res = $video->setVideoThumbnail($mediaId);
+
+        return response()->json([
+            'success' => $res
+        ]);
+
     }
 
 }

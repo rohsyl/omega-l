@@ -3,8 +3,9 @@
 namespace Omega\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Omega\Repositories\MediametaRepository;
+use Omega\Repositories\MediaMetaRepository;
 use Omega\Repositories\MediaRepository;
+use Omega\Utils\Entity\Entity;
 use Omega\Utils\Interfaces\InterfaceMediaConstant;
 use Omega\Utils\Url;
 
@@ -14,7 +15,7 @@ class Media extends Model implements InterfaceMediaConstant
     protected $table = 'medias';
 
     private static $mediaRepository;
-    private static $mediametaRepository;
+    private static $mediaMetaRepository;
 
     /**
      * Get an instance of MediaRepository
@@ -29,13 +30,13 @@ class Media extends Model implements InterfaceMediaConstant
 
     /**
      * Get an instance of MediametaRepository
-     * @return MediametaRepository
+     * @return MediaMetaRepository
      */
-    private static function GetMediametaRepository(){
-        if(!isset(self::$mediametaRepository)){
-            self::$mediametaRepository = new MediametaRepository(new Mediameta());
+    private static function GetMediaMetaRepository(){
+        if(!isset(self::$mediaMetaRepository)){
+            self::$mediaMetaRepository = new MediaMetaRepository(new MediaMeta());
         }
-        return self::$mediametaRepository;
+        return self::$mediaMetaRepository;
     }
 
     /**
@@ -102,20 +103,14 @@ class Media extends Model implements InterfaceMediaConstant
 
 
     public function saveMeta(){
-        foreach($this->metas as $lang => $meta){
-            $mm = new Mediameta();
+        foreach($this->metas as $lang => $meta) {
+            $mm = self::GetMediaMetaRepository()->getOrNew(isset($meta['id']) ? $meta['id'] : null);
             $mm->lang = $lang;
             $mm->title = $meta['title'];
             $mm->description = $meta['description'];
             $mm->fkMedia = $this->id;
-
-            if(isset($meta['id'])) {
-                $mm->id = $meta['id'];
-            }
-            $lid = $mm->save();
-
-            if($lid)
-                $this->metas[$lang]['id'] = $mm->id;
+            $mm->save();
+            $this->metas[$lang]['id'] = $mm->id;
         }
     }
 

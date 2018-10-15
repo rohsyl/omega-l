@@ -24,7 +24,7 @@ class UpdateMediaThumbnailRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'mediaId' => 'required|integer|exists:medias,id'
         ];
     }
 }

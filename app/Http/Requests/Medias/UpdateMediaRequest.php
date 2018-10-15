@@ -24,7 +24,10 @@ class UpdateMediaRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'title' => 'nullable|string',
+            'description' => 'nullable|string',
+            'titles.*' => 'nullable|string',
+            'descriptions.*' => 'nullable|string',
         ];
     }
 }
