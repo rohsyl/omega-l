@@ -20,4 +20,8 @@ class Page extends Model
     public function modules(){
         return $this->hasMany('Omega\Models\Module', 'fkPage', 'id');
     }
+
+    public function security(){
+        return $this->hasOne('Omega\Models\PageSecurity', 'fkPage', 'id');
+    }
 }

@@ -672,3 +672,7 @@ th.date{
 	-moz-border-radius-bottomright: 3px;
 	border-bottom-right-radius: 3px;
 }
+
+.panel .panel-heading .radio{
+	padding-top : 3px;
+}

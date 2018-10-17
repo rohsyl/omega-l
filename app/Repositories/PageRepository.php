@@ -11,6 +11,7 @@ namespace Omega\Repositories;
 
 use Illuminate\Support\Facades\Auth;
 use Omega\Models\Page;
+use Omega\Library\Entity\Page as PageHelper;
 
 class PageRepository
 {
@@ -19,6 +20,10 @@ class PageRepository
 
     public function __construct(Page $page) {
         $this->page = $page;
+    }
+
+    public function get($id){
+        return $this->page->find($id);
     }
 
     public function all($langSlug = null){
@@ -32,11 +37,9 @@ class PageRepository
 
     public function getPagesWithParent($idPageParent = null){
         if(!isset($idPageParent))
-            $query = $this->page->whereNull('fkPageParent');
+            return $this->page->whereNull('fkPageParent')->get();
         else
-            $query = $this->page->where('fkPageParent', $idPageParent);
-
-        return $query->get();
+            return $this->page->where('fkPageParent', $idPageParent)->get();
     }
 
     public function getPageWithParentAndLang($langSlug, $idPageParent = null){
@@ -48,6 +51,21 @@ class PageRepository
             $query = $query->where('fkPageParent', $idPageParent);
 
         return $query->get();
+    }
+
+    public function getCorrespondingParents($langs, $page){
+        $corr = array();
+        foreach ($langs as $l){
+            if($l->slug != $page->lang){
+                if($page->fkPageParent == null || $page->fkPageParent == 0){
+                    $corr[$l->slug] = null;
+                }
+                else{
+                    $corr[$l->slug] = PageHelper::GetCorrespondingInLang($page->fkPageParent, $l->slug);
+                }
+            }
+        }
+        return $corr;
     }
 
     public function hasChild($fkPageParent){
@@ -63,5 +81,25 @@ class PageRepository
         $page->fkPageParent = $inputs['parent'];
         $page->fkUser = Auth::id();
         return $page->save();
+    }
+
+    public function update($page, $inputs){
+        $page->showName = $inputs['showName'];
+        $page->name = $inputs['name'];
+        $page->showSubtitle = $inputs['showSubtitle'];
+        $page->subtitle = $inputs['subtitle'];
+        $page->slug = $inputs['slug'];
+        $page->model = $inputs['model'];
+        $page->cssTheme = $inputs['cssTheme'];
+        $page->keyWords = $inputs['keyword'];
+        $page->fkMenu = $inputs['menu'];
+        $page->fkPageParent = $inputs['parent'];
+        if(om_config('om_enable_front_langauge')){
+            $page->lang = real_null($inputs['lang']);
+
+        }
+
+        $page->save();
+        return $page;
     }
 }

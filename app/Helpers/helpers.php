@@ -206,6 +206,38 @@ if(!function_exists('to_select')) {
 }
 
 
+if(!function_exists('array_to_select')) {
+    /**
+     * Convert a collection of object to a key/value array
+     * @param $collection array The collection
+     * @param string $keyValue The name of the property value
+     * @param string $keyKey The name of the property key
+     * @return array The key value array
+     */
+    function array_to_select($array, $append = []){
+        $l = [];
+        foreach($array as $item){
+            $l[$item] = prettify_text($item);
+        }
+        return $append + $l;
+    }
+}
+if(!function_exists('remove_by_key')) {
+    /**
+     * Remove an element
+     * @param $collection array The collection
+     * @param string $keyValue The name of the property value
+     * @param string $keyKey The name of the property key
+     * @return array The key value array
+     */
+    function remove_by_key($array, $key){
+        if(isset($array[$key]))
+            unset($array[$key]);
+        return $array;
+    }
+}
+
+
 if(!function_exists('unique_slug')) {
     /**
      * Generate a slug and ensure it is unique in the database
@@ -251,5 +283,12 @@ if(!function_exists('prettify_text')) {
 if(!function_exists('without_ext')) {
     function without_ext($filename){
         return pathinfo($filename, PATHINFO_FILENAME);
+    }
+}
+
+
+if(!function_exists('real_null')) {
+    function real_null($value){
+        return (strtolower($value) == 'null') ? null : $value;
     }
 }

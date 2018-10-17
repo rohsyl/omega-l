@@ -22,6 +22,13 @@ class MenuRepository
         return $this->menu->find($id);
     }
 
+    public function getWithLang($lang = null){
+        if(isset($lang))
+            return $this->menu->where('lang', $lang)->get();
+        else
+            return $this->menu->get();
+    }
+
     public function all(){
         return $this->menu->with('membergroup')->get();
     }

@@ -13,7 +13,7 @@ class CreatePagesecuritytypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('pagesecuritytypes', function (Blueprint $table) {
+        Schema::create('page_security_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
             $table->string('title');
@@ -27,6 +27,6 @@ class CreatePagesecuritytypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pagesecuritytypes');
+        Schema::dropIfExists('page_security_types');
     }
 }

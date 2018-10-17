@@ -2,9 +2,18 @@
 
 namespace Omega\Http\Controllers;
 
+use Illuminate\Validation\Rule;
+use Omega\Repositories\GroupRepository;
+use Omega\Repositories\MembergroupRepository;
+use Omega\Repositories\PageLangRelRepository;
+use Omega\Repositories\PageSecurityRepository;
+use Omega\Repositories\PageSecurityTypeRepository;
+use Validator;
 use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\CreatePageRequest;
+use Omega\Http\Requests\Page\UpdateRequest;
 use Omega\Repositories\LangRepository;
+use Omega\Repositories\MenuRepository;
 use Omega\Repositories\ModuleAreaRepository;
 use Omega\Repositories\ModuleRepository;
 use Omega\Repositories\PageRepository;
@@ -12,31 +21,47 @@ use Omega\Repositories\PositionRepository;
 use Omega\Repositories\ThemeRepository;
 use Omega\Utils\Plugin\PluginMeta;
 use Omega\Utils\Plugin\Type;
+use Omega\Utils\Entity\Page as PageHelper;
 
 class PagesController extends AdminController
 {
 
     private $langRepository;
     private $pageRepository;
+    private $pageLangRelRepository;
+    private $pageSecurityTypeRepository;
+    private $pageSecurityRepository;
     private $moduleAreaRepository;
     private $themeRepository;
     private $positionRepository;
     private $moduleRepository;
+    private $menuRepository;
+    private $membergroupRepository;
 
     public function __construct(LangRepository $langRepository,
                                 PageRepository $pageRepository,
+                                PageLangRelRepository $pageLangRelRepository,
+                                PageSecurityRepository $pageSecurityRepository,
+                                PageSecurityTypeRepository $pageSecurityTypeRepository,
                                 ModuleAreaRepository $moduleAreaRepository,
                                 ThemeRepository $themeRepository,
                                 PositionRepository $positionRepository,
-                                ModuleRepository $moduleRepository)
+                                ModuleRepository $moduleRepository,
+                                MenuRepository $menuRepository,
+                                MembergroupRepository $membergroupRepository)
     {
         parent::__construct();
         $this->langRepository = $langRepository;
         $this->pageRepository = $pageRepository;
+        $this->pageLangRelRepository = $pageLangRelRepository;
+        $this->pageSecurityRepository = $pageSecurityRepository;
+        $this->pageSecurityTypeRepository = $pageSecurityTypeRepository;
         $this->moduleAreaRepository = $moduleAreaRepository;
         $this->themeRepository = $themeRepository;
         $this->positionRepository = $positionRepository;
         $this->moduleRepository = $moduleRepository;
+        $this->menuRepository = $menuRepository;
+        $this->membergroupRepository = $membergroupRepository;
     }
 
     public function index($lang = null){
@@ -83,7 +108,7 @@ class PagesController extends AdminController
         return redirect()->route('admin.pages');
     }
 
-    public function edit($id){
+    public function edit($id, $tab = 'content'){
         /*
         has_right( 'page_update' , true );
         if(ParamUtil::IsValidUrlParamId('id')){
@@ -211,6 +236,41 @@ class PagesController extends AdminController
             $this->view->Set('moduleList', $this->moduleList());
 
             return $this->view->Render();*/
+
+        $enabledLang = om_config('om_enable_front_langauge');
+        $currentTheme = $this->themeRepository->getCurrentThemeName();
+        $page = $this->pageRepository->get($id);
+        $langs = $this->langRepository->allEnabled();
+
+        $security = $page->security;
+        if($security != null) {
+            $securityType = $page->security->type;
+        }
+        else {
+            $securityType = $this->pageSecurityTypeRepository->getSecurityNone();
+            $security = $this->pageSecurityRepository->newInstanceOfType($securityType, $page->id);
+        }
+
+        return view('pages.edit')->with([
+            'tab' => isset($tab) ? $tab : 'content',
+            'enabledLang' => $enabledLang,
+            'page' => $page,
+
+            'pages' => remove_by_key(to_select($this->pageRepository->getPagesWithParent(null), 'name', 'id', [null => __('No parent')]), $page->id),
+            'models' => array_to_select($this->themeRepository->getThemeTemplate($currentTheme), ['default' => __('Default model')]),
+            'menus' => to_select($this->menuRepository->getWithLang($enabledLang ? $page->lang : null), 'name','id', [null => __('Default menu')]),
+            'cssThemes' => array_to_select($this->themeRepository->getThemeCssThemes($currentTheme), ['none' => __('None')]),
+
+            'langs_select' => to_select($langs, 'name', 'slug', [null => __('Any')]),
+            'langs' => $langs,
+            'correspondingParents' => $this->pageRepository->getCorrespondingParents($langs, $page),
+
+            'securityType' => $securityType->name,
+            'securityData' => unserialize($security->data),
+            'groups' => to_select($this->membergroupRepository->all(), 'name', 'id'),
+
+            'componentList' => '',
+        ]);
     }
 
     public function moduleareaList($pageId) {
@@ -245,6 +305,83 @@ class PagesController extends AdminController
         ]);
     }
 
+    public function update(UpdateRequest $request, $id){
+
+        $enabledLang = om_config('om_enable_front_langauge');
+
+        // make sur the slug is unique
+        $validator = Validator::make($request->all(), [
+            'slug' => [
+                Rule::unique('pages')->ignore($id),
+            ],
+        ]);
+
+        // send back with errors if the validation fails
+        if ($validator->fails()) {
+            toast()->error(__('Errors while saving the page'));
+            return redirect()
+                ->route('admin.pages.edit', ['id' => $id, 'tab' => $request->input('tab')])
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $page = $this->pageRepository->get($id);
+
+
+        // clear lang relation if the lang of the page is changed
+        if($enabledLang){
+            $this->pageLangRelRepository->clearRelIfLangChanged($page, $request->all());
+        }
+
+        // update the page
+        $this->pageRepository->update($page, $request->all());
+
+        // save the page relations
+        if($enabledLang){
+            if($request->has('plangs_rel')){
+                $langs_page_rel = $request->input('plangs_rel');
+                foreach($langs_page_rel as $lang => $rel){
+                    if($lang != $page->lang)
+                        $this->pageLangRelRepository->savePageLangRel($id, real_null($rel), $lang);
+                }
+            }
+        }
+
+        // save the security settings
+        switch ($request->input('security'))
+        {
+            case 'bypassword':
+                $this->pageSecurityRepository->update(
+                    $page->security,
+                    $this->pageSecurityTypeRepository->getSecurityPassword(),
+                    [
+                        'message' => $request->input('security_message'),
+                        'password' => $request->input('security_password')
+                    ]
+                );
+                break;
+            case 'bymember':
+                $this->pageSecurityRepository->update(
+                    $page->security,
+                    $this->pageSecurityTypeRepository->getSecurityMember(),
+                    [
+                        'membergroup' => $request->input('security_membergroup')
+                    ]
+                );
+                break;
+            case 'none' :
+            default :
+                $this->pageSecurityRepository->update(
+                    $page->security,
+                    $this->pageSecurityTypeRepository->getSecurityNone()
+                );
+                break;
+        }
+
+        toast()->success(__('Page saved'));
+        return redirect()->route('admin.pages.edit', ['id' => $page->id, 'tab' => $request->input('tab')]);
+    }
+
 
     public function delete($id){
 
@@ -270,6 +407,17 @@ class PagesController extends AdminController
     }
 
     public function getPagesLevelZeroBylang(){
+        /*
+        $lang = $_GET['lang'];
+        $pages = PageManager::GetAllPagesWithLangs($lang);
+        $this->view->Set('pageList', $pages);
+        return $this->view->RenderPartial();*/
+    }
 
+    function getAllPageByParentAndLang($pid, $lang, $idParent = null){
+        return response()->json([
+            'selected' => PageHelper::GetCorrespondingInLang($pid, $lang),
+            'pages' => $this->pageRepository->getPageWithParentAndLang($lang, $idParent)
+        ]);
     }
 }

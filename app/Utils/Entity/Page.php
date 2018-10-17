@@ -1,7 +1,9 @@
 <?php
-namespace Omega\Library\Entity;
+namespace Omega\Utils\Entity;
 
+use Illuminate\Support\Facades\DB;
 use Omega\Library;
+/*
 use Omega\Library\Database\Dbs;
 use Omega\Library\Util\Config;
 use Omega\Library\Util\Redirect;
@@ -11,27 +13,15 @@ use Omega\Library\Util\MessageFront;
 use Omega\Library\Util\OmegaUtil;
 use Omega\Library\PMvc\PController;
 use Omega\Library\Plugin\Type;
-use Omega\Library\Language\Front\LangManager;
-	
+use Omega\Library\Language\Front\LangManager;*/
+use Omega\Repositories\PageRepository;
+use Omega\Models\Page as PageModel;
+use Omega\Utils\Path;
+
 class Page{
 
-    public $id;
-    public $idText;
-    public $title;
-    public $isTitleShown;
-    public $subtitle;
-    public $isSubtitleShow;
-    public $model;
-    public $cssTheme;
-    public $keyword;
-    public $order;
-    public $idParent;
-    public $idCreator;
-    public $isEnabled;
-    public $idMenu;
-    public $created;
-    public $updated;
-    public $lang;
+    private $pageRepository;
+    private $page;
 
     public $secure;
     public $securityType;
@@ -41,59 +31,9 @@ class Page{
 
     public function __construct($id = 0) {
 
-        $page = Dbs::select('*')
-            ->from('om_page')
-            ->where('id', '=', '?')
-            ->prepare(array($id))
-            ->run();
+        $this->pageRepository = new PageRepository(new PageModel());
 
-        if($page->length() == 1){
-            $page = $page->getRowArray(0);
-            $this->id = $page['id'];
-            $this->idText = $page['idText'];
-            $this->title = $page['pageName'];
-            $this->subtitle = $page['pageSubtitle'];
-            $this->isTitleShown = $page['pageShowName'];
-            $this->isSubtitleShow = $page['pageShowSubtitle'];
-            $this->model = $page['pageModel'];
-            $this->lang = $page['pageLang'];
-            $this->cssTheme = $page['pageCssTheme'];
-            $this->keyword = $page['pageKeyWords'];
-            $this->order = $page['pageORDER'];
-            $this->idParent = $page['fkPageParent'];
-            $this->idCreator = $page['fkUser'];
-            $this->isEnabled = $page['pageIsEnabled'];
-            $this->idMenu = $page['pageMenu'] == 0 || !isset($page['pageMenu']) ? null : $page['pageMenu'];
-            $this->created = $page['pageDateCreated'];
-            $this->updated = date('d - m - Y', strtotime($page['pageDateUpdated']) );
-            $this->exists = true;
-
-            unset($page);
-        }
-        else
-        {
-            $this->id = 0;
-            $this->idText = '';
-            $this->title = '';
-            $this->subtitle = '';
-            $this->isTitleShown = true;
-            $this->isSubtitleShow = true;
-            $this->model = 'default';
-            $this->lang = null;
-            $this->cssTheme = 'none';
-            $this->keyword = '';
-            $this->order = '';
-            $this->content = '';
-            $this->idParent = '';
-            $this->idCreator = '';
-            $this->isEnabled = '';
-            $this->idMenu = null;
-            $this->created = '';
-            $this->updated = '';
-            $this->exists = false;
-            unset($page);
-        }
-        $this->content = '';
+        $this->page = $this->pageRepository->get($id);
 
         if($this->exists())
         {
@@ -118,6 +58,10 @@ class Page{
 
         }
     }
+
+    public function __get($name){
+        return $this->page->$name;
+    }
 	
 	public function render()
 	{
@@ -136,10 +80,11 @@ class Page{
 	}
 	
     public function exists() {
-        return $this->exists;
+        return isset($this->page);
     }
 
     public function doSecurityAction() {
+        /*
         switch ($this->securityType)
         {
             case 'bypassword':
@@ -206,11 +151,11 @@ class Page{
                 }
                 else $error403();
                 break;
-        }
+        }*/
     }
 
     public function reload() {
-        Redirect::toUrl(Url::CombAndAbs(ABSPATH, $this->idText));
+        return redirect(self::GetUrl($this->page->id));
     }
 
     private function renderView($viewName, $viewData = array(), $renderOnlyContent = true) {
@@ -232,7 +177,7 @@ class Page{
             function($matches) {
 
                 ob_start();
-				include Path::Combine(ROOT, 'om_macro', $matches[1]);
+				include Path::Combine(macro_path(), $matches[1]);
 				$html = ob_get_clean();
                 
                 return $html;
@@ -384,8 +329,7 @@ class Page{
         {
 
             $path = Path::Combine(
-                THEMEPATH,
-                Config::get('om_template_name'),
+                theme_path(om_config('om_template_name')),
                 'css',
                 'theme',
                 $this->cssTheme);
@@ -403,24 +347,16 @@ class Page{
                 $this->cssTheme
             );
 
-            echo '<link rel="stylesheet" href="'.$url.'" />';
+            return '<link rel="stylesheet" href="'.$url.'" />';
         }
     }
 
     public function isVisibleTitle(){
-        return $this->isTitleShown;
+        return $this->page->showTitle;
     }
 
     public function isVisibleSubTitle(){
-        return $this->isSubtitleShow;
-    }
-
-    public function setVisibleTitle($b){
-        $this->isTitleShown = $b;
-    }
-
-    public function setVisibleSubtitle($b){
-        $this->isSubtitleShow = $b;
+        return $this->page->showSubTitle;
     }
 
 
@@ -516,15 +452,15 @@ class Page{
     }
 
     public static function GetCorrespondingInLang($id, $langSlug){
-        $stmt = Dbs::select('P.id AS pid')
-            ->from('om_page_lang_rel AS R')
-            ->join('INNER', 'om_page AS P', 'P.id', 'R.fkPage1')
-            ->where('R.fkPage2', '=', '?')
-            ->andwhere('P.pageLang', 'LIKE', '?')
-            ->prepare(array($id, $langSlug))
-            ->run();
-        if($stmt->length() == 0) return null;
 
-        return $stmt->getInt(0, 'pid');
+        $stmt = DB::table('page_lang_rels')
+            ->selectRaw('pages.id AS pid')
+            ->join('pages', 'pages.id', 'page_lang_rels.fkPage1')
+            ->where('page_lang_rels.fkPage2', $id)
+            ->where('pages.lang', $langSlug);
+
+        if($stmt->doesntExist()) return null;
+
+        return $stmt->value('pid');
     }
 }

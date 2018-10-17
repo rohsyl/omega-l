@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePagesecuritiesTable extends Migration
+class CreatePagelangrelsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,16 @@ class CreatePagesecuritiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('pagesecurities', function (Blueprint $table) {
+        Schema::create('page_lang_rels', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer('fkType')->unsigned();
-            $table->integer('fkPage')->unsigned();
-            $table->longText('data');
+            $table->integer('fkPage1')->unsigned();
+            $table->integer('fkPage2')->unsigned();
 
-            $table->foreign('fkType')
-                ->references('id')->on('pagesecuritytypes')
+            $table->foreign('fkPage1')
+                ->references('id')->on('pages')
                 ->onDelete('cascade');
-
-            $table->foreign('fkPage')
+            $table->foreign('fkPage2')
                 ->references('id')->on('pages')
                 ->onDelete('cascade');
         });
@@ -37,6 +35,6 @@ class CreatePagesecuritiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pagesecurities');
+        Schema::dropIfExists('page_lang_rels');
     }
 }
