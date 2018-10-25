@@ -86,4 +86,8 @@ class PluginRepository
         }
         return $folders;
     }
+
+    public function getPluginsWithModulesSupport(){
+
+    }
 }

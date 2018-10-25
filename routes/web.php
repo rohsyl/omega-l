@@ -49,24 +49,27 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('/', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
 
-            Route::get('settings', 'SettingsController@index')->name('admin.settings');
-            Route::post('settings/general', 'SettingsController@saveGeneral')->name('admin.settings.general.save');
-            Route::get('settings/flang', 'SettingsController@flang')->name('admin.settings.flang');
-            Route::post('settings/flang', 'SettingsController@saveFlang')->name('admin.settings.flang.save');
-            Route::get('settings/flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
-            Route::get('settings/langfadd', 'SettingsController@langfadd')->name('admin.settings.flang.langfadd');
-            Route::post('settings/langfcreate', 'SettingsController@langfcreate')->name('admin.settings.flang.langfcreate');
-            Route::get('settings/langfedit/{slug}', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
-            Route::post('settings/langfupdate/{slug}', 'SettingsController@langfupdate')->name('admin.settings.flang.langfupdate');
-            Route::get('settings/delete/{slug}', 'SettingsController@langfdelete')->name('admin.settings.flang.langfdelete');
-            Route::get('settings/seo', 'SettingsController@seo')->name('admin.settings.seo');
-            Route::post('settings/seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
-            Route::get('settings/smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
-            Route::post('settings/smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
-            Route::get('settings/member', 'SettingsController@member')->name('admin.settings.member');
-            Route::post('settings/member', 'SettingsController@saveMember')->name('admin.settings.member.save');
-            Route::get('settings/advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
-            Route::get('settings/clearcache', 'SettingsController@clearCache')->name('admin.settings.advanced.clearCache');
+
+            Route::prefix('settings')->group(function(){
+                Route::get('/', 'SettingsController@index')->name('admin.settings');
+                Route::post('general', 'SettingsController@saveGeneral')->name('admin.settings.general.save');
+                Route::get('flang', 'SettingsController@flang')->name('admin.settings.flang');
+                Route::post('flang', 'SettingsController@saveFlang')->name('admin.settings.flang.save');
+                Route::get('flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
+                Route::get('langfadd', 'SettingsController@langfadd')->name('admin.settings.flang.langfadd');
+                Route::post('langfcreate', 'SettingsController@langfcreate')->name('admin.settings.flang.langfcreate');
+                Route::get('langfedit/{slug}', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
+                Route::post('langfupdate/{slug}', 'SettingsController@langfupdate')->name('admin.settings.flang.langfupdate');
+                Route::get('delete/{slug}', 'SettingsController@langfdelete')->name('admin.settings.flang.langfdelete');
+                Route::get('seo', 'SettingsController@seo')->name('admin.settings.seo');
+                Route::post('seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
+                Route::get('smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
+                Route::post('smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
+                Route::get('member', 'SettingsController@member')->name('admin.settings.member');
+                Route::post('member', 'SettingsController@saveMember')->name('admin.settings.member.save');
+                Route::get('advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
+                Route::get('clearcache', 'SettingsController@clearCache')->name('admin.settings.advanced.clearCache');
+            });
 
             Route::get('js/loadmain', 'JsController@loadmain')->name('js.loadmain');
             Route::get('language/loadforjs', 'LanguageController@loadforjs')->name('language.loadforjs');
@@ -97,6 +100,17 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');
             Route::get('pages/getPagesLevelZeroBylang', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
             Route::get('pages/moduleareaList/{pageId}', 'PagesController@moduleareaList')->name('admin.pages.moduleareaList');
+            Route::get('pages/moduleList/{pageId}', 'PagesController@moduleList')->name('admin.pages.moduleList');
+            Route::get('pages/ma/plugins/{pageId?}', 'ModuleareaController@listplugin')->name('admin.pages.ma.plugins');
+            Route::get('pages/ma/plugins/{pluginId}/modules/{pageId?}', 'ModuleareaController@listmodulebyplugin')->name('admin.pages.ma.plugins.modules');
+            Route::post('pages/ma/add/{pageId?}', 'ModuleareaController@addPosition')->name('admin.pages.ma.add');
+            Route::post('pages/ma/delete/{id}', 'ModuleareaController@deletePosition')->name('admin.pages.ma.delete');
+            Route::post('pages/ma/setonallpages/{id}/{set}/{pageId?}', 'ModuleareaController@setOnAllPages')->name('admin.pages.ma.setonallpages');
+            Route::post('pages/ma/setorder', 'ModuleareaController@setOrder')->name('admin.pages.ma.setorder');
+
+            Route::get('pages/getCreateFormForModule/{pageId?}', 'PagesController@getCreateFormForModule')->name('admin.pages.getCreateFormForModule');
+
+
             Route::post('pages/create', 'PagesController@create')->name('admin.pages.create');
             Route::get('pages/edit/{id}/{tab?}', 'PagesController@edit')->name('admin.pages.edit');
             Route::post('pages/update/{id}', 'PagesController@update')->name('admin.pages.update');

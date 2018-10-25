@@ -28,12 +28,8 @@ $(function(){
                     name : name
                 };
                 omega.ajax.query(url, args, "POST", function(){
-                    url = omega.mvc.url('page', 'moduleList');
-                    args = { id : pageId };
-                    omega.ajax.query(url, args, "GET", function(data){
-                        $modulesContainer.html(data);
-                        omega.modal.hide(idm);
-                    });
+                    loadModuleList();
+                    omega.modal.hide(idm);
                 });
             });
         });
@@ -242,6 +238,14 @@ $(function(){
                 $item.find('.downComponent').removeClass('hidden');
                 $item.find('.downdownComponent').removeClass('hidden');
             }
+        });
+    }
+
+    loadModuleList();
+    function loadModuleList(){
+        url = route('admin.pages.moduleList', { id : pageId });
+        omega.ajax.query(url, {}, "GET", function(data){
+            $modulesContainer.html(data);
         });
     }
 });

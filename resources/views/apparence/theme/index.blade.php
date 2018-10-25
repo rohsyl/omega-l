@@ -11,7 +11,7 @@
         @else
             @foreach($installed as $it)
                 @php $used = $it->name == $current; @endphp
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-4 col-sm-6">
                 <div class="panel panel-{{ $used ? 'green' : 'success' }}">
                     <div class="panel-heading">
                         {{ $it->title }}
@@ -39,7 +39,7 @@
             <p class="text-center">{{ __('There is no availables themes ...') }}</p>
         @else
             @foreach ($uninstalled as $name)
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-4 col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         {{ $name }}

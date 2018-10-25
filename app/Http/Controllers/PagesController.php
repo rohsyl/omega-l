@@ -8,6 +8,7 @@ use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
 use Omega\Repositories\PageSecurityTypeRepository;
+use Omega\Repositories\PluginRepository;
 use Validator;
 use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\CreatePageRequest;
@@ -37,6 +38,7 @@ class PagesController extends AdminController
     private $moduleRepository;
     private $menuRepository;
     private $membergroupRepository;
+    private $pluginRepository;
 
     public function __construct(LangRepository $langRepository,
                                 PageRepository $pageRepository,
@@ -48,9 +50,11 @@ class PagesController extends AdminController
                                 PositionRepository $positionRepository,
                                 ModuleRepository $moduleRepository,
                                 MenuRepository $menuRepository,
-                                MembergroupRepository $membergroupRepository)
+                                MembergroupRepository $membergroupRepository,
+                                PluginRepository $pluginRepository)
     {
         parent::__construct();
+
         $this->langRepository = $langRepository;
         $this->pageRepository = $pageRepository;
         $this->pageLangRelRepository = $pageLangRelRepository;
@@ -62,6 +66,7 @@ class PagesController extends AdminController
         $this->moduleRepository = $moduleRepository;
         $this->menuRepository = $menuRepository;
         $this->membergroupRepository = $membergroupRepository;
+        $this->pluginRepository = $pluginRepository;
     }
 
     public function index($lang = null){
@@ -420,4 +425,50 @@ class PagesController extends AdminController
             'pages' => $this->pageRepository->getPageWithParentAndLang($lang, $idParent)
         ]);
     }
+
+
+
+
+    #region module
+    public function getCreateFormForModule(){
+        $this->view->Set('plugins', PluginManager::GetPluginsWithModulesSupport());
+        return $this->view->RenderPartial();
+        return view('pages.module.create')->with([
+            'plugins' => []
+        ]);
+    }
+
+    public function createModule() {
+        if(ParamUtil::IsValidRequestParamId('pageId')
+            && ParamUtil::IsValidRequestParamId('pluginId')
+            && ParamUtil::IsValidRequestParamString('name')){
+
+            $res = ModuleManager::CreateModule($_POST['pageId'], $_POST['pluginId'], $_POST['name']);
+            $this->view->Set('result', $res);
+            return $this->view->RenderAjax();
+        }
+    }
+
+    public function getEditFormForModule() {
+        if(ParamUtil::IsValidUrlParamId('moduleId') && ParamUtil::IsValidUrlParamId('pageId')){
+            $moduleId = $_GET['moduleId'];
+            $pageId = $_GET['pageId'];
+            $module = ModuleManager::GetModule($moduleId);
+            $pluginId = $module->fkPlugin;
+            return Type::FormRender($pluginId, $moduleId, $pageId);
+        }
+    }
+
+    public function saveModule() {
+        if(ParamUtil::IsValidUrlParamId('moduleId')){
+            $moduleId = $_GET['moduleId'];
+            $module = ModuleManager::GetModule($moduleId);
+            $pluginId = $module->fkPlugin;
+            $pageId = $module->fkPage;
+            $res = Type::FormSave($pluginId, $moduleId, $pageId);
+            $this->view->Set('result', $res);
+            return $this->view->RenderAjax();
+        }
+    }
+    #endregion
 }

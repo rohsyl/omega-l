@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @push('scripts')
+    <script src="{{ asset('js/Sortable.min.js') }}" ></script>
     <script src="{{ asset('js/omega/admin/pages/edit.js') }}" ></script>
     <script src="{{ asset('js/omega/admin/pages/edit.langs.js') }}" ></script>
     <script src="{{ asset('js/omega/admin/pages/edit.modulearea.js') }}" ></script>

@@ -422,15 +422,31 @@ th.date{
 
 
 
+.sortable-ghost{
+	background-color: lightblue;
+}
 
 .module-area{
 	margin-bottom : 10px;
 	border : 1px solid #ccc;
 	height : 160px;
 }
+.module-area .glyphicon-move {
+	cursor: move;
+	cursor: -webkit-grabbing;
+}
+.module-area .list-group{
+	min-height: 50px;
+}
+.module-area .list-group .list-group-item{
+	border-radius: 0px;
+	border-width: 0 0 1px 0;
+}
 .module-header{
-	padding : 0px;
-	padding-left: 8px;
+	padding :  0 0 10px 8px;
+	font-weight: bold;
+	border-bottom : 1px solid #ccc;
+	margin-bottom : 0;
 }
 .module-area.empty{
 	border : 1px dashed #ccc;

@@ -9,6 +9,7 @@
 namespace Omega\Repositories;
 
 
+use Illuminate\Support\Facades\DB;
 use Omega\Models\Module;
 
 class ModuleRepository
@@ -46,10 +47,10 @@ class ModuleRepository
     }
 
     public function getAllComponentsByPage($pageId){
-        return $this->module->with('position')->where('position.fkPage', $pageId)->where('isComponent', 1)->get();
+        return $this->module->with('position')->where('fkPage', $pageId)->where('isComponent', 1)->get();
     }
 
     public function getAllModulesByPage($pageId){
-        return $this->module->with('position')->where('position.fkPage', $pageId)->where('isComponent', 0)->get();
+        return $this->module->with('position')->where('fkPage', $pageId)->where('isComponent', 0)->get();
     }
 }

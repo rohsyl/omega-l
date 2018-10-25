@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Position extends Model
 {
+    public $timestamps = false;
+
     public function page(){
         return $this->belongsTo('Omega\Models\Page', 'fkPage', 'id');
     }

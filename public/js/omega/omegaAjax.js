@@ -11,7 +11,7 @@ OmegaAjax.prototype = {
 		var ajaxArgs = {
 			url: url,
 			data: data,
-			method: method
+			method: method,
 		};
 		var args = $.extend( {}, ajaxArgs, userArgs );
 		var jqXhr;
