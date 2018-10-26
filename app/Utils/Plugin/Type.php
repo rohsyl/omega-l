@@ -7,11 +7,20 @@
  */
 namespace Omega\Utils\Plugin;
 
-use Omega\Library\Database\Dbs;
+use Omega\Repositories\FormRepository;
 
 define('ATYPEENTRY', 'Omega\\Library\\Plugin\\ATypeEntry');
 
 class Type{
+
+    private static $formRepository = null;
+
+    private static function GetRepository(){
+        if(self::$formRepository == null){
+            self::$formRepository = new FormRepository(new \Omega\Models\Form(), new \Omega\Models\FormEntry(), new \Omega\Models\FormEntryValue());
+        }
+        return self::$formRepository;
+    }
 
     public static function GetValues($idPlugin, $idModule, $idPage){
         $idForm = self::Get($idPlugin);
@@ -27,21 +36,11 @@ class Type{
     }
 
     public static function FormExistsForModule($idPlugin){
-        $count = Dbs::select('count(*) AS nbr')
-            ->from('om_form')
-            ->where('fkPlugin', '=', $idPlugin)
-            ->andwhere('isModule', '=', 1)
-            ->runScalar('nbr');
-        return $count > 0;
+        return self::GetRepository()->formExistsForModule($idPlugin);
     }
 
     public static function FormExistsForComponent($idPlugin){
-        $count = Dbs::select('count(*) AS nbr')
-            ->from('om_form')
-            ->where('fkPlugin', '=', $idPlugin)
-            ->andwhere('isComponent', '=', 1)
-            ->runScalar('nbr');
-        return $count > 0;
+        return self::GetRepository()->formExistsForComponent($idPlugin);
     }
 
     public static function FormRender($idPlugin, $idModule, $idPage)
@@ -108,72 +107,27 @@ class Type{
     }
 
     protected static function Get($idPlugin){
-        $id = Dbs::select('id')
-            ->from('om_form')
-            ->where('fkPlugin', '=', $idPlugin)
-            ->andwhere('(isComponent', '=', '1')
-            ->orwhere('isModule', '=', '1)')
-            ->runScalar();
-        return $id;
+        return self::GetRepository()->getFormId($idPlugin);
     }
 
     protected static function GetByName($name){
-        $id = Dbs::select('id')
-            ->from('om_form')
-            ->where('name', 'LIKE', '?')
-            ->prepare(array($name))
-            ->runScalar();
-        return $id;
+        return self::GetRepository()->getFormIdByName($name);
     }
 
     protected static function GetFormEntries($idForm, $headings = null){
-        $entries = Dbs::select('*')
-            ->from('om_form_entry')
-            ->where('fkForm', '=', $idForm);
-
-        if(isset($headings)){
-            $entries->andwhere('heading', '=', $headings);
-        }
-
-        $entries = $entries->orderby('`order`', 'ASC')
-            ->run()
-            ->getAllArray();
-        return $entries;
+        return self::GetRepository()->getFormEntries($idForm, $headings);
     }
 
     public static function GetValueForEntry($entryId, $moduleId){
-        $stmt = Dbs::select('*')
-            ->from('om_form_entry_value')
-            ->where('fkFormEntry', '=', $entryId)
-            ->andwhere('fkModule', '=', $moduleId)
-            ->run();
-        if($stmt->length() == 0){
-            return null;
-        }
-
-        $value = $stmt->getRowArray(0);
-        return $value;
+       return self::GetRepository()->getValueForEntry($entryId, $moduleId);
     }
 
+    /**
+     *
+     * @param $entry FormEntry
+     * @return mixed
+     */
     protected static function SaveValueForEntry($entry){
-
-        $newValue = $entry->getType()->getPostedValue();
-        $valueEntry = $entry->getValue();
-        if(isset($valueEntry)){
-            // update
-            $res = Dbs::update('om_form_entry_value')
-                ->field('value')
-                ->value($newValue)
-                ->where('id', '=', $valueEntry->getId())
-                ->run();
-        }
-        else {
-            // insert
-            $res =  Dbs::insert('om_form_entry_value')
-                ->field('value', 'fkFormEntry', 'fkModule')
-                ->value($newValue, $entry->getId(), $entry->getIdModule())
-                ->run();
-        }
-        return $res;
+        return self::GetRepository()->saveValueForEntry($entry);
     }
 }

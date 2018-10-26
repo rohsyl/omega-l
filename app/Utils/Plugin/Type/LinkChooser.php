@@ -1,25 +1,26 @@
 <?php
 namespace Omega\Library\Plugin\Type;
 
-use Omega\Library\Plugin\ATypeEntry;
+use Omega\Utils\Plugin\ATypeEntry;
+use Omega\Library\Util\LinkChooser as LC;
 
-class IconChooser extends ATypeEntry {
+class LinkChooser extends ATypeEntry {
 
     public  function getPostedValue() {
         $uid = $this->getUniqId();
-        return $this->getPost($uid);
+        return LC::Decode($this->getPost($uid));
     }
 
     public  function getObjectValue() {
         $v = $this->getValue();
-        $v = isset($v) ? $v : '';
-        return $v;
+        return LC::GetLink($v);
     }
 
     public  function getHtml() {
-        $v = $this->getObjectValue();
+        $v = $this->getValue();
+        $v = isset($v) ? $v : '';
         $m['uid'] = $this->getUniqId();
-        $m['value'] = $v;
+        $m['value'] = LC::Encode($v);
         return $this->view('Html', $m);
     }
 

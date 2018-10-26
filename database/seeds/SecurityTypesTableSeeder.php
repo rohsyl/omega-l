@@ -21,7 +21,7 @@ class SecurityTypesTableSeeder extends Seeder
 
         foreach($securityTypes as $type){
 
-            DB::table('pagesecuritytypes')->insert([
+            DB::table('page_security_types')->insert([
                 'id' => $type[0],
                 'name' => $type[1],
                 'title' => $type[2]

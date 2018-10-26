@@ -12,6 +12,9 @@ use Omega\Models\User;
 
 class InstallController extends Controller
 {
+    public function __construct(){
+        ini_set('max_execution_time', 300);
+    }
 
     public function index(){
         $data = [

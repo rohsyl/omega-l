@@ -11,7 +11,7 @@ use Omega\Repositories\ModuleAreaRepository;
 class ModuleArea{
 
     private static function GetRepository(){
-        return new ModuleAreaRepository(new \Omega\ModuleArea());
+        return new ModuleAreaRepository(new \Omega\Models\ModuleArea());
     }
 
     /**

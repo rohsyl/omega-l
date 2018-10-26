@@ -21,7 +21,7 @@ class CreatePagesecuritiesTable extends Migration
             $table->longText('data')->nullable();
 
             $table->foreign('fkType')
-                ->references('id')->on('pagesecuritytypes')
+                ->references('id')->on('page_security_types')
                 ->onDelete('cascade');
 
             $table->foreign('fkPage')

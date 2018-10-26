@@ -9,7 +9,8 @@
 namespace Omega\Utils\Plugin;
 
 
-use Omega\Library\Util\Path;
+use Omega\Utils\Path;
+use ReflectionClass;
 
 /**
  * Class ATypeEntry is used to implement TypeEntry for Form
@@ -110,10 +111,11 @@ abstract class ATypeEntry
      * @return string The html
      */
     public function view($viewName, $dataSet = array(), $viewParentPath = null){
-        $reflect = new \ReflectionClass($this);
+        $reflect = new ReflectionClass($this);
         $className = $reflect->getShortName();
-        $ppath = isset($viewParentPath) ? $viewParentPath : Path::Combine(LIBPATH, 'plugin', 'type', 'view', $className);
-        $viewPath = Path::Combine($ppath, 'view-'.$viewName.'.php');
+        $ppath = isset($viewParentPath) ? $viewParentPath : Path::Combine(app_path('Utils'), 'Plugin', 'Type', 'view', $className);
+        $viewPath = Path::Combine($ppath, $viewName.'.blade.php');
+        return View::file($viewPath)->with($dataSet);
         extract($dataSet);
         ob_start();
         include($viewPath);

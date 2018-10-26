@@ -13,7 +13,7 @@ class CreateFormentriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('formentries', function (Blueprint $table) {
+        Schema::create('form_entries', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('type');

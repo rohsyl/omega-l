@@ -11,7 +11,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'OmegaCMS') }} - {{ __('administration') }}</title>
+    <title>{{ 'OmegaCMS' }} - {{ __('administration') }}</title>
 
 
     <!-- Fonts -->

@@ -13,7 +13,7 @@ class CreateFormentryvaluesTable extends Migration
      */
     public function up()
     {
-        Schema::create('formentryvalues', function (Blueprint $table) {
+        Schema::create('form_entry_values', function (Blueprint $table) {
             $table->increments('id');
             $table->longText('value');
 
@@ -21,7 +21,7 @@ class CreateFormentryvaluesTable extends Migration
             $table->integer('fkModule')->unsigned();
 
             $table->foreign('fkFormEntry')
-                ->references('id')->on('formentries')
+                ->references('id')->on('form_entries')
                 ->onDelete('cascade');
 
             $table->foreign('fkModule')

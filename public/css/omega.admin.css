@@ -428,8 +428,11 @@ th.date{
 
 .module-area{
 	margin-bottom : 10px;
-	border : 1px solid #ccc;
-	height : 160px;
+	border : 1px solid #dddddd;
+	min-height : 160px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 .module-area .glyphicon-move {
 	cursor: move;
@@ -437,15 +440,22 @@ th.date{
 }
 .module-area .list-group{
 	min-height: 50px;
+	margin-top : -1px;
+	margin-bottom: 0px;
 }
 .module-area .list-group .list-group-item{
 	border-radius: 0px;
 	border-width: 0 0 1px 0;
+	border-color: #dddddd;
+	background-color: transparent;
+}
+.module-area .list-group .list-group-item:last-child{
+	border-width: 0;
 }
 .module-header{
 	padding :  0 0 10px 8px;
 	font-weight: bold;
-	border-bottom : 1px solid #ccc;
+	border-bottom : 1px solid #dddddd;
 	margin-bottom : 0;
 }
 .module-area.empty{

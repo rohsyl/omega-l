@@ -12,10 +12,6 @@ class MembergroupsTableSeeder extends Seeder
      */
     public function run()
     {
-        //
-        /*
-INSERT INTO `om_membergroup` VALUES (1,'public'),(2,'member');*/
-
         $memberGroups = [
             [1, 'public'],
             [2, 'member']

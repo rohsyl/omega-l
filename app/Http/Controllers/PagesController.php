@@ -3,6 +3,7 @@
 namespace Omega\Http\Controllers;
 
 use Illuminate\Validation\Rule;
+use Omega\Http\Requests\Page\Module\CreateModuleRequest;
 use Omega\Repositories\GroupRepository;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\PageLangRelRepository;
@@ -427,36 +428,48 @@ class PagesController extends AdminController
     }
 
 
+    #region component
+    function createComponent() {
+        $res = ModuleManager::CreateComponent($_GET['pageId'], $_GET['pluginId']);
+        $this->view->Set('result', $res);
+        return $this->view->RenderAjax();
+    }
+
+
+    function deleteComponent($id) {
+        $result = $this->moduleRepository->delete($id);
+        return response()->json([
+            'result'  => $result
+        ]);
+    }
+    #endregion
 
 
     #region module
     public function getCreateFormForModule(){
-        $this->view->Set('plugins', PluginManager::GetPluginsWithModulesSupport());
-        return $this->view->RenderPartial();
         return view('pages.module.create')->with([
-            'plugins' => []
+            'plugins' => to_select($this->pluginRepository->getPluginsWithModulesSupport(), 'name', 'id')
         ]);
     }
 
-    public function createModule() {
-        if(ParamUtil::IsValidRequestParamId('pageId')
-            && ParamUtil::IsValidRequestParamId('pluginId')
-            && ParamUtil::IsValidRequestParamString('name')){
-
-            $res = ModuleManager::CreateModule($_POST['pageId'], $_POST['pluginId'], $_POST['name']);
-            $this->view->Set('result', $res);
-            return $this->view->RenderAjax();
-        }
+    public function createModule(CreateModuleRequest $request) {
+        $this->moduleRepository->create(
+            $request->input('pluginId'),
+            $request->input('name'),
+            [],
+            false,
+            true,
+            $request->input('pageId')
+        );
+        return response()->json([
+            'result'  => true
+        ]);
     }
 
-    public function getEditFormForModule() {
-        if(ParamUtil::IsValidUrlParamId('moduleId') && ParamUtil::IsValidUrlParamId('pageId')){
-            $moduleId = $_GET['moduleId'];
-            $pageId = $_GET['pageId'];
-            $module = ModuleManager::GetModule($moduleId);
-            $pluginId = $module->fkPlugin;
-            return Type::FormRender($pluginId, $moduleId, $pageId);
-        }
+    public function getEditFormForModule($moduleId, $pageId) {
+        $module = $this->moduleRepository->get($moduleId);
+        $pluginId = $module->fkPlugin;
+        return Type::FormRender($pluginId, $moduleId, $pageId);
     }
 
     public function saveModule() {

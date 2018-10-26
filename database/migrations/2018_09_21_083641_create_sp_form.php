@@ -32,7 +32,7 @@ BEGIN
 	DECLARE idForm INT;
     SELECT id INTO idForm FROM forms WHERE `name` LIKE _fname;
     IF( idForm IS NOT NULL ) THEN
-		INSERT INTO formentries (`fkForm`, `name`, `type`, `param`, `title`, `description`, `mandatory`, `heading`, `order`)
+		INSERT INTO form_entries (`fkForm`, `name`, `type`, `param`, `title`, `description`, `mandatory`, `heading`, `order`)
 							VALUES (idForm, _ename, _type, _param, _title, _description, _mandatory, 0, _order);
 	END IF;
 END;');

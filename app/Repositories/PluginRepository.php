@@ -10,6 +10,7 @@ namespace Omega\Repositories;
 
 use Omega\Models\Plugin;
 use Omega\Utils\Plugin\PluginMeta;
+use Omega\Utils\Plugin\Type;
 
 class PluginRepository
 {
@@ -56,7 +57,7 @@ class PluginRepository
     }
 
     public function getInstalledPlugin(){
-        return $this->plugin->get();
+        return $this->plugin->all();
     }
 
     public function getPluginInMenu(){
@@ -88,6 +89,13 @@ class PluginRepository
     }
 
     public function getPluginsWithModulesSupport(){
-
+        $plugins = $this->getInstalledPlugin();
+        $modules = array();
+        foreach($plugins as $plugin) {
+            if(Type::FormExistsForModule($plugin->id)){
+                $modules[] = $plugin;
+            }
+        }
+        return $modules;
     }
 }

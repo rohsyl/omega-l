@@ -9,8 +9,7 @@
 namespace Omega\Library\Plugin\Type;
 
 
-use Omega\Library\Plugin\ATypeEntry;
-use Omega\Library\Util\Util;
+use Omega\Utils\Plugin\ATypeEntry;
 
 class DropDown extends ATypeEntry {
 
