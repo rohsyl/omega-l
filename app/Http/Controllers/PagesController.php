@@ -257,6 +257,7 @@ class PagesController extends AdminController
             $security = $this->pageSecurityRepository->newInstanceOfType($securityType, $page->id);
         }
 
+
         return view('pages.edit')->with([
             'tab' => isset($tab) ? $tab : 'content',
             'enabledLang' => $enabledLang,
@@ -384,6 +385,13 @@ class PagesController extends AdminController
                 break;
         }
 
+
+        $cs = $this->moduleRepository->getAllComponentsByPage($id);
+
+        foreach($cs as $c) {
+            Type::FormSave($c->fkPlugin, $c->id, $id);
+        }
+
         toast()->success(__('Page saved'));
         return redirect()->route('admin.pages.edit', ['id' => $page->id, 'tab' => $request->input('tab')]);
     }
@@ -429,18 +437,183 @@ class PagesController extends AdminController
 
 
     #region component
-    function createComponent() {
-        $res = ModuleManager::CreateComponent($_GET['pageId'], $_GET['pluginId']);
-        $this->view->Set('result', $res);
-        return $this->view->RenderAjax();
+    public function getCreateFormForComponent(){
+        return view('pages.component.create')->with([
+            'plugins' => $this->pluginRepository->getPluginsWithComponentsSupport()
+        ]);
     }
 
+    public function getComponentForm($id){
+        $comp = $this->moduleRepository->get($id);
+        $item = array(
+            'id' => $comp->id,
+            'pluginMeta' => new PluginMeta($comp->plugin->name),
+            'html' => Type::FormRender($comp->fkPlugin, $id, $comp->fkPage),
+            'args' => json_decode($comp->param, true)
+        );
+        $components[] = $item;
 
+        return view('pages.componentlist')->with([
+            'components' => $components
+        ]);
+    }
+
+    function createComponent($pageId, $pluginId) {
+        $plugin = $this->pluginRepository->get($pluginId);
+        $comp = $this->moduleRepository->createComponent($pageId, $plugin);
+        return response()->json([
+            'result'  => $comp->id
+        ]);
+    }
     function deleteComponent($id) {
         $result = $this->moduleRepository->delete($id);
         return response()->json([
             'result'  => $result
         ]);
+    }
+
+    // TODO
+    public function getFormComponentSettings() {
+        if(ParamUtil::IsValidUrlParamId('compId')){
+            $compId = $_GET['compId'];
+            $module = ModuleManager::GetModule($compId);
+
+            $themeName = Config::get('om_template_name');
+
+            $plugin = PluginManager::GetPlugin($module->fkPlugin);
+
+            $pluginName = $plugin->plugName;
+
+            $pluginTemplates = PluginManager::GetPluginTemplateViewsByTheme($themeName, $pluginName);
+            array_unshift($pluginTemplates, null);
+
+            $pluginTemplatesWithTitle = array();
+            foreach($pluginTemplates as $template){
+                if($template == null){
+                    $pluginTemplatesWithTitle[] = array(
+                        'key' => 'null',
+                        'value' => 'Default',
+                    );
+                }
+                else{
+                    $pluginTemplatesWithTitle[] = array(
+                        'key' => $themeName . '/' . $pluginName . '/' . $template,
+                        'value' => ucfirst($themeName) . ' - ' . ucfirst($pluginName) . ' - ' . pathinfo($template, PATHINFO_FILENAME),
+                    );
+                }
+            }
+
+            $themeColors = ThemeManager::GetThemeColors($themeName);
+
+            $args = json_decode($module->moduleParam, true);
+            if(isset($args['settings']['isWrapped'])) {
+                $this->view->Set('isWrapped', $args['settings']['isWrapped']);
+            }
+            else {
+                $this->view->Set('isWrapped', true);
+            }
+            if(isset($args['settings']['bgColorType'])) {
+                $this->view->Set('bgColorType', $args['settings']['bgColorType']);
+            }
+            else {
+                $this->view->Set('bgColorType', 'transparent');
+            }
+            if(isset($args['settings']['bgColor'])) {
+                $this->view->Set('bgColor', $args['settings']['bgColor']);
+            }
+            else {
+                $this->view->Set('bgColor', 'transparent');
+            }
+            if(isset($args['settings']['isHidden'])) {
+                $this->view->Set('isHidden', $args['settings']['isHidden']);
+            }
+            else {
+                $this->view->Set('isHidden', false);
+            }
+            if(isset($args['settings']['compId'])) {
+                $this->view->Set('compId', $args['settings']['compId']);
+            }
+            else {
+                $this->view->Set('compId', '');
+            }
+            if(isset($args['settings']['pluginTemplate'])){
+                $this->view->Set('pluginTemplate', $args['settings']['pluginTemplate']);
+            }
+            else{
+                $this->view->Set('pluginTemplate', 'null');
+            }
+            if(isset($args['settings']['compTitle'])){
+                $this->view->Set('compTitle', $args['settings']['compTitle']);
+            }
+            else{
+                $this->view->Set('compTitle', '');
+            }
+
+            $this->view->Set('pluginTemplates', $pluginTemplatesWithTitle);
+            $this->view->Set('themeColors', $themeColors);
+            return $this->view->RenderPartial();
+        }
+    }
+
+    // TODO :
+    public function saveSettings() {
+        if(ParamUtil::IsValidUrlParamId('compId')){
+            $compId = $_GET['compId'];
+            $module = ModuleManager::GetModule($compId);
+            $args = json_decode($module->moduleParam, true);
+            if(!isset($args['settings'])) $args['settings'] = array();
+            $args['settings']['compId'] = $_POST['compId'];
+            $args['settings']['compTitle'] = $_POST['compTitle'];
+            $args['settings']['isHidden'] = $_POST['is_hidden'] == 'true';
+            $args['settings']['isWrapped'] = $_POST['comp_width'] == 'wrapped';
+            switch($_POST['bgcolor']) {
+                case 'custom':
+                    $args['settings']['bgColor'] = $_POST['customcolor'];
+                    $args['settings']['bgColorType'] = 'custom';
+                    break;
+                case 'theme':
+                    $args['settings']['bgColor'] = $_POST['themecolor'];
+                    $args['settings']['bgColorType'] = 'theme';
+                    break;
+                default:
+                    $args['settings']['bgColor'] = 'transparent';
+                    $args['settings']['bgColorType'] = 'transparent';
+                    break;
+            }
+            $args['settings']['pluginTemplate'] = $_POST['compTemplate'];
+            $module->moduleParam = json_encode($args);
+            $res = ModuleManager::Save($module);
+
+            $this->view->Set('args', $args);
+            $this->view->Set('result', $res);
+            return $this->view->RenderAjax();
+        }
+
+    }
+
+    // TODO :
+    public function orderComponent(){
+        if(ParamUtil::IsValidUrlParamId('compId') && ParamUtil::IsValidUrlParamString('position')){
+            $cId = $_GET['compId'];
+            $module = ModuleManager::GetModule($cId);
+            $pId = $module->fkPage;
+
+            ModuleManager::ComponentOrderInitForPage($pId);
+            switch($_GET['position']){
+                case 'upper':
+                    ModuleManager::ComponentOrderSetOrderUpper($cId, $pId);
+                    break;
+                case 'up':
+                    ModuleManager::ComponentOrderSetOrderUp($cId, $pId);
+                    break;
+                case 'downer':
+                    ModuleManager::ComponentOrderSetOrderDowner($cId, $pId);
+                    break;
+                case 'down':
+                    ModuleManager::ComponentOrderSetOrderDown($cId, $pId);
+                    break;
+            }
+        }
     }
     #endregion
 

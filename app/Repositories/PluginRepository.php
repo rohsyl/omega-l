@@ -98,4 +98,15 @@ class PluginRepository
         }
         return $modules;
     }
+
+    public function getPluginsWithComponentsSupport(){
+        $plugins = $this->getInstalledPlugin();
+        $modules = array();
+        foreach($plugins as $plugin) {
+            if(Type::FormExistsForComponent($plugin->id)){
+                $modules[] = $plugin;
+            }
+        }
+        return $modules;
+    }
 }

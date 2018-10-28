@@ -70,7 +70,6 @@
                         <div class="tab-pane @if($tab == 'content') active @endif page-tab" id="content">
 
                             <div id="component-container">
-                                {{ $componentList }}
                             </div>
                             <p class="text-center">
                                 <button id="add-page-module" class="btn btn-lg btn-primary text-center" style="margin-top : 20px;"><span class="glyphicon glyphicon-plus"></span> {{ __('Add component') }}</button>

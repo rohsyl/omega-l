@@ -1,9 +1,10 @@
 @php
-$id = isset($value) ? $value : null;
+$id = isset($value) && !empty($value) ? $value : null;
 $media = new \Omega\Models\Media();
 $name = '';
 $title = '';
 $description = '';
+print_r($id);
 if(isset($id))
 {
     $media = \Omega\Utils\Entity\Media::Get($id);

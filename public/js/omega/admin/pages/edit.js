@@ -42,21 +42,18 @@ $(function(){
 
     $btnAddComponent.click(function(){
 
-        var url = omega.mvc.url('page', 'getCreateFormForComponent');
-        var args = { pid : pageId };
-        omega.ajax.query(url, args, omega.ajax.GET, function(data){
+        var url = route('admin.pages.getCreateFormForComponent', { pageId : pageId });
+        omega.ajax.query(url, {}, omega.ajax.GET, function(data){
             var idm = omega.modal.open(__("Insert a component"), data, __("Insert"), function(){
                 var $componentActive= $('.component-container.active');
                 if($componentActive.length == 1) {
                     var pluginId = $componentActive.data('pluginid');
-                    url = omega.mvc.url('page', 'createComponent');
-                    args = { pageId : pageId, pluginId : pluginId };
-                    omega.ajax.query(url, args, omega.ajax.GET, function(data){
+                    url = route('admin.pages.createComponent', { pageId : pageId, pluginId : pluginId });
+                    omega.ajax.query(url, {}, omega.ajax.GET, function(data){
                         if(data.result !== false){
                             var compId = data.result;
-                            url = omega.mvc.url('page', 'getComponentForm');
-                            args = { id : compId };
-                            omega.ajax.query(url, args, omega.ajax.GET, function(data){
+                            url = route('admin.pages.getComponentForm', { id : compId });
+                            omega.ajax.query(url, {}, omega.ajax.GET, function(data){
                                 $componentContainer.append(data);
                                 hideOrShowOrderingButtons();
                             });
@@ -102,18 +99,12 @@ $(function(){
     });
 
     $body.delegate( ".deleteComponent", "click", function() {
-        var $this = $(this);
+        var id = $(this).data('id');
         omega.modal.confirm(__('Do you really want to delete this ?'), function(yes){
             if(yes){
-                var id = $this.data('id');
-                var url = omega.mvc.url('page', 'deleteComponent');
-                var args = {cid: id};
-                omega.ajax.query(url, args, 'GET', function () {
-                    url = omega.mvc.url('page', 'componentList');
-                    args = {id: pageId};
-                    omega.ajax.query(url, args, 'GET', function (data) {
-                        $componentContainer.html(data);
-                    });
+                var url = route('admin.pages.deleteComponent', {id: id});
+                omega.ajax.query(url, {}, 'GET', function () {
+                    $('#component-'+id).remove();
                 });
             }
         });
@@ -362,9 +353,16 @@ $(function(){
             $('#modulearea-list').html(data);
             createSortable();
         });
+    }
 
+    loadComponentList();
+    function loadComponentList(){
 
-
+        url = route('admin.pages.componentList',  { pageId : pageId });
+       $componentContainer.html(loading);
+        omega.ajax.query(url, {}, 'GET', function(data){
+            $componentContainer.html(data);
+        });
     }
 
     function createSortable(){

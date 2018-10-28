@@ -108,12 +108,17 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('pages/ma/setonallpages/{id}/{set}/{pageId?}', 'ModuleareaController@setOnAllPages')->name('admin.pages.ma.setonallpages');
             Route::post('pages/ma/setorder', 'ModuleareaController@setOrder')->name('admin.pages.ma.setorder');
 
+            Route::get('pages/componentList/{pageId}', 'PagesController@componentList')->name('admin.pages.componentList');
+
             Route::get('pages/getCreateFormForModule/{pageId?}', 'PagesController@getCreateFormForModule')->name('admin.pages.getCreateFormForModule');
             Route::post('pages/createModule', 'PagesController@createModule')->name('admin.pages.createModule');
             Route::get('pages/deleteComponent/{id}', 'PagesController@deleteComponent')->name('admin.pages.deleteComponent');
             Route::get('pages/getEditFormForModule/{moduleId}/{pageId?}', 'PagesController@getEditFormForModule')->name('admin.pages.getEditFormForModule');
             Route::post('pages/saveModule/{moduleId}', 'PagesController@saveModule')->name('admin.pages.saveModule');
 
+            Route::get('pages/getCreateFormForComponent/{pageId}', 'PagesController@getCreateFormForComponent')->name('admin.pages.getCreateFormForComponent');
+            Route::get('pages/getComponentForm/{id}', 'PagesController@getComponentForm')->name('admin.pages.getComponentForm');
+            Route::get('pages/createComponent/{pageId}/{pluginId}', 'PagesController@createComponent')->name('admin.pages.createComponent');
 
             Route::post('pages/create', 'PagesController@create')->name('admin.pages.create');
             Route::get('pages/edit/{id}/{tab?}', 'PagesController@edit')->name('admin.pages.edit');

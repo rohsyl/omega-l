@@ -33,6 +33,35 @@ class ModuleRepository
         return $module;
     }
 
+    public function createComponent($pageId, $plugin) {
+        $maxOrder = $this->getMaxOrderOnPage($pageId);
+        $maxId = $this->getMaxId();
+
+        $m = new Module();
+        $m->fkPlugin = $plugin->id;
+        $m->fkPage = $pageId;
+        $m->name = $plugin->name.$maxId;
+        $m->param = json_encode(array(
+            'settings' => array('compId' => $plugin->name.$maxId)
+        ));
+        $m->isEnabled = true;
+        $m->isComponent = true;
+        $m->order = $maxOrder + 1;
+
+        $m->save();
+
+        return $m;
+    }
+
+    private function getMaxOrderOnPage($pageId){
+        return $this->module->where('fkPage', $pageId)->max('order');
+    }
+
+
+    private function getMaxId(){
+        return $this->module->max('id');
+    }
+
     public function saveParam($module, $param){
         $module->param = json_encode($param);
         $module->save();
@@ -56,7 +85,7 @@ class ModuleRepository
     }
 
     public function getAllComponentsByPage($pageId){
-        return $this->module->with('position')->where('fkPage', $pageId)->where('isComponent', 1)->get();
+        return $this->module->where('fkPage', $pageId)->where('isComponent', 1)->get();
     }
 
     public function getAllModulesByPage($pageId){
