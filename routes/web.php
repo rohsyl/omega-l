@@ -112,6 +112,7 @@ Route::middleware('om_not_installed')->group(function(){
             Route::post('pages/createModule', 'PagesController@createModule')->name('admin.pages.createModule');
             Route::get('pages/deleteComponent/{id}', 'PagesController@deleteComponent')->name('admin.pages.deleteComponent');
             Route::get('pages/getEditFormForModule/{moduleId}/{pageId?}', 'PagesController@getEditFormForModule')->name('admin.pages.getEditFormForModule');
+            Route::post('pages/saveModule/{moduleId}', 'PagesController@saveModule')->name('admin.pages.saveModule');
 
 
             Route::post('pages/create', 'PagesController@create')->name('admin.pages.create');

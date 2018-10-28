@@ -9,6 +9,7 @@
 namespace Omega\Utils\Plugin;
 
 
+use Illuminate\Support\Facades\View;
 use Omega\Utils\Path;
 use ReflectionClass;
 

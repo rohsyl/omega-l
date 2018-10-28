@@ -40,5 +40,5 @@ CREATE TABLE `news_post_category` (
 CALL `om_CreateForm`('news', 'news', 1, 1, 'News');
 
 -- Create form entry
-CALL `om_CreateFormEntry`('news', 'count', 1, 'Omega\\Library\\Plugin\\Type\\TextSimple', '{}', 'Number of post displayed', 'By default all posts are displayed', 0);
-CALL `om_CreateFormEntry`('news', 'categories', 2, 'Omega\\Library\\Plugin\\Type\\CheckBoxes', '{"model":"Omega\\\\Plugin\\\\News\\\\Model\\\\CheckBoxesCategoriesModel"}', 'Categories', '', 0);
+CALL `om_CreateFormEntry`('news', 'count', 1, 'Omega\\Utils\\Plugin\\Type\\TextSimple', '{}', 'Number of post displayed', 'By default all posts are displayed', 0);
+CALL `om_CreateFormEntry`('news', 'categories', 2, 'Omega\\Utils\\Plugin\\Type\\CheckBoxes', '{"model":"Omega\\\\Plugin\\\\News\\\\Model\\\\CheckBoxesCategoriesModel"}', 'Categories', '', 0);

@@ -102,4 +102,4 @@ ADD COLUMN `propOrder` INT NULL DEFAULT 0 AFTER `useAsFilter`;
 CALL `om_CreateForm`('portfolio', 'portfolio', 0, 1, 'Portfolio');
 
 -- Create form entry
-CALL `om_CreateFormEntry`('portfolio', 'display', 1, 'Omega\\Library\\Plugin\\Type\\DropDown', '{"default": 1,"options": {"1": "List","2": "Grid - 2", "3": "Grid - 3","4": "Grid - 4"}}', 'Display', 'How the portfolio is displayed in the page', 0);
+CALL `om_CreateFormEntry`('portfolio', 'display', 1, 'Omega\\Utils\\Plugin\\Type\\DropDown', '{"default": 1,"options": {"1": "List","2": "Grid - 2", "3": "Grid - 3","4": "Grid - 4"}}', 'Display', 'How the portfolio is displayed in the page', 0);

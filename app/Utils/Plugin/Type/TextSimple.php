@@ -6,9 +6,9 @@
  * Time: 19:12
  */
 
-namespace Omega\Library\Plugin\Type;
+namespace Omega\Utils\Plugin\Type;
 
-use Omega\Library\Plugin\ATypeEntry;
+use Omega\Utils\Plugin\ATypeEntry;
 
 class TextSimple extends ATypeEntry {
 

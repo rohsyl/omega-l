@@ -45,4 +45,4 @@ CREATE TABLE IF NOT EXISTS  `alb_image` (
 
 
 CALL `om_CreateForm`('imagealbum', 'imagealbum', 0, 1, 'Image album');
-CALL `om_CreateFormEntry`('imagealbum', 'messageinfo', 1, 'Omega\\Library\\Plugin\\Type\\Alert', '{"type":"info","text":"Pour gérer les albums, veuillez vous rendre à la page Plugins > Image Album"}', '', '', 0);
+CALL `om_CreateFormEntry`('imagealbum', 'messageinfo', 1, 'Omega\\Utils\\Plugin\\Type\\Alert', '{"type":"info","text":"Pour gérer les albums, veuillez vous rendre à la page Plugins > Image Album"}', '', '', 0);

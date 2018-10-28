@@ -33,6 +33,7 @@ class MediaRepository implements InterfaceMediaConstant {
      * @return Media The media
      */
     public function GetMedia($id){
+        if(!isset($id)) return null;
         $media = $this->media->find($id);
         $media->readInDbMeta();
         return $media;

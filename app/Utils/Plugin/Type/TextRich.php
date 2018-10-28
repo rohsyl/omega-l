@@ -6,10 +6,10 @@
  * Time: 19:12
  */
 
-namespace Omega\Library\Plugin\Type;
+namespace Omega\Utils\Plugin\Type;
 
-use Omega\Library\Plugin\ATypeEntry;
-use Omega\Library\Entity\Page;
+use Omega\Utils\Plugin\ATypeEntry;
+use Omega\Utils\Entity\Page;
 
 class TextRich extends ATypeEntry {
 

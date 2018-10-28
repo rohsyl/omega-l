@@ -78,7 +78,7 @@ $(function(){
         omega.ajax.query(url, {}, 'GET', function(data){
             var mid = omega.modal.open('Edit module', '<form id="formEditModule">'+data+'</form>', 'Save', function(){
                 var $form = $('#formEditModule');
-                url = omega.mvc.url('page', 'saveModule', {moduleId : id});
+                url = route('admin.pages.saveModule', {moduleId : id});
                 args = omega.ajax._serializeForm($form);
                 omega.ajax.query(url, args, 'POST', function(){
                     omega.modal.hide(mid);

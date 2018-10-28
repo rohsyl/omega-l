@@ -9,7 +9,7 @@ namespace Omega\Utils\Plugin;
 
 use Omega\Repositories\FormRepository;
 
-define('ATYPEENTRY', 'Omega\\Library\\Plugin\\ATypeEntry');
+define('ATYPEENTRY', 'Omega\\Utils\\Plugin\\ATypeEntry');
 
 class Type{
 
@@ -56,7 +56,7 @@ class Type{
             return $html;
         }
         else{
-            return '<div class="alert alert-danger">Form type doesn\'t exists ...</div>';
+            return view('form.formtype_notexists');
         }
     }
 
@@ -72,7 +72,7 @@ class Type{
             return $html;
         }
         else{
-            return '<div class="alert alert-danger">Form type doesn\'t exists ...</div>';
+            return view('form.formtype_notexists');
         }
     }
 

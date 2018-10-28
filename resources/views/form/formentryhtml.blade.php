@@ -7,7 +7,7 @@
     @if(isset($type))
         {!! $type->getHtml() !!}
     @else
-        <div class="alert alert-danger">{{ __('Entry type does\'nt exists ...') }}</div>
+        <div class="alert alert-danger">{{ __('Entry type doesn\'t exists ...') }}</div>
     @endif
 
     @if(isset($description) && !empty($description))

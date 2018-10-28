@@ -7,6 +7,8 @@ use Omega\Repositories\MediaMetaRepository;
 use Omega\Repositories\MediaRepository;
 use Omega\Utils\Entity\Entity;
 use Omega\Utils\Interfaces\InterfaceMediaConstant;
+use Omega\Utils\Path;
+use Omega\Utils\PictureHelper;
 use Omega\Utils\Url;
 
 class Media extends Model implements InterfaceMediaConstant
@@ -114,23 +116,24 @@ class Media extends Model implements InterfaceMediaConstant
         }
     }
 
-    /*
-    public function GetThumbnail($w, $h, $returnUrl = true)
+
+    public function getThumbnail($w, $h, $returnUrl = true)
     {
 
         $fn = basename($this->path);
-        $p = Path::Combine(ROOT, 'media', $this->id);
+
+        $p = Path::Combine(media_path(), $this->id);
         $fp = Path::Combine($p, $fn);
 
         $newFilename = PictureHelper::GetImageName($fp, $w, $h);
         $newFilePath = Path::Combine( $p, $newFilename);
-        $newFileUrl = Url::Absolute(Url::Combine( ABSPATH, 'media', $this->id, $newFilename));
+        $newFileUrl = Url::Absolute(Url::Combine( url('media'), $this->id, $newFilename));
 
         if(!file_exists($newFilePath))
             PictureHelper::Crop($fp, $newFilePath, $w, $h, 100);
 
         return $returnUrl ? $newFileUrl : $newFilePath;
-    }*/
+    }
 
     public function getType(){
         return $this->getTypeByExt($this->ext);

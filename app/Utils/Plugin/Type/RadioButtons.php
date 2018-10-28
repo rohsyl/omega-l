@@ -7,10 +7,9 @@
  */
 
 
-namespace Omega\Library\Plugin\Type;
+namespace Omega\Utils\Plugin\Type;
 
-use Omega\Library\Plugin\ATypeEntry;
-use Omega\Library\Util\Util;
+use Omega\Utils\Plugin\ATypeEntry;
 
 class RadioButtons extends ATypeEntry {
 

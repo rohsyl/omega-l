@@ -276,11 +276,21 @@ if(!function_exists('clean_text')) {
 
 
 if(!function_exists('prettify_text')) {
+    /**
+     * Pretttify a text
+     * @param $text
+     * @return string
+     */
     function prettify_text($text){
         return title_case(snake_case(camel_case($text), ' '));
     }
 }
 if(!function_exists('without_ext')) {
+    /**
+     * Remove the extention from a filename
+     * @param $filename
+     * @return mixed
+     */
     function without_ext($filename){
         return pathinfo($filename, PATHINFO_FILENAME);
     }
@@ -288,7 +298,35 @@ if(!function_exists('without_ext')) {
 
 
 if(!function_exists('real_null')) {
+    /**
+     * Return null if the $value containe a 'null' string value
+     * @param $value
+     * @return null
+     */
     function real_null($value){
         return (strtolower($value) == 'null') ? null : $value;
+    }
+}
+
+if(!function_exists('array_orderby')) {
+    /**
+     * Order an array
+     * @return mixed
+     */
+    function array_orderby()
+    {
+        $args = func_get_args();
+        $data = array_shift($args);
+        foreach ($args as $n => $field) {
+            if (is_string($field)) {
+                $tmp = array();
+                foreach ($data as $key => $row)
+                    $tmp[$key] = $row[$field];
+                $args[$n] = $tmp;
+            }
+        }
+        $args[] = &$data;
+        call_user_func_array('array_multisort', $args);
+        return array_pop($args);
     }
 }

@@ -32,6 +32,6 @@ CREATE TABLE `dataentity_layouts` (
 
 
 CALL `om_CreateForm`('dataentity', 'dataentity', 1, 1, 'Data Entity');
-CALL `om_CreateFormEntry`('dataentity', 'title', 1, 'Omega\\Library\\Plugin\\Type\\TextSimple', '{}', 'Title', '', 0);
-CALL `om_CreateFormEntry`('dataentity', 'layout', 2, 'Omega\\Library\\Plugin\\Type\\DropDown', '{"model" : "Omega\\\\Plugin\\\\Dataentity\\\\Library\\\\Type\\\\Model\\\\LayoutDropDownModel"}', 'Layout', 'Choose a layout that will be used to display selected entites', 0);
+CALL `om_CreateFormEntry`('dataentity', 'title', 1, 'Omega\\Utils\\Plugin\\Type\\TextSimple', '{}', 'Title', '', 0);
+CALL `om_CreateFormEntry`('dataentity', 'layout', 2, 'Omega\\Utils\\Plugin\\Type\\DropDown', '{"model" : "Omega\\\\Plugin\\\\Dataentity\\\\Library\\\\Type\\\\Model\\\\LayoutDropDownModel"}', 'Layout', 'Choose a layout that will be used to display selected entites', 0);
 CALL `om_CreateFormEntry`('dataentity', 'entities', 3, 'Omega\\Plugin\\Dataentity\\Library\\Type\\DataEntityChooser', '{}', 'Entities', 'Choose entites that will be displayed', 0);

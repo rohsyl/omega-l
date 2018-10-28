@@ -472,16 +472,12 @@ class PagesController extends AdminController
         return Type::FormRender($pluginId, $moduleId, $pageId);
     }
 
-    public function saveModule() {
-        if(ParamUtil::IsValidUrlParamId('moduleId')){
-            $moduleId = $_GET['moduleId'];
-            $module = ModuleManager::GetModule($moduleId);
-            $pluginId = $module->fkPlugin;
-            $pageId = $module->fkPage;
-            $res = Type::FormSave($pluginId, $moduleId, $pageId);
-            $this->view->Set('result', $res);
-            return $this->view->RenderAjax();
-        }
+    public function saveModule($moduleId) {
+        $module = $this->moduleRepository->get($moduleId);
+        $res = Type::FormSave($module->fkPlugin, $moduleId, $module->fkPage);
+        return response()->json([
+            'result'  => $res
+        ]);
     }
     #endregion
 }

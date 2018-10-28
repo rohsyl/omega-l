@@ -1,0 +1,1 @@
+<div class="alert alert-danger">{{ __('Form type doesn\'t exists ...') }}</div>

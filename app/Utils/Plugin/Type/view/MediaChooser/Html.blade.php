@@ -1,14 +1,10 @@
-<?php
-    use Omega\Library\Entity\Media;
-    use Omega\Library\Entity\VideoExternal;
-
-
+@php
     $allowedType = json_encode($param['type']);
 
     $medias = array();
     foreach($values as $val){
         $mediaId = $val['id'];
-        $media = new Media($mediaId);
+        $media = \Omega\Utils\Entity\Media::Get($mediaId);
         $mediaItem = array(
             'id' => $mediaId,
             'name' => $media->name,
@@ -16,30 +12,30 @@
             'description' => $media->description,
             'type' => $media->getType(),
         );
-        if($media->getType() == Media::T_PICTURE){
-            $mediaItem['thumbnail'] = $media->GetThumbnail(120, 68);
+        if($media->getType() == \Omega\Utils\Entity\Media::T_PICTURE){
+            $mediaItem['thumbnail'] = $media->getThumbnail(120, 68);
         }
-        if($media->type == Media::EXTERNAL_VIDEO){
-            $media = new VideoExternal($mediaId);
+        if($media->type == \Omega\Utils\Entity\Media::EXTERNAL_VIDEO){
+            $media = new \Omega\Utils\Entity\VideoExternal($mediaId);
             $mediaItem['thumbnail'] = $media->getVideoThumbnail();
         }
         $medias[] = $mediaItem;
     }
     $jsonMedia = json_encode($medias);
-?>
+@endphp
 <div>
-    <button class="btn btn-primary" id="<?php echo $uid ?>-media-chooser"><i class="fa fa-plus"></i> Add media(s)</button>
-    <div id="<?php echo $uid ?>-media-container">
+    <button class="btn btn-primary" id="{{ $uid }}-media-chooser"><i class="fa fa-plus"></i> Add media(s)</button>
+    <div id="{{ $uid }}-media-container">
     </div>
 </div>
 <script language="JavaScript">
     $(function(){
-        var hasPreview = <?php echo $param['preview'] ? 'true' : 'false' ?>;
-        var medias = <?php echo $jsonMedia ?>;
-        var idDeleter = '<?php echo $uid ?>-deleter';
+        var hasPreview = {{ $param['preview'] ? 'true' : 'false' }};
+        var medias = {!! $jsonMedia !!};
+        var idDeleter = '{{ $uid }}-deleter';
         var $body = $( "body" );
-        var $btnAdd = $('#<?php echo $uid ?>-media-chooser');
-        var $mediaContainer = $('#<?php echo $uid ?>-media-container');
+        var $btnAdd = $('#{{ $uid }}-media-chooser');
+        var $mediaContainer = $('#{{ $uid }}-media-container');
 
         initList(medias);
 
@@ -48,7 +44,7 @@
             var modalId = omega.modal.confirm('Do you really want to delete this ?',function(yes){
                 if(yes){
                     var i = $this.data('index');
-                    $('input[name="<?php echo $uid ?>-media-delete[' + i + ']').val(1);
+                    $('input[name="{{ $uid }}-media-delete[' + i + ']').val(1);
                     $this.parent().parent().hide();
                     omega.modal.hide(modalId);
                 }
@@ -59,7 +55,7 @@
 
         $btnAdd.rsMediaChooser({
             multiple: true,
-            allowedMedia: <?php echo $allowedType ?>,
+            allowedMedia: {!! $allowedType !!},
             doneFunction: function (data) {
                 // has selected more than one media
                 if($.isArray(data))
@@ -95,22 +91,22 @@
                 logo = '<i class="fa fa-play"></i> ';
             }
 
-            var html = '<div class="media <?php echo $uid ?>-media">';
+            var html = '<div class="media {{ $uid }}-media">';
             html += getPreview(media);
             html += '<div class="media-body">';
-            html += '<button class="btn btn-danger btn-sm <?php echo $uid ?>-deleter" data-index="'+i+'">Delete</button>';
-            html += '<h4 class="media-heading" id="<?php echo $uid ?>-media-name">' + logo + headingText + '</h4>';
-            html += '<div id="<?php echo $uid ?>-media-description">';
+            html += '<button class="btn btn-danger btn-sm {{ $uid }}-deleter" data-index="'+i+'">Delete</button>';
+            html += '<h4 class="media-heading" id="{{ $uid }}-media-name">' + logo + headingText + '</h4>';
+            html += '<div id="{{ $uid }}-media-description">';
             if(description !== undefined && description !== '' && description != null) {
                 html += '<p>' + description + '</p>';
             }
             html += '</div>'; // end.media-description
 
 
-            html += '<input type="hidden" name="<?php echo $uid ?>-media-id['+i+']" value="'+media.id+'">' +
-                '<input type="hidden" name="<?php echo $uid ?>-media-type['+i+']" value="'+type+'">' +
-                '<input type="hidden" name="<?php echo $uid ?>-media-order['+i+']" value="'+i+'">' +
-                '<input type="hidden" name="<?php echo $uid ?>-media-delete['+i+']" value="0">';
+            html += '<input type="hidden" name="{{ $uid }}-media-id['+i+']" value="'+media.id+'">' +
+                '<input type="hidden" name="{{ $uid }}-media-type['+i+']" value="'+type+'">' +
+                '<input type="hidden" name="{{ $uid }}-media-order['+i+']" value="'+i+'">' +
+                '<input type="hidden" name="{{ $uid }}-media-delete['+i+']" value="0">';
 
             html += '</div>'; // end.media-body
             html += '</div>'; // end.media
@@ -120,7 +116,7 @@
 
 
         function getPreview(media){
-            var html = '<div class="media-left media-middle" id="<?php echo $uid ?>-media-preview">';
+            var html = '<div class="media-left media-middle" id="{{ $uid }}-media-preview">';
             if(hasPreview){
 
                 if(media.type === 'picture'){
@@ -161,14 +157,14 @@
             return $mediaContainer.children().length;
         }
 
-        $('.<?php echo $uid ?>-media', '#<?php echo $uid ?>-media-container').each(function () {
+        $('.{{ $uid }}-media', '#{{ $uid }}-media-container').each(function () {
             var cell = $(this);
             //cell.width(cell.width());
             cell.css('background-color', '#ffffff');
         });
-        $( '#<?php echo $uid ?>-media-container' ).sortable({
+        $( '#{{ $uid }}-media-container' ).sortable({
             itemPath: '>',
-            itemSelector: '.<?php echo $uid ?>-media',
+            itemSelector: '.{{ $uid }}-media',
             helper: function(e, tr)
             {
                 var $originals = tr.children();
@@ -180,11 +176,11 @@
                 });
                 return $helper;
             },
-            placeholder: '<?php echo $uid ?>-sortable-placeholder',
+            placeholder: '{{ $uid }}-sortable-placeholder',
             update: function( event, ui ) {
                 var i = 0;
-                $('#<?php echo $uid ?>-media-container .<?php echo $uid ?>-media').each(function(i) {
-                    var $inputOrder = $(this).find('input[name^="<?php echo $uid ?>-media-order"]');
+                $('#{{ $uid }}-media-container .{{ $uid }}-media').each(function(i) {
+                    var $inputOrder = $(this).find('input[name^="{{ $uid }}-media-order"]');
                     $inputOrder.val(i);
                     i++;
                 });
@@ -193,29 +189,29 @@
     });
 </script>
 <style>
-    #<?php echo $uid ?>-media-container{
+    #{{ $uid }}-media-container{
         margin-top: 15px;
     }
-    #<?php echo $uid ?>-media-container .<?php echo $uid ?>-media{
+    #{{ $uid }}-media-container .{{ $uid }}-media{
         border-bottom: 1px solid #ddd;
         padding : 10px;
         cursor : move;
         margin-top : 0;
     }
 
-    #<?php echo $uid ?>-media-container .<?php echo $uid ?>-media .media-body{
+    #{{ $uid }}-media-container .{{ $uid }}-media .media-body{
         padding-top : 10px;
     }
 
-    #<?php echo $uid ?>-media-container .media-object{
+    #{{ $uid }}-media-container .media-object{
         min-width: 120px;
         text-align: center;
     }
-    #<?php echo $uid ?>-media-container .<?php echo $uid ?>-deleter{
+    #{{ $uid }}-media-container .{{ $uid }}-deleter{
         float:right;
     }
 
-    .<?php echo $uid ?>-sortable-placeholder{
+    .{{ $uid }}-sortable-placeholder{
         height : 100px;
         background-color : #9bc373;
     }

@@ -1,5 +1,5 @@
 <?php
-namespace Omega\Library\Plugin\Type\DropDown;
+namespace Omega\Utils\Plugin\Type\DropDown;
 
 abstract class ADropDownModel{
 

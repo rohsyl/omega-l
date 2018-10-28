@@ -1,5 +1,5 @@
 <?php
-namespace Omega\Library\Plugin\Type\CheckBoxes;
+namespace Omega\Utils\Plugin\Type\CheckBoxes;
 
 abstract class ACheckBoxesModel{
 

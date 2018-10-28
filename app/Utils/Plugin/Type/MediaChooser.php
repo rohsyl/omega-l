@@ -6,11 +6,10 @@
  * Time: 17:12
  */
 
-namespace Omega\Library\Plugin\Type;
+namespace Omega\Utils\Plugin\Type;
 
-use Omega\Library\Plugin\ATypeEntry;
-use Omega\Library\Entity\Media;
-use function Omega\Library\array_orderby;
+use Omega\Utils\Plugin\ATypeEntry;
+use Omega\Utils\Entity\Media;
 
 class MediaChooser extends ATypeEntry {
 

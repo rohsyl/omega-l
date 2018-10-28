@@ -6,7 +6,7 @@
  * Time: 18:12
  */
 
-namespace Omega\Library\Plugin\Type;
+namespace Omega\Utils\Plugin\Type;
 
 use Omega\Utils\Plugin\ATypeEntry;
 

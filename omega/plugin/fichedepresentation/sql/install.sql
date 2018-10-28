@@ -27,4 +27,4 @@ CREATE TABLE IF NOT EXISTS  `pres_article` (
 );
 
 CALL `om_CreateForm`('fichedepresentation', 'fichedepresentation', 0, 1, 'Fiche de presentation');
-CALL `om_CreateFormEntry`('fichedepresentation', 'messageinfo', 1, 'Omega\\Library\\Plugin\\Type\\Alert', '{"type":"info","text":"Pour gérer les fiches de presentation, veuillez vous rendre à la page Plugins > Fiche de presentation"}', '', '', 0);
+CALL `om_CreateFormEntry`('fichedepresentation', 'messageinfo', 1, 'Omega\\Utils\\Plugin\\Type\\Alert', '{"type":"info","text":"Pour gérer les fiches de presentation, veuillez vous rendre à la page Plugins > Fiche de presentation"}', '', '', 0);
