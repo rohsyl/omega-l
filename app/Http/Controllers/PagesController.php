@@ -5,7 +5,6 @@ namespace Omega\Http\Controllers;
 use Illuminate\Validation\Rule;
 use Omega\Http\Requests\Page\Component\SaveSettingsRequest;
 use Omega\Http\Requests\Page\Module\CreateModuleRequest;
-use Omega\Repositories\GroupRepository;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
@@ -26,6 +25,11 @@ use Omega\Utils\Plugin\PluginMeta;
 use Omega\Utils\Plugin\Type;
 use Omega\Utils\Entity\Page as PageHelper;
 
+/**
+ * Class PagesController.
+ * Manage pages.
+ * @package Omega\Http\Controllers
+ */
 class PagesController extends AdminController
 {
 
@@ -71,6 +75,11 @@ class PagesController extends AdminController
         $this->pluginRepository = $pluginRepository;
     }
 
+    /**
+     * The list of pages
+     * @param null $lang If not null, filter by lang
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index($lang = null){
 
 
@@ -91,14 +100,28 @@ class PagesController extends AdminController
         return view('pages.index')->with($viewBag);
     }
 
+    /**
+     * Change the selected lang
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function chooseLang(Request $request){
         return redirect()->route('admin.pages', ['lang' => $request->input('lang')]);
     }
 
+    /**
+     * Display the form to add a new page
+     * @param null $lang If not null, set by default the given lang
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function add($lang = null){
         $enabledLang = om_config('om_enable_front_langauge');
+
         $langs = $this->langRepository->allEnabled();
-        $pages = !$enabledLang ? $this->pageRepository->getPagesWithParent(null) : $this->pageRepository->getPageWithParentAndLang($lang, null);
+
+        $pages = !$enabledLang
+            ? $this->pageRepository->getPagesWithParent(null)
+            : $this->pageRepository->getPageWithParentAndLang($lang, null);
 
         return view('pages.add')->with([
             'enableLang' => $enabledLang,
@@ -108,6 +131,11 @@ class PagesController extends AdminController
         ]);
     }
 
+    /**
+     * Create a new page
+     * @param CreatePageRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function create(CreatePageRequest $request){
 
         $this->pageRepository->create($request->all());
@@ -115,6 +143,12 @@ class PagesController extends AdminController
         return redirect()->route('admin.pages');
     }
 
+    /**
+     * Display the form to edit a page
+     * @param $id int The id of the page
+     * @param string $tab The selected tab
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function edit($id, $tab = 'content'){
 
         $enabledLang = om_config('om_enable_front_langauge');
@@ -122,10 +156,12 @@ class PagesController extends AdminController
         $page = $this->pageRepository->get($id);
         $langs = $this->langRepository->allEnabled();
 
+        // Get the security type of the page
         $security = $page->security;
         if($security != null) {
             $securityType = $page->security->type;
         }
+        // If not defined, set it to NoneSecurity
         else {
             $securityType = $this->pageSecurityTypeRepository->getSecurityNone();
             $security = $this->pageSecurityRepository->newInstanceOfType($securityType, $page->id);
@@ -148,12 +184,16 @@ class PagesController extends AdminController
 
             'securityType' => $securityType->name,
             'securityData' => unserialize($security->data),
-            'groups' => to_select($this->membergroupRepository->all(), 'name', 'id'),
 
-            'componentList' => '',
+            'groups' => to_select($this->membergroupRepository->all(), 'name', 'id')
         ]);
     }
 
+    /**
+     * Get all modulearea for the given page
+     * @param $pageId int The id of the page
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function moduleareaList($pageId) {
         $moduleAreas = $this->moduleAreaRepository->getAllModuleAreaByThemeName($this->themeRepository->getCurrentThemeName());
         return view('pages.modulearealist')->with([
@@ -162,30 +202,47 @@ class PagesController extends AdminController
         ]);
     }
 
+    /**
+     * Get all component for the given page
+     * @param $pageId int The id of the page
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function componentList($pageId){
-            $cs = $this->moduleRepository->getAllComponentsByPage($pageId);
-            $components = array();
-            foreach ($cs as $c) {
-                $item['id'] = $c->id;
-                $item['pluginMeta'] = new PluginMeta($c->plugin->name);
-                $item['html'] = Type::FormRender($c->fkPlugin, $c->id, $pageId);
-                $item['args'] = json_decode($c->param, true);
-                $components[] = $item;
-            }
-            return view('pages.componentlist')->with([
-                'components' => $components
-            ]);
+        $cs = $this->moduleRepository->getAllComponentsByPage($pageId);
+        $components = array();
 
+        foreach ($cs as $c) {
+            $item['id'] = $c->id;
+            $item['pluginMeta'] = new PluginMeta($c->plugin->name);
+            $item['html'] = Type::FormRender($c->fkPlugin, $c->id, $pageId);
+            $item['args'] = json_decode($c->param, true);
+            $components[] = $item;
+        }
+
+        return view('pages.componentlist')->with([
+            'components' => $components
+        ]);
     }
 
-
+    /**
+     * Get all modules for the given page
+     * @param $pageId
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function moduleList($pageId){
         $modules = $this->moduleRepository->getAllModulesByPage($pageId);
+
         return view('pages.modulelist')->with([
             'modules' => $modules
         ]);
     }
 
+    /**
+     * Update the given page
+     * @param UpdateRequest $request
+     * @param $id int The id of the page
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(UpdateRequest $request, $id){
 
         $enabledLang = om_config('om_enable_front_langauge');
@@ -214,7 +271,7 @@ class PagesController extends AdminController
             $this->pageLangRelRepository->clearRelIfLangChanged($page, $request->all());
         }
 
-        // update the page
+        // update the page basic data
         $this->pageRepository->update($page, $request->all());
 
         // save the page relations
@@ -259,9 +316,8 @@ class PagesController extends AdminController
                 break;
         }
 
-
+        // Save all component fields
         $cs = $this->moduleRepository->getAllComponentsByPage($id);
-
         foreach($cs as $c) {
             Type::FormSave($c->fkPlugin, $c->id, $id);
         }
@@ -270,16 +326,42 @@ class PagesController extends AdminController
         return redirect()->route('admin.pages.edit', ['id' => $page->id, 'tab' => $request->input('tab')]);
     }
 
-
-    public function delete($id){
-
+    /**
+     * Soft-Delete a page by id after confirmation
+     * @param $id int The id of the page
+     * @param bool $confirm
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
+    public function delete($id, $confirm = false){
+        if($confirm){
+            $this->pageRepository->delete($id);
+            toast()->success(__('Page deleted'));
+            return redirect()->route('admin.pages');
+        }
+        else{
+            return view('pages.delete')
+                ->with(['id' => $id]);
+        }
     }
 
-
-    public function enable($id){
-
+    /**
+     * Enable or disable the given page
+     * @param $id int The id of the page
+     * @param $enable boolean
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function enable($id, $enable){
+        $page = $this->pageRepository->get($id);
+        $this->pageRepository->enable($page, $enable);
+        toast()->success($enable ? __('Page enabled') : __('Page disabled'));
+        return redirect()->back();
     }
 
+    /**
+     * Get the table with all the page filtered by lang
+     * @param null|string $lang
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getTable($lang = null){
         $enabledLang = om_config('om_enable_front_langauge');
 
@@ -294,14 +376,14 @@ class PagesController extends AdminController
         ]);
     }
 
-    public function getPagesLevelZeroBylang(){
-        /*
-        $lang = $_GET['lang'];
-        $pages = PageManager::GetAllPagesWithLangs($lang);
-        $this->view->Set('pageList', $pages);
-        return $this->view->RenderPartial();*/
-    }
-
+    /**
+     * Get all pages filtered by parent and lang
+     * Used for the multi-lang
+     * @param $pid int The id of the current page
+     * @param $lang string The selected lang
+     * @param null $idParent The id of the page parent
+     * @return \Illuminate\Http\JsonResponse
+     */
     function getAllPageByParentAndLang($pid, $lang, $idParent = null){
         return response()->json([
             'selected' => PageHelper::GetCorrespondingInLang($pid, $lang),
@@ -311,12 +393,21 @@ class PagesController extends AdminController
 
 
     #region component
+    /**
+     * Get the form to create a component
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getCreateFormForComponent(){
         return view('pages.component.create')->with([
             'plugins' => $this->pluginRepository->getPluginsWithComponentsSupport()
         ]);
     }
 
+    /**
+     * Get the form to edit a component
+     * @param $id int The id of the component
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getComponentForm($id){
         $comp = $this->moduleRepository->get($id);
         $item = array(
@@ -332,6 +423,12 @@ class PagesController extends AdminController
         ]);
     }
 
+    /**
+     * Create a component
+     * @param $pageId int The id of the page on which the component must be created
+     * @param $pluginId int The id of the plugin
+     * @return \Illuminate\Http\JsonResponse
+     */
     function createComponent($pageId, $pluginId) {
         $plugin = $this->pluginRepository->get($pluginId);
         $comp = $this->moduleRepository->createComponent($pageId, $plugin);
@@ -339,6 +436,12 @@ class PagesController extends AdminController
             'result'  => $comp->id
         ]);
     }
+
+    /**
+     * Delete a component
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     function deleteComponent($id) {
         $result = $this->moduleRepository->delete($id);
         return response()->json([
@@ -346,82 +449,91 @@ class PagesController extends AdminController
         ]);
     }
 
-    // TODO
+    /**
+     * Get a form to manage the settings of a component
+     * @param $compId int The id of the component
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getFormComponentSettings($compId) {
-            $module = $this->moduleRepository->get($compId);
 
-            $themeName = $this->themeRepository->getCurrentThemeName();
+        $module = $this->moduleRepository->get($compId);
 
-            $plugin = $this->pluginRepository->get($module->fkPlugin);
+        // TODO : improve the managment of the settings
+        // using a Form ? (class:Type)
 
-            $pluginName = $plugin->name;
+        $themeName = $this->themeRepository->getCurrentThemeName();
+        $pluginName = $module->plugin->name;
 
+        $pluginTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
+        array_unshift($pluginTemplates, null);
 
-            $pluginTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
-            array_unshift($pluginTemplates, null);
-
-            $pluginTemplatesWithTitle = array();
-            foreach($pluginTemplates as $template){
-                if($template == null){
-                    $pluginTemplatesWithTitle['null'] = __('Default');
-                }
-                else{
-                    $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(prettify_text($template));
-                }
-            }
-
-            $themeColors = $this->themeRepository->getThemeColors($themeName);
-            $viewBag = [];
-            $args = json_decode($module->param, true);
-            if(isset($args['settings']['isWrapped'])) {
-                $viewBag['isWrapped'] = $args['settings']['isWrapped'];
-            }
-            else {
-                $viewBag['isWrapped'] = true;
-            }
-            if(isset($args['settings']['bgColorType'])) {
-                $viewBag['bgColorType'] = $args['settings']['bgColorType'];
-            }
-            else {
-                $viewBag['bgColorType'] = 'transparent';
-            }
-            if(isset($args['settings']['bgColor'])) {
-                $viewBag['bgColor'] = $args['settings']['bgColor'];
-            }
-            else {
-                $viewBag['bgColor'] = 'transparent';
-            }
-            if(isset($args['settings']['isHidden'])) {
-                $viewBag['isHidden'] = $args['settings']['isHidden'];
-            }
-            else {
-                $viewBag['isHidden'] = false;
-            }
-            if(isset($args['settings']['compId'])) {
-                $viewBag['compId'] = $args['settings']['compId'];
-            }
-            else {
-                $viewBag['compId'] = '';
-            }
-            if(isset($args['settings']['pluginTemplate'])){
-                $viewBag['pluginTemplate'] = $args['settings']['pluginTemplate'];
+        $pluginTemplatesWithTitle = array();
+        foreach($pluginTemplates as $template){
+            if($template == null){
+                $pluginTemplatesWithTitle['null'] = __('Default');
             }
             else{
-                $viewBag['pluginTemplate'] = 'null';
+                $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(prettify_text($template));
             }
-            if(isset($args['settings']['compTitle'])){
-                $viewBag['compTitle'] = $args['settings']['compTitle'];
-            }
-            else{
-                $viewBag['compTitle'] = '';
-            }
+        }
 
-            $viewBag['pluginTemplates'] = $pluginTemplatesWithTitle;
-            $viewBag['themeColors'] = $themeColors;
-            return view('pages.component.settings')->with($viewBag);
+        $themeColors = $this->themeRepository->getThemeColors($themeName);
+        $viewBag = [];
+        $args = json_decode($module->param, true);
+        if(isset($args['settings']['isWrapped'])) {
+            $viewBag['isWrapped'] = $args['settings']['isWrapped'];
+        }
+        else {
+            $viewBag['isWrapped'] = true;
+        }
+        if(isset($args['settings']['bgColorType'])) {
+            $viewBag['bgColorType'] = $args['settings']['bgColorType'];
+        }
+        else {
+            $viewBag['bgColorType'] = 'transparent';
+        }
+        if(isset($args['settings']['bgColor'])) {
+            $viewBag['bgColor'] = $args['settings']['bgColor'];
+        }
+        else {
+            $viewBag['bgColor'] = 'transparent';
+        }
+        if(isset($args['settings']['isHidden'])) {
+            $viewBag['isHidden'] = $args['settings']['isHidden'];
+        }
+        else {
+            $viewBag['isHidden'] = false;
+        }
+        if(isset($args['settings']['compId'])) {
+            $viewBag['compId'] = $args['settings']['compId'];
+        }
+        else {
+            $viewBag['compId'] = '';
+        }
+        if(isset($args['settings']['pluginTemplate'])){
+            $viewBag['pluginTemplate'] = $args['settings']['pluginTemplate'];
+        }
+        else{
+            $viewBag['pluginTemplate'] = 'null';
+        }
+        if(isset($args['settings']['compTitle'])){
+            $viewBag['compTitle'] = $args['settings']['compTitle'];
+        }
+        else{
+            $viewBag['compTitle'] = '';
+        }
+
+        $viewBag['pluginTemplates'] = $pluginTemplatesWithTitle;
+        $viewBag['themeColors'] = $themeColors;
+        return view('pages.component.settings')->with($viewBag);
     }
 
-    // TODO :
+    /**
+     * Save settings of a component
+     * @param SaveSettingsRequest $request
+     * @param $compId int The id of the component
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function saveSettings(SaveSettingsRequest $request, $compId) {
         $module = $this->moduleRepository->get($compId);
         $args = json_decode($module->param, true);
@@ -455,7 +567,12 @@ class PagesController extends AdminController
 
     }
 
-    // TODO :
+    /**
+     * Change the order of a component
+     * @param $compId int The id of the component
+     * @param $position string The way of moving the component (upper, up, downer, down)
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function orderComponent($compId, $position){
         $module = $this->moduleRepository->get($compId);
         $pageId = $module->fkPage;
@@ -483,12 +600,21 @@ class PagesController extends AdminController
 
 
     #region module
+    /**
+     * Get the form to create a module
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getCreateFormForModule(){
         return view('pages.module.create')->with([
             'plugins' => to_select($this->pluginRepository->getPluginsWithModulesSupport(), 'name', 'id')
         ]);
     }
 
+    /**
+     * Create a module
+     * @param CreateModuleRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function createModule(CreateModuleRequest $request) {
         $this->moduleRepository->create(
             $request->input('pluginId'),
@@ -503,12 +629,23 @@ class PagesController extends AdminController
         ]);
     }
 
+    /**
+     * Get a form to edit a module
+     * @param $moduleId int The id of the module
+     * @param $pageId int The id of the page
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
     public function getEditFormForModule($moduleId, $pageId) {
         $module = $this->moduleRepository->get($moduleId);
         $pluginId = $module->fkPlugin;
         return Type::FormRender($pluginId, $moduleId, $pageId);
     }
 
+    /**
+     * Save the module
+     * @param $moduleId The id of the module
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function saveModule($moduleId) {
         $module = $this->moduleRepository->get($moduleId);
         $res = Type::FormSave($module->fkPlugin, $moduleId, $module->fkPage);

@@ -40,9 +40,9 @@
                             class="delete text-danger">{{ __('Delete') }}</a>
                         |
                         @if($page->isEnabled)
-                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => false]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
+                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => 0]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
                         @else
-                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => true]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
+                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => 1]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
                         @endif
 
                     </span>

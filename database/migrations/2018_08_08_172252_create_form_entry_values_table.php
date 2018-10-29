@@ -20,6 +20,9 @@ class CreateFormentryvaluesTable extends Migration
             $table->integer('fkFormEntry')->unsigned();
             $table->integer('fkModule')->unsigned();
 
+            $table->timestamps();
+            $table->softDeletes();
+
             $table->foreign('fkFormEntry')
                 ->references('id')->on('form_entries')
                 ->onDelete('cascade');
@@ -37,6 +40,6 @@ class CreateFormentryvaluesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('formentryvalues');
+        Schema::dropIfExists('form_entry_values');
     }
 }

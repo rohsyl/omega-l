@@ -3,11 +3,13 @@
 namespace Omega\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Page extends Model
 {
-    //
+    use SoftDeletes;
 
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
     public function owner(){
         return $this->belongsTo('Omega\Models\User', 'fkUser', 'id');

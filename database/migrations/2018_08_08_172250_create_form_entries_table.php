@@ -40,6 +40,6 @@ class CreateFormentriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('formentries');
+        Schema::dropIfExists('form_entries');
     }
 }

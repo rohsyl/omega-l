@@ -32,6 +32,7 @@ class CreatePagesTable extends Migration
             $table->integer('fkMenu')->unsigned()->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('fkPageParent')
                 ->references('id')->on('pages')

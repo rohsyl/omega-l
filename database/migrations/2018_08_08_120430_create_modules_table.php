@@ -25,6 +25,7 @@ class CreateModulesTable extends Migration
             $table->integer('fkPage')->unsigned()->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('fkPlugin')
                 ->references('id')->on('plugins')
