@@ -41,9 +41,6 @@ class ModuleareaController extends AdminController
         ]);
     }
 
-
-
-
     public function addPosition(AddPositionRequest $request, $pageId = null)
     {
         $areaName = $request->input('areaName');

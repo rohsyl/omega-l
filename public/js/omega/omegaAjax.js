@@ -25,6 +25,10 @@ OmegaAjax.prototype = {
 			if(typeof onError !== 'undefined'){
 				onError(data);
 			}
+			else{
+				console.log(data);
+				omega.notice.error(data.responseJSON.message);
+			}
 		});
 	},
 

@@ -70,12 +70,11 @@
                         <div class="tab-pane @if($tab == 'content') active @endif page-tab" id="content">
 
                             <div id="component-container">
+
                             </div>
                             <p class="text-center">
                                 <button id="add-page-module" class="btn btn-lg btn-primary text-center" style="margin-top : 20px;"><span class="glyphicon glyphicon-plus"></span> {{ __('Add component') }}</button>
                             </p>
-
-
                         </div>
 
                         @if($enabledLang)
@@ -95,21 +94,11 @@
                         <div class="tab-pane @if($tab == 'modulearea') active @endif page-tab" id="modulearea">
 
                             @include('pages.edit-modulearea')
-                            {{-- echo $this->partialView('page', 'edit-modulearea', array(
-                                'moduleareaList' => $moduleareaList,
-                                'moduleList' => $moduleList))
-                            --}}
 
                         </div>
                         <div class="tab-pane @if($tab == 'security') active @endif page-tab" id="security">
 
                             @include('pages.edit-security')
-                            {{-- echo $this->partialView('page', 'edit-security', array(
-                                'groups' => $groups,
-                                'securityData' => $securityData,
-                                'securityType' => $securityType
-                            ))
-                            --}}
 
                         </div>
                     </div>

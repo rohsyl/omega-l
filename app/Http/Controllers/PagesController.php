@@ -3,6 +3,7 @@
 namespace Omega\Http\Controllers;
 
 use Illuminate\Validation\Rule;
+use Omega\Http\Requests\Page\Component\SaveSettingsRequest;
 use Omega\Http\Requests\Page\Module\CreateModuleRequest;
 use Omega\Repositories\GroupRepository;
 use Omega\Repositories\MembergroupRepository;
@@ -115,133 +116,6 @@ class PagesController extends AdminController
     }
 
     public function edit($id, $tab = 'content'){
-        /*
-        has_right( 'page_update' , true );
-        if(ParamUtil::IsValidUrlParamId('id')){
-
-            $id = $_GET['id'];
-            $page = PageManager::GetPage($id);
-
-            if($page == null) die("This page doesn't exists...");
-
-            $langs = LangManager::GetAllLangsWhereEnabled(true);
-            $enabledLang = LangManager::IsEnableLanguage();
-
-            $security = PageSecurityManager::GetPageSecurity($id);
-            if($security != null){
-                $securityType = PageSecurityTypeManager::GetSecurityType($security->fkType);
-            }
-            else{
-                $securityType = PageSecurityTypeManager::GetSecurityNone();
-                $security = PageSecurityManager::NewInstanceOfType($securityType, $page->id);
-            }
-
-            $form = new Form('getEditPageForm');
-            if($form->isPosted()) {
-                if(!$form->checkTokenInput()) {
-                    die('Invalid token');
-                }
-                if(!$form->checkValue('pageName')){
-                    Message::error(__('No title', true));
-                    Redirect::toAction('page', 'add');
-                }
-
-                $urlAlias = PageManager::BuildUrlAlias($form->getValue('idText'));
-
-                if($urlAlias == $page->idText || !PageManager::UrlAliasExists($urlAlias))
-                {
-                    $parent = Util::getRealNull($form->getValue('fkPageParent'));
-
-                    $page->idText = $urlAlias;
-                    $page->pageName = $form->getValue('pageName');
-                    $page->pageSubtitle = $form->getValue('pageSubtitle');
-                    $page->pageKeyWords = $form->getValue('pageKeyWords');
-                    $page->pageModel = $form->getValue('pageModel');
-                    $page->pageCssTheme = $form->getValue('pageCssTheme');
-                    $page->pageMenu = $form->getValue('pageMenu');
-                    $page->pageDateUpdated = date('Y-m-d H:i:s');
-                    $page->fkPageParent = $parent;
-                    $page->pageShowName = $form->checkValue('pageShowName');
-                    $page->pageShowSubtitle = $form->checkValue('pageShowSubtitle');
-
-                    if($enabledLang){
-                        // save page relation to the corresponding page in other language
-                        $page->pageLang = Util::getRealNull($form->getValue('lang'));
-                        if($form->checkValue('plangs_rel')){
-                            $langs_page_rel = $form->getValue('plangs_rel');
-                            foreach($langs_page_rel as $lang => $rel){
-                                PageLangRelManager::SavePageLangRel($id, Util::getRealNull($rel), $lang);
-                            }
-                        }
-                    }
-
-                    MenuManager::UpdateTitleInCustomMenu($form->getValue('pageName'), $id);
-                    MenuManager::UpdateUrlAliasInCustomMenu($urlAlias, $id);
-
-                    switch ($form->getValue('security'))
-                    {
-                        case 'bypassword':
-                            $security->fkType = PageSecurityTypeManager::GetSecurityPassword()->id;
-                            $security->data = serialize(array(
-                                'message' => $form->getValue('securityMessage'),
-                                'password' => $form->getValue('securityPassword')
-                            ));
-                            PageSecurityManager::SaveSecurity($security);
-                            break;
-                        case 'bymember':
-                            $security->fkType = PageSecurityTypeManager::GetSecurityMember()->id;
-                            $security->data = serialize(array(
-                                'membergroup' => $form->getValue('fkMemberGroup')
-                            ));
-                            PageSecurityManager::SaveSecurity($security);
-                            break;
-                        case 'none' :
-                        default :
-                            PageSecurityManager::SaveNoneSecurity($id);
-                            break;
-                    }
-
-                    $cs = ModuleManager::GetAllComponentsByPage($id);
-
-                    foreach($cs as $c) {
-                        Type::FormSave($c->fkPlugin, $c->id, $id);
-                    }
-
-                    $result = PageManager::Save($page);
-
-                    if($result) {
-                        Message::success(__('Page upated!', true));
-                        Redirect::toAction('page', 'edit', array('id' => $_GET['id']));
-                    }
-                    else {
-                        Message::error(__('Error while updating a page!', true));
-                        Redirect::toAction('page', 'index');
-                    }
-                }
-                else {
-                    Message::error(sprintf(__('The url alias \'%s\' already exists !', true), $urlAlias));
-                    Redirect::toAction('page', 'edit', array('id' => $_GET['id']));
-                }
-            }
-
-            $this->view->Set('page', $page);
-            $this->view->Set('enabledLang', $enabledLang);
-            $this->view->Set('langs', $langs);
-            $this->view->Set('correspondingParents', PageManager::GetCorrespondingParents($langs, $page));
-            $this->view->Set('securityType', $securityType->name);
-            $this->view->Set('securityData', unserialize($security->data));
-            $this->view->Set('pages', PageManager::GetAllPagesWithParent(null));
-            $this->view->Set('groups', MemberGroupManager::GetAllMemberGroups());
-            $this->view->Set('menus', MenuManager::GetAllMenusWithLang($enabledLang ? $page->pageLang : null));
-            $this->view->Set('countPage', PageManager::CountSameLevel($page->fkPageParent));
-            $this->view->Set('menuUrl', Url::Action('apparence', 'menuindex'));
-            $this->view->Set('models', ThemeManager::GetThemeTemplate(ThemeManager::GetCurrentThemeName()));
-            $this->view->Set('cssThemes', ThemeManager::GetThemeCssThemes(ThemeManager::GetCurrentThemeName()));
-            $this->view->Set('moduleareaList', $this->moduleareaList());
-            $this->view->Set('componentList', $this->componentList());
-            $this->view->Set('moduleList', $this->moduleList());
-
-            return $this->view->Render();*/
 
         $enabledLang = om_config('om_enable_front_langauge');
         $currentTheme = $this->themeRepository->getCurrentThemeName();
@@ -473,147 +347,137 @@ class PagesController extends AdminController
     }
 
     // TODO
-    public function getFormComponentSettings() {
-        if(ParamUtil::IsValidUrlParamId('compId')){
-            $compId = $_GET['compId'];
-            $module = ModuleManager::GetModule($compId);
+    public function getFormComponentSettings($compId) {
+            $module = $this->moduleRepository->get($compId);
 
-            $themeName = Config::get('om_template_name');
+            $themeName = $this->themeRepository->getCurrentThemeName();
 
-            $plugin = PluginManager::GetPlugin($module->fkPlugin);
+            $plugin = $this->pluginRepository->get($module->fkPlugin);
 
-            $pluginName = $plugin->plugName;
+            $pluginName = $plugin->name;
 
-            $pluginTemplates = PluginManager::GetPluginTemplateViewsByTheme($themeName, $pluginName);
+
+            $pluginTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
             array_unshift($pluginTemplates, null);
 
             $pluginTemplatesWithTitle = array();
             foreach($pluginTemplates as $template){
                 if($template == null){
-                    $pluginTemplatesWithTitle[] = array(
-                        'key' => 'null',
-                        'value' => 'Default',
-                    );
+                    $pluginTemplatesWithTitle['null'] = __('Default');
                 }
                 else{
-                    $pluginTemplatesWithTitle[] = array(
-                        'key' => $themeName . '/' . $pluginName . '/' . $template,
-                        'value' => ucfirst($themeName) . ' - ' . ucfirst($pluginName) . ' - ' . pathinfo($template, PATHINFO_FILENAME),
-                    );
+                    $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(prettify_text($template));
                 }
             }
 
-            $themeColors = ThemeManager::GetThemeColors($themeName);
-
-            $args = json_decode($module->moduleParam, true);
+            $themeColors = $this->themeRepository->getThemeColors($themeName);
+            $viewBag = [];
+            $args = json_decode($module->param, true);
             if(isset($args['settings']['isWrapped'])) {
-                $this->view->Set('isWrapped', $args['settings']['isWrapped']);
+                $viewBag['isWrapped'] = $args['settings']['isWrapped'];
             }
             else {
-                $this->view->Set('isWrapped', true);
+                $viewBag['isWrapped'] = true;
             }
             if(isset($args['settings']['bgColorType'])) {
-                $this->view->Set('bgColorType', $args['settings']['bgColorType']);
+                $viewBag['bgColorType'] = $args['settings']['bgColorType'];
             }
             else {
-                $this->view->Set('bgColorType', 'transparent');
+                $viewBag['bgColorType'] = 'transparent';
             }
             if(isset($args['settings']['bgColor'])) {
-                $this->view->Set('bgColor', $args['settings']['bgColor']);
+                $viewBag['bgColor'] = $args['settings']['bgColor'];
             }
             else {
-                $this->view->Set('bgColor', 'transparent');
+                $viewBag['bgColor'] = 'transparent';
             }
             if(isset($args['settings']['isHidden'])) {
-                $this->view->Set('isHidden', $args['settings']['isHidden']);
+                $viewBag['isHidden'] = $args['settings']['isHidden'];
             }
             else {
-                $this->view->Set('isHidden', false);
+                $viewBag['isHidden'] = false;
             }
             if(isset($args['settings']['compId'])) {
-                $this->view->Set('compId', $args['settings']['compId']);
+                $viewBag['compId'] = $args['settings']['compId'];
             }
             else {
-                $this->view->Set('compId', '');
+                $viewBag['compId'] = '';
             }
             if(isset($args['settings']['pluginTemplate'])){
-                $this->view->Set('pluginTemplate', $args['settings']['pluginTemplate']);
+                $viewBag['pluginTemplate'] = $args['settings']['pluginTemplate'];
             }
             else{
-                $this->view->Set('pluginTemplate', 'null');
+                $viewBag['pluginTemplate'] = 'null';
             }
             if(isset($args['settings']['compTitle'])){
-                $this->view->Set('compTitle', $args['settings']['compTitle']);
+                $viewBag['compTitle'] = $args['settings']['compTitle'];
             }
             else{
-                $this->view->Set('compTitle', '');
+                $viewBag['compTitle'] = '';
             }
 
-            $this->view->Set('pluginTemplates', $pluginTemplatesWithTitle);
-            $this->view->Set('themeColors', $themeColors);
-            return $this->view->RenderPartial();
-        }
+            $viewBag['pluginTemplates'] = $pluginTemplatesWithTitle;
+            $viewBag['themeColors'] = $themeColors;
+            return view('pages.component.settings')->with($viewBag);
     }
 
     // TODO :
-    public function saveSettings() {
-        if(ParamUtil::IsValidUrlParamId('compId')){
-            $compId = $_GET['compId'];
-            $module = ModuleManager::GetModule($compId);
-            $args = json_decode($module->moduleParam, true);
-            if(!isset($args['settings'])) $args['settings'] = array();
-            $args['settings']['compId'] = $_POST['compId'];
-            $args['settings']['compTitle'] = $_POST['compTitle'];
-            $args['settings']['isHidden'] = $_POST['is_hidden'] == 'true';
-            $args['settings']['isWrapped'] = $_POST['comp_width'] == 'wrapped';
-            switch($_POST['bgcolor']) {
-                case 'custom':
-                    $args['settings']['bgColor'] = $_POST['customcolor'];
-                    $args['settings']['bgColorType'] = 'custom';
-                    break;
-                case 'theme':
-                    $args['settings']['bgColor'] = $_POST['themecolor'];
-                    $args['settings']['bgColorType'] = 'theme';
-                    break;
-                default:
-                    $args['settings']['bgColor'] = 'transparent';
-                    $args['settings']['bgColorType'] = 'transparent';
-                    break;
-            }
-            $args['settings']['pluginTemplate'] = $_POST['compTemplate'];
-            $module->moduleParam = json_encode($args);
-            $res = ModuleManager::Save($module);
-
-            $this->view->Set('args', $args);
-            $this->view->Set('result', $res);
-            return $this->view->RenderAjax();
+    public function saveSettings(SaveSettingsRequest $request, $compId) {
+        $module = $this->moduleRepository->get($compId);
+        $args = json_decode($module->param, true);
+        if(!isset($args['settings'])) $args['settings'] = array();
+        $args['settings']['compId'] = $request->input('compId');
+        $args['settings']['compTitle'] = $request->input('compTitle');
+        $args['settings']['isHidden'] = $request->input('is_hidden') == 'true';
+        $args['settings']['isWrapped'] = $request->input('comp_width') == 'wrapped';
+        switch($_POST['bgcolor']) {
+            case 'custom':
+                $args['settings']['bgColor'] = $request->input('customcolor');
+                $args['settings']['bgColorType'] = 'custom';
+                break;
+            case 'theme':
+                $args['settings']['bgColor'] = $request->input('themecolor');
+                $args['settings']['bgColorType'] = 'theme';
+                break;
+            default:
+                $args['settings']['bgColor'] = 'transparent';
+                $args['settings']['bgColorType'] = 'transparent';
+                break;
         }
+        $args['settings']['pluginTemplate'] = $request->input('compTemplate');
+        $this->moduleRepository->saveParam($module, $args);
+
+        return response()->json([
+            'args' => $args,
+            'result'  => true
+        ]);
+
 
     }
 
     // TODO :
-    public function orderComponent(){
-        if(ParamUtil::IsValidUrlParamId('compId') && ParamUtil::IsValidUrlParamString('position')){
-            $cId = $_GET['compId'];
-            $module = ModuleManager::GetModule($cId);
-            $pId = $module->fkPage;
+    public function orderComponent($compId, $position){
+        $module = $this->moduleRepository->get($compId);
+        $pageId = $module->fkPage;
 
-            ModuleManager::ComponentOrderInitForPage($pId);
-            switch($_GET['position']){
-                case 'upper':
-                    ModuleManager::ComponentOrderSetOrderUpper($cId, $pId);
-                    break;
-                case 'up':
-                    ModuleManager::ComponentOrderSetOrderUp($cId, $pId);
-                    break;
-                case 'downer':
-                    ModuleManager::ComponentOrderSetOrderDowner($cId, $pId);
-                    break;
-                case 'down':
-                    ModuleManager::ComponentOrderSetOrderDown($cId, $pId);
-                    break;
-            }
+        $this->moduleRepository->componentOrderInitForPage($pageId);
+        switch($position){
+            case 'upper':
+                $this->moduleRepository->componentOrderSetOrderUpper($compId, $pageId);
+                break;
+            case 'up':
+                $this->moduleRepository->componentOrderSetOrderUp($compId, $pageId);
+                break;
+            case 'downer':
+                $this->moduleRepository->componentOrderSetOrderDowner($compId, $pageId);
+                break;
+            case 'down':
+                $this->moduleRepository->componentOrderSetOrderDown($compId, $pageId);
+                break;
         }
+        return response()->json([
+            'result'  => true
+        ]);
     }
     #endregion
 

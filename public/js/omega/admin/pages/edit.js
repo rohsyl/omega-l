@@ -17,9 +17,8 @@ $(function(){
         $inputTab.val($(e.target).attr('href').substring(1));
     });
 
-    // Open a modale to create a new module
+    // Open a modal to create a new module
     $btnAddModule.click(function(){
-
         var url = route('admin.pages.getCreateFormForModule', { pageId : pageId });
         omega.ajax.query(url, {}, "GET", function(data){
             var idm = omega.modal.open(__("Create a module"), data, __("Create"), function(){
@@ -40,13 +39,13 @@ $(function(){
         return false;
     });
 
+    // Open a modal to create a new component
     $btnAddComponent.click(function(){
-
         var url = route('admin.pages.getCreateFormForComponent', { pageId : pageId });
         omega.ajax.query(url, {}, omega.ajax.GET, function(data){
             var idm = omega.modal.open(__("Insert a component"), data, __("Insert"), function(){
                 var $componentActive= $('.component-container.active');
-                if($componentActive.length == 1) {
+                if($componentActive.length === 1) {
                     var pluginId = $componentActive.data('pluginid');
                     url = route('admin.pages.createComponent', { pageId : pageId, pluginId : pluginId });
                     omega.ajax.query(url, {}, omega.ajax.GET, function(data){
@@ -69,6 +68,7 @@ $(function(){
         return false;
     });
 
+    // Open a modal to edit a module
     $body.delegate( ".editModule", "click", function() {
         var id = $(this).data('id');
         var url = route('admin.pages.getEditFormForModule', { moduleId : id, pageId : pageId });
@@ -85,6 +85,7 @@ $(function(){
         return false;
     });
 
+    // Delete a module
     $body.delegate( ".deleteModule", "click", function() {
         var id = $(this).data('id');
         omega.modal.confirm(__('Do you really want to delete this ?'), function(yes){
@@ -98,6 +99,7 @@ $(function(){
         });
     });
 
+    // Delete a component
     $body.delegate( ".deleteComponent", "click", function() {
         var id = $(this).data('id');
         omega.modal.confirm(__('Do you really want to delete this ?'), function(yes){
@@ -111,17 +113,16 @@ $(function(){
         return false;
     });
 
+    // Open a modal to edit settings of a component
     $body.delegate( ".settingsComponent", "click", function() {
         var id = $(this).data('id');
-        var url = omega.mvc.url('page', 'getFormComponentSettings');
-        var args = { compId : id };
-        omega.ajax.query(url, args, 'GET', function(data){
+        var url = route('admin.pages.getFormComponentSettings', { compId : id });
+        omega.ajax.query(url, {}, 'GET', function(data){
             var mid = omega.modal.open(__("Edit component's settings"), '<form id="formEditSettings">'+data+'</form>', __('Save'), function(){
                 var $form = $('#formEditSettings');
-                url = omega.mvc.url('page', 'saveSettings', { compId : id });
+                url = route('admin.pages.saveSettings', { compId : id });
                 args = omega.ajax._serializeForm($form);
-                omega.ajax.query(url, args, 'POST', function(response){
-                    var jResponse = JSON.parse(response);
+                omega.ajax.query(url, args, 'POST', function(jResponse){
                     $('#hidden-comp-' + id).parent().remove();
                     if(jResponse.args.settings.isHidden) {
                         $('#component-' + id + ' .component-item-top ul').append('<li><i class="fa fa-eye-slash" id="hidden-comp-'+id+'"></i></li>');
@@ -147,90 +148,70 @@ $(function(){
                         $('#component-' + id + ' .component-item-top ul').append(
                             '<li><i class="fa fa-hashtag" id="id-comp-'+id+'"></i>'+jResponse.args.settings.compId+'</li>');
                     }
+                    omega.notice.success('Settings saved');
                     omega.modal.hide(mid);
-                });
+                }, null, {dataType: 'json'});
             }, 'modal-lg');
         });
         return false;
     });
 
+    // Move a component up
     $body.delegate( ".upComponent", "click", function() {
         var id = $(this).data('id');
-        var url = omega.mvc.url('page', 'orderComponent');
-        var args = { compId : id, position: 'up' };
-        omega.ajax.query(url, args, 'GET', function(data) {
-            url = omega.mvc.url('page', 'componentList');
-            args = {id: pageId};
-            omega.ajax.query(url, args, 'GET', function (data) {
-                $componentContainer.html(data);
-                omega.notice.success(undefined, __('Order updated'))
-            });
+        var url = route('admin.pages.orderComponent', { compId : id, position: 'up' });
+        omega.ajax.query(url, {}, 'GET', function(data) {
+            loadComponentList();
+            omega.notice.success(undefined, __('Order updated'));
         });
         return false;
     });
 
+    // Move a component to the top of the list
     $body.delegate( ".upupComponent", "click", function() {
         var id = $(this).data('id');
-        var url = omega.mvc.url('page', 'orderComponent');
-        var args = { compId : id, position: 'upper' };
-        omega.ajax.query(url, args, 'GET', function(data) {
-            url = omega.mvc.url('page', 'componentList');
-            args = {id: pageId};
-            omega.ajax.query(url, args, 'GET', function (data) {
-                $componentContainer.html(data);
-                omega.notice.success(undefined, __('Order updated'))
-            });
+        var url = route('admin.pages.orderComponent', { compId : id, position: 'upper' });
+        omega.ajax.query(url, {}, 'GET', function(data) {
+            loadComponentList();
+            omega.notice.success(undefined, __('Order updated'));
         });
         return false;
     });
 
+    // Move a component to the bottom of the list
     $body.delegate( ".downdownComponent", "click", function() {
         var id = $(this).data('id');
-        var url = omega.mvc.url('page', 'orderComponent');
-        var args = { compId : id, position: 'downer' };
-        omega.ajax.query(url, args, 'GET', function(data) {
-            url = omega.mvc.url('page', 'componentList');
-            args = {id: pageId};
-            omega.ajax.query(url, args, 'GET', function (data) {
-                $componentContainer.html(data);
-                omega.notice.success(undefined, __('Order updated'))
-            });
+        var url = route('admin.pages.orderComponent', { compId : id, position: 'downer' });
+        omega.ajax.query(url, {}, 'GET', function(data) {
+            loadComponentList();
+            omega.notice.success(undefined, __('Order updated'));
         });
         return false;
     });
 
+    // Move down a component
     $body.delegate( ".downComponent", "click", function() {
         var id = $(this).data('id');
-        var url = omega.mvc.url('page', 'orderComponent');
-        var args = { compId : id, position: 'down' };
-        omega.ajax.query(url, args, 'GET', function(data) {
-            url = omega.mvc.url('page', 'componentList');
-            args = {id: pageId};
-            omega.ajax.query(url, args, 'GET', function (data) {
-                $componentContainer.html(data);
-                omega.notice.success(undefined, __('Order updated'))
-            });
+        var url = route('admin.pages.orderComponent', { compId : id, position: 'down' });
+        omega.ajax.query(url, {}, 'GET', function(data) {
+            loadComponentList();
+            omega.notice.success(undefined, __('Order updated'));
         });
         return false;
     });
 
 
-    // Set on all page
+    // Set a module visiable on all pages
     $body.delegate( ".setOnAllPages", "click", function(e) {
         e.stopPropagation();
         var $this = $(this);
-        var $parent = $this.parent();
-
         var is = $this.data('is');
-
-        console.log(is);
+        var posId = $this.data('positionid');
 
         if(is === 1)
         {
-
             $this.find('span').addClass('fa-spin');
 
-            var posId = $this.data('positionid');
             url = route('admin.pages.ma.setonallpages', { id : posId, set : 0, pageId : pageId });
             omega.ajax.query(url.url(), {}, omega.ajax.POST, function(){
                 $this.find('span').removeClass('glyphicon-star fa-spin');
@@ -244,7 +225,6 @@ $(function(){
         {
             $this.find('span').addClass('fa-spin');
 
-            var posId = $this.data('positionid');
             url = route('admin.pages.ma.setonallpages', { id : posId, set : 1, pageId : 'null' });
             omega.ajax.query(url.url(), {}, omega.ajax.POST, function(){
                 $this.find('span').removeClass('glyphicon-star-empty fa-spin');
@@ -258,7 +238,7 @@ $(function(){
         return false;
     });
 
-    // Delete position
+    // Remove a module from a modulearea
     $body.delegate( ".deletePosition", "click", function(e) {
         e.stopPropagation();
         var $this = $(this);
@@ -273,7 +253,7 @@ $(function(){
         return false;
     });
 
-    // Add position
+    // Insert a module in a modulearea
     $body.delegate( ".module-area-add", "click", function(e) {
 
         var moduleArea = $(this).parents('.module-area').data('areaname');
@@ -344,7 +324,10 @@ $(function(){
         }, { dataType: 'json' });
     });
 
-    loadModuleareas();
+
+    /**
+     * Load all the moduleareas
+     */
     function loadModuleareas(){
 
         url = route('admin.pages.moduleareaList',  { id : pageId });
@@ -354,17 +337,35 @@ $(function(){
             createSortable();
         });
     }
+    loadModuleareas();
 
-    loadComponentList();
+    /**
+     * Load all components
+     */
     function loadComponentList(){
 
         url = route('admin.pages.componentList',  { pageId : pageId });
-       $componentContainer.html(loading);
+       //$componentContainer.html(loading);
         omega.ajax.query(url, {}, 'GET', function(data){
             $componentContainer.html(data);
         });
     }
+    loadComponentList();
 
+    /**
+     * Load all modules
+     */
+    function loadModuleList(){
+        url = route('admin.pages.moduleList', { id : pageId });
+        omega.ajax.query(url, {}, "GET", function(data){
+            $modulesContainer.html(data);
+        });
+    }
+    loadModuleList();
+
+    /**
+     * Init sortable in modulearea
+     */
     function createSortable(){
         $('.sortable').each(function () {
             Sortable.create(this, {
@@ -394,6 +395,9 @@ $(function(){
     }
 
 
+    /**
+     * Update the ordering buttons for components
+     */
     function hideOrShowOrderingButtons(){
         var count = $componentContainer.children(componentItemClass).length;
         $componentContainer.children(componentItemClass).each(function(i) {
@@ -409,11 +413,4 @@ $(function(){
         });
     }
 
-    loadModuleList();
-    function loadModuleList(){
-        url = route('admin.pages.moduleList', { id : pageId });
-        omega.ajax.query(url, {}, "GET", function(data){
-            $modulesContainer.html(data);
-        });
-    }
 });

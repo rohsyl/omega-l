@@ -85,10 +85,89 @@ class ModuleRepository
     }
 
     public function getAllComponentsByPage($pageId){
-        return $this->module->where('fkPage', $pageId)->where('isComponent', 1)->get();
+        return $this->module->where('fkPage', $pageId)->where('isComponent', 1)->orderBy('order')->get();
     }
 
     public function getAllModulesByPage($pageId){
         return $this->module->where('fkPage', $pageId)->where('isComponent', 0)->get();
+    }
+
+
+    public function componentOrderInitForPage($pageId){
+        $components = $this->getAllComponentsByPage($pageId);
+        $i = 1;
+        foreach($components as $comp){
+            $comp->order = $i;
+            $comp->save();
+            $i++;
+        }
+    }
+
+    public function componentOrderSetOrderUpper($compId, $pageId){
+        $module = $this->get($compId);
+        $module->order = 1;
+        $module->save();
+        $components = $this->getAllComponentsByPage($pageId);
+        $i = 2;
+        foreach($components as $comp) {
+            if($compId != $comp->id) {
+                $comp->order = $i;
+                $comp->save();
+                $i++;
+            }
+        }
+    }
+
+    public function getModuleWithOrderAndPage($order, $pageId){
+
+        return $this->module
+            ->where('fkPage', $pageId)
+            ->where('order', $order)
+            ->first();
+    }
+
+    public function componentOrderSetOrderUp($compId, $pageId){
+        $module = $this->get($compId);
+        $order = $module->order;
+        if($order > 0){
+            $order = $order - 1;
+            $moduleBefore = $this->getModuleWithOrderAndPage($order, $pageId);
+            $moduleBefore->order = $order + 1;
+            $moduleBefore->save();
+
+            $module->order = $order;
+            $module->save();
+        }
+    }
+
+    public function ComponentOrderSetOrderDown($compId, $pageId){
+        $maxOrder = $this->getMaxOrderOnPage($pageId);
+        $module = $this->get($compId);
+        $order = $module->order;
+        if($order < $maxOrder){
+            $order = $order + 1;
+            $moduleAfter = $this->getModuleWithOrderAndPage($order, $pageId);
+            $moduleAfter->order = $order - 1;
+            $moduleAfter->save();
+
+            $module->order = $order;
+            $module->save();
+        }
+    }
+
+    public function ComponentOrderSetOrderDowner($compId, $pageId){
+        $maxOrder = $this->getMaxOrderOnPage($pageId);
+        $module = $this->get($compId);
+        $module->order = $maxOrder;
+        $module->save();
+        $components = $this->getAllComponentsByPage($pageId);
+        $i = 1;
+        foreach($components as $comp) {
+            if($compId != $comp->id) {
+                $comp->order = $i;
+                $comp->save();
+                $i++;
+            }
+        }
     }
 }

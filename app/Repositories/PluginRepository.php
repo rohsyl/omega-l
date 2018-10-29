@@ -9,6 +9,7 @@
 namespace Omega\Repositories;
 
 use Omega\Models\Plugin;
+use Omega\Utils\Path;
 use Omega\Utils\Plugin\PluginMeta;
 use Omega\Utils\Plugin\Type;
 
@@ -108,5 +109,14 @@ class PluginRepository
             }
         }
         return $modules;
+    }
+
+    public function getPluginTemplateViewsByTheme($themeName, $pluginName){
+        $folder = Path::Combine(theme_path(), $themeName, 'template', $pluginName);
+        $files = array();
+        if(file_exists($folder)){
+            $files = Path::GetFiles($folder);
+        }
+        return $files;
     }
 }

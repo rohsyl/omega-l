@@ -119,6 +119,10 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('pages/getCreateFormForComponent/{pageId}', 'PagesController@getCreateFormForComponent')->name('admin.pages.getCreateFormForComponent');
             Route::get('pages/getComponentForm/{id}', 'PagesController@getComponentForm')->name('admin.pages.getComponentForm');
             Route::get('pages/createComponent/{pageId}/{pluginId}', 'PagesController@createComponent')->name('admin.pages.createComponent');
+            Route::get('pages/orderComponent/{compId}/{position}', 'PagesController@orderComponent')->name('admin.pages.orderComponent');
+
+            Route::get('pages/getFormComponentSettings/{compId}', 'PagesController@getFormComponentSettings')->name('admin.pages.getFormComponentSettings');
+            Route::post('pages/saveSettings/{compId}', 'PagesController@saveSettings')->name('admin.pages.saveSettings');
 
             Route::post('pages/create', 'PagesController@create')->name('admin.pages.create');
             Route::get('pages/edit/{id}/{tab?}', 'PagesController@edit')->name('admin.pages.edit');
