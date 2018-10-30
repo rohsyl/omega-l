@@ -37,20 +37,12 @@ class Page{
 
         if($this->exists())
         {
-            $stmt = Dbs::select('name', 'data')
-                ->from('om_page_security')
-                ->join('inner', 'om_page_security_type', 'om_page_security_type.id', 'fkType')
-                ->where('fkPage', '=', '?')
-                ->prepare(array($this->id))
-                ->run();
-            if($stmt->length() > 0)
-            {
-                $this->securityType = $stmt->getString(0, 'name');
-                $this->securityData = unserialize($stmt->getString(0, 'data'));
+            if(isset($this->page->security->type)) {
                 $this->secure = true;
+                $this->securityType = $this->page->security->type->name;
+                $this->securityData = unserialize($this->page->security->data);
             }
-            else
-            {
+            else {
                 $this->secure = false;
                 $this->securityType = 'none';
                 $this->securityData = array();
@@ -364,29 +356,28 @@ class Page{
 
     public static function GetHome($lang = null){
 
-        $home_page_id = Config::get('om_home_page_id');
+        $home_page_id = om_config('om_home_page_id');
 
         $page = new Page($home_page_id);
 
         if(!$page->exists()) {
-            $stmt = Dbs::select('id')
-                ->from('om_page')
-                ->where('pageIsEnabled', '=', '1')
-                ->orderby('pageOrder', 'ASC')
-                ->run();
+            $pageId = DB::table('pages')
+                    ->where('isEnabled', 1)
+                    ->orderBy('order')
+                    ->select(['id'])
+                    ->first();
 
-            if ($stmt->length() <> 0){
-
-                Config::set('om_home_page_id', $stmt->getRow(0)->getInt('id'));
-                $home_page_id = Config::get('om_home_page_id');
-                $page = new Page($home_page_id);
+            if (isset($pageId)){
+                om_config(['om_home_page_id' => $pageId]);
+                $page = new Page($pageId);
+            }
+            else
+            {
+                return abort(404);
             }
         }
-        if(!$page->exists()) {
-            return null;
-        }
         if(isset($lang) && $page->lang != $lang){
-            $_SESSION['front_lang'] = $lang;
+            session(['front_lang' => $lang]);
             $home_page_id = self::GetCorrespondingInLang($home_page_id, $lang);
         }
         return $home_page_id;

@@ -44,4 +44,8 @@ class LangRepository{
     public function delete($slug){
         return $this->lang->where('slug', $slug)->delete();
     }
+
+    public function isEnabled(){
+        return om_config('om_enable_front_langauge');
+    }
 }

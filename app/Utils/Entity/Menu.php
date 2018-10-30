@@ -1,16 +1,16 @@
 <?php
-namespace Omega\Library\Entity;
+namespace Omega\Utils\Entity;
 
-use Omega\Library;
-use Omega\Library\Database\Dbs;
-use Omega\Library\Util\Util;
-use Omega\Library\Util\Ini;
-use Omega\Library\Util\Url;
-use Omega\Library\Language\Front\LangManager;
-use Omega\Library\PMvc\PController;
-use Omega\Library\BLL\MenuManager;
+use Omega\Utils\Url;
+use Omega\Repositories\LangRepository;
+use Omega\Repositories\MemberRepository;
+use Omega\Repositories\MenuRepository;
 
 class Menu{
+
+    private $menuRepository;
+    private $langRepository;
+    private $memberRepository;
 
     /**
      * @var array
@@ -30,6 +30,10 @@ class Menu{
 
     public function __construct()
     {
+        $this->menuRepository = new MenuRepository(new \Omega\Models\Menu());
+        $this->langRepository = new LangRepository(new \Omega\Models\Lang());
+        $this->memberRepository = new MemberRepository(new \Omega\Models\Member());
+
         $this->menuHtmlStruct = array(
             'ul_main' => '<ul>%1$s</ul>',
             'li_nochildren' => '<li class="nav-item-%3$s"><a href="%1$s">%2$s</a></li>',
@@ -66,21 +70,19 @@ class Menu{
      * @return string The html structure
      */
 	public function getMenuById($id) {
-	    $menu = MenuManager::GetMenu($id);
+	    $menu = $this->menuRepository->get($id);
 
 		if($menu == null) return 'No menu';
 
 
         $menuLang = null;
-        if(LangManager::isEnabled()){
-            $menuLang = $menu->menuLang;
+        if($this->langRepository->isEnabled()){
+            $menuLang = $menu->lang;
         }
 
-		$menuJson = $menu->menuJson;
-		$menuHtml = $this->getHtmlFromJson($menuJson, $this->menuHtmlStruct, $menuLang);
+		$menuHtml = $this->getHtmlFromJson($menu->json, $this->menuHtmlStruct, $menuLang);
 
 		return $menuHtml;
-		
 	}
 
     /**
@@ -89,11 +91,11 @@ class Menu{
      */
 	public function getBySecurity() {
 
-        $langEnabled = LangManager::isEnabled();
+        $langEnabled = $this->langRepository->isEnabled();
 
         $menu = null;
         if (isset($this->currentPage) && isset($this->currentPage->idMenu)) {
-            $menu = MenuManager::GetMenu($this->currentPage->idMenu);
+            $menu = $this->menuRepository->get($this->currentPage->idMenu);
         }
 
         // else find menu by member group
@@ -101,7 +103,9 @@ class Menu{
             $ids = $this->getMemberGroupOrPublic();
             foreach ($ids as $id) {
 
-                $menu = $langEnabled ? MenuManager::GetMenuMainByMemberGroupAndLang($id, $_SESSION['front_lang']) : MenuManager::GetMenuMainByMemberGroup($id);
+                $menu = $langEnabled
+                    ? $this->menuRepository->getMenuMainByMemberGroupAndLang($id, session('front_lang'))
+                    : $this->menuRepository->getMenuMainByMemberGroup($id);
 
                 if (isset($menu)) {
                     break;
@@ -109,17 +113,17 @@ class Menu{
             }
         }
 
-        // if no menu found, display public menu
+        // if no menu found
         if (!isset($menu)) {
             return 'No menu';
         }
 
         $menuLang = null;
         if ($langEnabled) {
-            $menuLang = $menu->menuLang;
+            $menuLang = $menu->lang;
         }
 
-        $menuJson = $menu->menuJson;
+        $menuJson = $menu->json;
 
         $menuHtml = $this->getHtmlFromJson($menuJson, $this->menuHtmlStruct, $menuLang);
 
@@ -158,22 +162,23 @@ class Menu{
 
 				if($url == $current_page || $containesActive){
 
-					$z .= sprintf($html['li_childrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(Util::toTextKey($title)), $sub);
+					$z .= sprintf($html['li_childrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $sub);
 					$containesActive = true;
 					
 				} else {
 				
-					$z .= sprintf($html['li_children'], $this->PrepareUrl($url, $lang), $title, strtolower(Util::toTextKey($title)), $sub);
+					$z .= sprintf($html['li_children'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $sub);
 					
 				}
 				
-			} else {
+			}
+			else {
 
 				if($url == $current_page) {
 
-				    Menu::$currentPageUrl = $url;
+				    self::$currentPageUrl = $url;
 
-					$z .= sprintf($html['li_nochildrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(Util::toTextKey($title)));
+					$z .= sprintf($html['li_nochildrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)));
 					$containesActive = true;
 					
 				} else {
@@ -206,20 +211,20 @@ class Menu{
 
 		if(Ini::Get('omega.member.enable')) {
 
-			$title = '<span class="glyphicon glyphicon-user"></span> <span class="hidden-md hidden-lg">'.Library\oo('Member', true) .'</span>';
+			$title = '<span class="glyphicon glyphicon-user"></span> <span class="hidden-md hidden-lg">'.__('Member') .'</span>';
 			$url = '#';
 
 			if(isset($_SESSION['member_connected']) && $_SESSION['member_connected'] == true)
 			{
-				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/profil'), Library\oo('Profil', true), 'profil');
-				$subItems .= sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/logout'), Library\oo('Logout', true), 'logout');
+				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/profil'), __('Profil'), 'profil');
+				$subItems .= sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/logout'), __('Logout'), 'logout');
 				$sub = sprintf($html['ul_children'], $subItems);
 				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub);
 
 			}
 			else
 			{
-				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/login'), Library\oo('Log in', true), 'login');
+				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/login'), __('Log in'), 'login');
 				$sub = sprintf($html['ul_children'], $subItems);
 				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub);
 			}
@@ -231,7 +236,7 @@ class Menu{
 	public function getLanguagePart()
 	{
 
-        $langEnabled = LangManager::isEnabled();
+        $langEnabled = $this->langRepository->isEnabled();
 
 		$html = $this->menuHtmlStruct;
 		$z = '';
@@ -240,12 +245,12 @@ class Menu{
 
 		if($langEnabled) {
 
-			$title = '<span class="glyphicon glyphicon-globe"></span> <span class="hidden-md hidden-lg">'.Library\oo('Language', true) .'</span>';
+			$title = '<span class="glyphicon glyphicon-globe"></span> <span class="hidden-md hidden-lg">'.__('Language') .'</span>';
 			$url = '#';
 
 			$current_page = Entity::Page()->id;
 			$current_page = $current_page != 0 ? $current_page : $_SERVER["REQUEST_URI"];
-			$languages = LangManager::getAllLang();
+			$languages = $this->langRepository->allEnabled();
 
 			$subItems = '';
 			foreach($languages as $lang)
@@ -273,22 +278,13 @@ class Menu{
 
     private function getMemberGroupOrPublic()
     {
-        if(isset($_SESSION['member_id']))
-        {
-            $stmt = Dbs::select('fkMembergroup')
-                ->from('om_member_membergroup')
-                ->where('fkMember', '=', '?')
-                ->prepare(array($_SESSION['member_id']))
-                ->run();
+        if(session()->has('member_id')) {
+            $member = $this->memberRepository->get(session('member_id'));
 
-            if($stmt->length() == 0){
+            if($member->membergroups->count() == 0){
                 return array(1);
             }
-            $membergroups = array();
-            for($i = 0; $i < $stmt->length(); $i++){
-                $membergroups[] = $stmt->getRow($i)->getInt('fkMembergroup');
-            }
-            return $membergroups;
+            return $member->membergroups->pluck('id');
         }
         else return array(1);
     }
@@ -308,20 +304,20 @@ class Menu{
             $queryStrings = array();
             parse_str(parse_url($url, PHP_URL_QUERY), $queryStrings);
 
-            return Url::CombAndAbs(ABSPATH, Url::Link('library/demo.php', array_merge(array('theme' => $_SESSION['demoTheme'], 'url' => urlencode($path)), $queryStrings)));
+            return Url::CombAndAbs(url('/'), Url::Link('library/demo.php', array_merge(array('theme' => $_SESSION['demoTheme'], 'url' => urlencode($path)), $queryStrings)));
         }
 
         if(!isset($lang))
-            return Url::CombAndAbs(ABSPATH, $url);
+            return Url::CombAndAbs(url('/'), $url);
 
 
         $trimedUrl = trim($url, '/');
         // if lang slug already in $url, don't change the $url
         if(strpos($trimedUrl, $lang) === 0){
-            return Url::CombAndAbs(ABSPATH, $url);
+            return Url::CombAndAbs(url('/'), $url);
         }
         // else add lang slug
-        return Url::CombAndAbs(ABSPATH, $lang, $url);
+        return Url::CombAndAbs(url('/'), $lang, $url);
 
     }
 }

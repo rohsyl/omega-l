@@ -23,6 +23,7 @@
     },
     "autoload": {
         "files": [
+            "app/Helpers/public.php",
             "app/Helpers/helpers.php",
             "app/Helpers/plugins.php",
             "app/Helpers/themes.php"

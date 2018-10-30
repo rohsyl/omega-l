@@ -1,7 +1,7 @@
 <?php
 namespace Omega\Utils\Entity;
 
-use Omega\Library\DTO\Lang;
+use Omega\Models\Lang;
 use Omega\Library\Util\Omega;
 
 class Entity{
@@ -17,7 +17,7 @@ class Entity{
     private static $menu;
 
     /**
-     * @var Omega
+     * @var Site
      */
     private static $site;
 
@@ -41,7 +41,7 @@ class Entity{
     }
 
     /**
-     * @param $site Omega
+     * @param $site Site
      */
     public static function SetSite($site){
         self::$site = $site;
@@ -69,7 +69,7 @@ class Entity{
     }
 
     /**
-     * @return Omega
+     * @return Site
      */
     public static function Site(){
         return self::$site;

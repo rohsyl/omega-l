@@ -23,7 +23,13 @@ Route::middleware('om_not_installed')->group(function(){
     /**
      * Public routes
      */
-    Route::get('/', 'PublicController@index')->name('public');
+
+    Route::get('/{lang?}/', 'PublicController@home')
+        ->where(['lang' => '[a-z]{2}'])
+        ->name('public');
+
+
+
 
 
 

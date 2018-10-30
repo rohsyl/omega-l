@@ -2,18 +2,20 @@
 
 namespace Omega\Http\Controllers;
 
-use Illuminate\Http\Request;
+
+use Omega\Utils\Entity\Entity;
+use Omega\Utils\Entity\Site;
 
 class PublicController extends Controller
 {
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    public function __construct() {
+        Entity::SetSite(new Site());
+    }
+
+    public function home($lang = null)
     {
-        return view('public');
+        return page()->withLang($lang);
     }
 
 }

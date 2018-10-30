@@ -60,4 +60,25 @@ class MenuRepository
     public function delete($id){
         return $this->menu->destroy($id);
     }
+
+
+
+
+    public function getMenuMainByMemberGroup($idMemberGroup){
+
+        return $this->menu
+            ->where('isEnabled', 1)
+            ->where('fkMemberGroup', $idMemberGroup)
+            ->where('isMain', 1)
+            ->first();
+    }
+
+    public function getMenuMainByMemberGroupAndLang($idMemberGroup, $lang){
+        return $this->menu
+            ->where('isEnabled', 1)
+            ->where('fkMemberGroup', $idMemberGroup)
+            ->where('isMain', 1)
+            ->where('lang', $lang)
+            ->first();
+    }
 }
