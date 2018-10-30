@@ -23,7 +23,7 @@ class MediaRepository implements InterfaceMediaConstant {
      * Get the root directory
      * @return mixed|null
      */
-    public function GetRoot(){
+    public function getRoot(){
         return $this->media->where('name', 'ROOT')->first();
     }
 
@@ -35,6 +35,7 @@ class MediaRepository implements InterfaceMediaConstant {
     public function GetMedia($id){
         if(!isset($id) || empty($id)) return null;
         $media = $this->media->find($id);
+        if(!isset($media)) return null;
         $media->readInDbMeta();
         return $media;
     }

@@ -12,6 +12,7 @@ namespace Omega\Utils\Plugin;
 use Illuminate\Support\Facades\View;
 use Omega\Utils\Path;
 use ReflectionClass;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 
 /**
  * Class ATypeEntry is used to implement TypeEntry for Form
@@ -58,7 +59,7 @@ abstract class ATypeEntry
      * Get the uniqId
      * @return string The unid id
      */
-    protected function getUniqId(){
+    public function getUniqId(){
         return $this->_uniqId;
     }
 
@@ -116,11 +117,17 @@ abstract class ATypeEntry
         $className = $reflect->getShortName();
         $ppath = isset($viewParentPath) ? $viewParentPath : Path::Combine(app_path('Utils'), 'Plugin', 'Type', 'view', $className);
         $viewPath = Path::Combine($ppath, $viewName.'.blade.php');
-        return View::file($viewPath)->with($dataSet);
-        extract($dataSet);
-        ob_start();
-        include($viewPath);
-        return ob_get_clean();
+
+        try{
+            // We do the render here, so we can catch error and return them to be shown in the view.
+            return View::file($viewPath)->with($dataSet)->render();
+        }
+        catch(\Exception $e){
+            return view('form.typeviewerror')->with([
+                'e' => $e,
+                'type' => $this
+            ]);
+        }
     }
 
     /**

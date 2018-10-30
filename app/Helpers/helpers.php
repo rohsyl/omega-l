@@ -330,3 +330,24 @@ if(!function_exists('array_orderby')) {
         return array_pop($args);
     }
 }
+
+if(!function_exists('substr_if_longer')) {
+    /**
+     * Substring if the $str is longer than $len
+     * @param $str
+     * @param $len
+     * @param bool $addDots
+     * @return bool|string
+     */
+    function substr_if_longer($str, $len, $addDots = false)
+    {
+        if (strlen($str) > $len) {
+            $res = substr($str, 0, $len);
+            if ($addDots) {
+                $res .= ' ...';
+            }
+            return $res;
+        }
+        return $str;
+    }
+}

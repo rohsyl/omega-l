@@ -4,13 +4,14 @@ $media = new \Omega\Models\Media();
 $name = '';
 $title = '';
 $description = '';
-print_r($id);
-if(isset($id))
+if(isset($id) && !empty($id))
 {
     $media = \Omega\Utils\Entity\Media::Get($id);
-    $name = $media->name;
-    $title = $media->title;
-    $description = $media->description;
+    if(isset($media)){
+        $name = $media->name;
+        $title = $media->title;
+        $description = $media->description;
+    }
 }
 $allowedType = json_encode($param['type']);
 @endphp
@@ -18,26 +19,33 @@ $allowedType = json_encode($param['type']);
 <div class="media {{ $uid }}-media">
     @if($param['preview'])
     <div class="media-left media-middle" id="{{ $uid }}-media-preview">
-        @if($media->getType() == \Omega\Utils\Entity\Media::T_PICTURE)
-            <img class="media-object" src=" {{ $media->getThumbnail(120, 85) }}" alt="Thumbnail" width="120px"/>
-        @elseif($media->getType() == \Omega\Utils\Entity\Media::T_FOLDER)
-            <i class="media-object fa fa-3x fa-folder"></i>
-        @elseif($media->getType() == \Omega\Utils\Entity\Media::T_MUSIC)
-            <i class="media-object fa fa-3x fa-music"></i>
-        @elseif($media->getType() == \Omega\Utils\Entity\Media::T_VIDEO)
-            <i class="media-object fa fa-3x fa-video"></i>
-        @elseif($media->getType() == \Omega\Utils\Entity\Media::T_DOCUMENT || $media->getType() == \Omega\Utils\Entity\Media::T_OTHER)
-            <i class="media-object fa fa-3x fa-file"></i>
-        @elseif($media->getType() == \Omega\Utils\Entity\Media::T_VIDEO_EXT)
-            @php
-                $media = new \Omega\Utils\Entity\VideoExternal($id);
-                $thumbnail = $media->getVideoThumbnail();
-            @endphp
-            @if(!empty($thumbnail))
-                <img class="media-object" src="{{ $thumbnail }}" alt="Thumbnail" width="120px"/>
-            @else
-                <span class="media-object">No thumbnail</span>
+        @if(isset($media))
+            @if($media->getType() == \Omega\Utils\Entity\Media::T_PICTURE)
+                <img class="media-object" src=" {{ $media->getThumbnail(120, 85) }}" alt="Thumbnail" width="120px"/>
+            @elseif($media->getType() == \Omega\Utils\Entity\Media::T_FOLDER)
+                <i class="media-object fa fa-3x fa-folder"></i>
+            @elseif($media->getType() == \Omega\Utils\Entity\Media::T_MUSIC)
+                <i class="media-object fa fa-3x fa-music"></i>
+            @elseif($media->getType() == \Omega\Utils\Entity\Media::T_VIDEO)
+                <i class="media-object fa fa-3x fa-video"></i>
+            @elseif($media->getType() == \Omega\Utils\Entity\Media::T_DOCUMENT || $media->getType() == \Omega\Utils\Entity\Media::T_OTHER)
+                <i class="media-object fa fa-3x fa-file"></i>
+            @elseif($media->getType() == \Omega\Utils\Entity\Media::T_VIDEO_EXT)
+                @php
+                    $thumbnail = '';
+                    if(isset($id)){
+                        $media = new \Omega\Utils\Entity\VideoExternal($media);
+                        $thumbnail = $media->getVideoThumbnail();
+                    }
+                @endphp
+                @if(!empty($thumbnail))
+                    <img class="media-object" src="{{ $thumbnail }}" alt="Thumbnail" width="120px"/>
+                @else
+                    <span class="media-object">No thumbnail</span>
+                @endif
             @endif
+        @else
+            <i class="media-object fa fa-3x fa-file"></i>
         @endif
     </div>
     @endif

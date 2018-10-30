@@ -190,4 +190,12 @@ class Media extends Model implements InterfaceMediaConstant
     private function getTypeByExt($ext){
         return self::GetMediaRepository()->GetType($this);
     }
+
+    public function getIcon(){
+        return self::GetMediaRepository()->GetIcon($this);
+    }
+
+    public function getMediaSize(){
+        return self::GetMediaRepository()->GetMediaSize($this);
+    }
 }

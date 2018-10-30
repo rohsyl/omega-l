@@ -23,6 +23,10 @@ class Page extends Model
         return $this->hasMany('Omega\Models\Module', 'fkPage', 'id');
     }
 
+    public function components(){
+        return $this->modules()->where('isComponent', 1);
+    }
+
     public function security(){
         return $this->hasOne('Omega\Models\PageSecurity', 'fkPage', 'id');
     }

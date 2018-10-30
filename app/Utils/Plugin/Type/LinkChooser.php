@@ -2,7 +2,7 @@
 namespace Omega\Utils\Plugin\Type;
 
 use Omega\Utils\Plugin\ATypeEntry;
-use Omega\Library\Util\LinkChooser as LC;
+use Omega\Utils\LinkChooser as LC;
 
 class LinkChooser extends ATypeEntry {
 

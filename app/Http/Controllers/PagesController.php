@@ -288,6 +288,7 @@ class PagesController extends AdminController
         // save the security settings
         switch ($request->input('security'))
         {
+            // secure the page with a password
             case 'bypassword':
                 $this->pageSecurityRepository->update(
                     $page->security,
@@ -298,6 +299,8 @@ class PagesController extends AdminController
                     ]
                 );
                 break;
+            // secure the page by membergroup
+            // only the authenticated member that are in the selected group can see this page
             case 'bymember':
                 $this->pageSecurityRepository->update(
                     $page->security,
@@ -307,6 +310,8 @@ class PagesController extends AdminController
                     ]
                 );
                 break;
+            // no security
+            // this page is public
             case 'none' :
             default :
                 $this->pageSecurityRepository->update(

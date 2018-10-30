@@ -107,7 +107,7 @@ LinkChooser.prototype = {
         var _this = this;
         console.log('btn clicked');
 
-        var url = omega.mvc.url('linkchooser', 'getForm');
+        var url = route('linkchooser.form');
         omega.ajax.query(url, {}, omega.ajax.GET, function(html){
             var mid = omega.modal.open('Choose link', html, 'Ok', function(){
                 _this.data = $.parseJSON(decodeURIComponent($('.linkchooser-input').val()));
