@@ -1,5 +1,5 @@
 <?php
-use Omega\Library\Entity\Entity;
+use Omega\Utils\Entity\Entity;
 ?>
 <body class="subpage">
 

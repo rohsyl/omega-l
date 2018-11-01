@@ -5,10 +5,28 @@
 // Variables
 @import "variables";
 
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
+// Bootstrap v3.3
+@import '~bootstrap/dist/css/bootstrap.min.css';
 
-.navbar-laravel {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
+// FontAwesome
+@import "~font-awesome/scss/font-awesome";
+
+// Toastr
+@import "~toastr/toastr";
+
+// Summernote (wysiwyg editor)
+@import "~summernote/dist/summernote.css";
+
+@import "../external/bootstrap-iconpicker/css/bootstrap-iconpicker.min.css";
+@import "../external/bootstrap3-datepicker/css/bootstrap-datepicker3.min.css";
+
+// Omega assets
+@import "assets/metisMenu.min.css";
+@import "assets/sb-admin-2.min.css";
+
+// TODO : convert to scss
+@import "omega/omega.admin.css";
+@import "omega/omega.custom.css";
+@import "omega/omega.install.css";
+@import "omega/omega.login.css";
+

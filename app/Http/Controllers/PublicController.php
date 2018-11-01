@@ -2,7 +2,6 @@
 
 namespace Omega\Http\Controllers;
 
-
 use Omega\Utils\Entity\Entity;
 use Omega\Utils\Entity\Site;
 
@@ -17,5 +16,6 @@ class PublicController extends Controller
     {
         return page()->withLang($lang);
     }
+
 
 }

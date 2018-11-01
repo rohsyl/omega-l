@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "axios": "^0.18",
-    "bootstrap": "^4.0.0",
+    "bootstrap": "^3.3",
     "cross-env": "^5.1",
     "jquery": "^3.2",
     "laravel-mix": "^2.1.14",
@@ -20,7 +20,12 @@
     "vue": "^2.5.7"
   },
   "dependencies": {
+    "ace-builds": "^1.4.1",
+    "codemirror": "^5.41.0",
+    "font-awesome": "^4.7.0",
+    "jquery-ui": "^1.12.1",
     "sortablejs": "^1.7.0",
+    "summernote": "^0.8.10",
     "toastr": "^2.1.4"
   }
 }

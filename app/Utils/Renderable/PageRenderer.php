@@ -79,6 +79,7 @@ class PageRenderer implements Renderable
             return abord(404);
         }
 
+
         Entity::SetPage(new Page($this->id));
 
         Entity::SetMenu(new Menu());

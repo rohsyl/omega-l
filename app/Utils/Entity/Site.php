@@ -19,9 +19,9 @@ class Site{
         $this->name = om_config('om_site_title');
         $this->slogan =om_config('om_site_slogan');
         $this->url = om_config('om_web_adress');
-        $this->template_name = !isset($template_name) ? om_config('om_template_name') : $template_name;
+        $this->template_name = !isset($template_name) ? om_config('om_theme_name') : $template_name;
         $this->template_directory_uri = Url::Absolute(Url::Combine($this->url, 'theme', $this->template_name));
-        $this->php_template_path = Path::Combine(theme_path(), om_config('om_template_name'));
+        $this->php_template_path = Path::Combine(theme_path(), om_config('om_theme_name'));
         //$this->contact = new ContactInformation();
     }
 

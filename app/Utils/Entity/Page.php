@@ -2,18 +2,6 @@
 namespace Omega\Utils\Entity;
 
 use Illuminate\Support\Facades\DB;
-use Omega\Library;
-/*
-use Omega\Library\Database\Dbs;
-use Omega\Library\Util\Config;
-use Omega\Library\Util\Redirect;
-use Omega\Library\Util\Url;
-use Omega\Library\Util\Path;
-use Omega\Library\Util\MessageFront;
-use Omega\Library\Util\OmegaUtil;
-use Omega\Library\PMvc\PController;
-use Omega\Library\Plugin\Type;
-use Omega\Library\Language\Front\LangManager;*/
 use Omega\Repositories\PageRepository;
 use Omega\Models\Page as PageModel;
 use Omega\Utils\Path;
@@ -51,7 +39,9 @@ class Page{
         }
     }
 
+
     public function __get($name){
+        print_r($name);
         return $this->page->$name;
     }
 	
@@ -361,15 +351,11 @@ class Page{
         $page = new Page($home_page_id);
 
         if(!$page->exists()) {
-            $pageId = DB::table('pages')
-                    ->where('isEnabled', 1)
-                    ->orderBy('order')
-                    ->select(['id'])
-                    ->first();
+            $pageId = PageModel::where('isEnabled', 1)->orderBy('order')->first();
 
             if (isset($pageId)){
-                om_config(['om_home_page_id' => $pageId]);
-                $page = new Page($pageId);
+                om_config(['om_home_page_id' => $pageId->id]);
+                $page = new Page($pageId->id);
             }
             else
             {

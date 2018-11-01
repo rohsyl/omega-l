@@ -1,6 +1,6 @@
 <?php
-use Omega\Library\Util\OmegaUtil;
-use Omega\Library\Entity\Entity;
+use Omega\Utils\OmegaUtils;
+use Omega\Utils\Entity\Entity;
 ?>
 <!DOCTYPE HTML>
 <!--
@@ -14,7 +14,7 @@ use Omega\Library\Entity\Entity;
     <title><?php echo Entity::Site()->name ?> - <?php echo Entity::Page()->title ?></title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <?php OmegaUtil::renderMeta() ?>
+    <?php OmegaUtils::renderMeta() ?>
     <link rel="stylesheet" href="<?= Entity::Site()->template_directory_uri ?>/assets/css/main.css" />
 
     <!-- Scripts -->
@@ -25,5 +25,5 @@ use Omega\Library\Entity\Entity;
     <script src="<?= Entity::Site()->template_directory_uri ?>/assets/js/main.js"></script>
 
     <?php Entity::Page()->RenderCssTheme() ?>
-    <?php OmegaUtil::renderDependencies() ?>
+    <?php OmegaUtils::renderDependencies() ?>
 </head>
