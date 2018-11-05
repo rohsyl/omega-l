@@ -11,6 +11,11 @@ namespace Omega\Utils\Plugin;
 
 class Plugin
 {
+    /**
+     * @param $name
+     * @param $action
+     * @return bool
+     */
     public static function Call($name, $action){
 
         $className = BController::getClassName($name);
@@ -26,6 +31,22 @@ class Plugin
         }
 
         return $pluginController->$action();
+    }
+
+    /**
+     * @param string $name The name of the plugin
+     * @return false|FController The front-end controller of the plugin
+     */
+    public static function FInstance($name){
+        $className = FController::getClassName($name);
+
+        if(!class_exists($className)){
+            return false;
+        }
+
+        $pluginController = new $className();
+
+        return $pluginController;
     }
 
 }

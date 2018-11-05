@@ -1,10 +1,9 @@
 <?php
-namespace Omega\Plugin\Text;
+namespace OmegaPlugin\Text;
 
-use Omega\Library\Plugin\FController;
+use Omega\Utils\Plugin\FController;
 
 class FControllerText extends  FController {
-
 
     public function __construct() {
         parent::__construct('text');
@@ -12,15 +11,17 @@ class FControllerText extends  FController {
 
     public function registerDependencies()
     {
-        return array(
-            'css' => array(
-            ),
-            'js' => array(
-            )
-        );
+        return [
+            'css' => [
+
+            ],
+            'js' => [
+
+            ]
+        ];
     }
 
     public function display( $args, $data ) {
-        return $this->view( $data );
+        return $this->view('display')->with($data);
     }
 }

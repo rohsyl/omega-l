@@ -118,8 +118,7 @@ class ThemeRepository
 
     public function getThemeCssThemes($name)
     {
-        $themeFolder = theme_path($name);
-        $directory_path = Path::Combine($themeFolder, 'css', 'theme');
+        $directory_path = theme_css_path($name);
 
         $file = array();
         if(file_exists($directory_path)){

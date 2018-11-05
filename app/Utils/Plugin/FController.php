@@ -1,94 +1,61 @@
 <?php
 namespace Omega\Utils\Plugin;
 
+use Illuminate\Support\Facades\View;
 
 abstract class FController {
 
 	protected $root;
 	public $name;
 
+    private $meta;
 	private $forceView;
 
     public $idComponent = null;
-	
+
 	public function  __construct($name) {
-		$this->root = PLUGINPATH . DS . $name . DS;
 		$this->name = $name;
+        $this->root =  plugin_path($this->name);
+        $this->meta = new PluginMeta($this->name);
 	}
 
-	public function partialView( $name, $m = array()) {
-		extract($m);
-		ob_start();
+    public static function getClassName($name)
+    {
+        $nameF = camelize_plugin($name);
+        return 'OmegaPlugin\\' . $nameF . '\\FController' . $nameF;
+    }
+
+    public function getMeta() {
+        return $this->meta;
+    }
+
+    protected function view($name){
+
         if(isset($this->forceView)){
-            require($this->forceView);
-            $this->forceView = null;
+            $path = $this->forceView;
         }
         else{
-		    require($this->root . 'view' . DS . 'view-'.$name.'.php');
+            $path = $this->root . DS . 'view' . DS . $name . '.blade.php';
         }
-		return ob_get_clean();
 
-	}
-
-	public function abs_view( $path, $m = array() )
-	{
-		$m = $m == null ? array() : $m;
-		extract($m);
-		ob_start();
-		require($path);
-		return ob_get_clean();
-	}
-
-	public function view( $m = array() ) {
-        $m = $m == null ? array() : $m;
-		extract($m);
-		if(isset($_GET['action']))
-			$action = $_GET['action'];
-		else 
-			$action = 'display';
-
-
-		ob_start();
-        if(isset($this->forceView)){
-            require($this->forceView);
-            $this->forceView = null;
-        }
-        else{
-            require($this->root . 'view' . DS . 'view-'.$action.'.php');
-        }
-		return ob_get_clean();
-	}
-	
-	public function includeFile($filePath)
-	{
-		include_once ($this->root.'/'.$filePath);
-	}
-	
-	public function partialSharedPluginView($name, $m = array())
-	{
-		extract($m);
-		$filePath = APPPATH.'/view/plugin/view-'.$name.'.php';
-		//if(file_exists($filePath))
-		//{
-			ob_start();
-			require($filePath);
-			return ob_get_clean();
-		//}
-		// null;
-	}
+        return View::file($path)->with([
+            'meta' => $this->getMeta()
+        ]);
+    }
 
 	public function forceView($viewPath){
 	    $this->forceView = $viewPath;
     }
 
-	public function json($array) {
-		
-		return json_encode($array);
-	}
+    protected function json($data){
+        return response()->json($data);
+    }
 
 	public function unique($key){
 	    return $this->name . '_' . $this->idComponent . '_' . $key;
     }
+
+    public abstract function registerDependencies();
 
     public abstract function display($args, $data);
 }

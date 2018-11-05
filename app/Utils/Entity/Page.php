@@ -2,24 +2,31 @@
 namespace Omega\Utils\Entity;
 
 use Illuminate\Support\Facades\DB;
+use Omega\Facades\OmegaUtils;
+use Omega\Models\Module;
+use Omega\Repositories\ModuleRepository;
 use Omega\Repositories\PageRepository;
 use Omega\Models\Page as PageModel;
 use Omega\Utils\Path;
+use Omega\Utils\Plugin\Plugin;
+use Omega\Utils\Plugin\Type;
 
 class Page{
 
     private $pageRepository;
+    private $moduleRepository;
     private $page;
 
     public $secure;
     public $securityType;
     public $securityData;
 
-    private $exists;
+    public $content;
 
     public function __construct($id = 0) {
 
         $this->pageRepository = new PageRepository(new PageModel());
+        $this->moduleRepository = new ModuleRepository(new Module());
 
         $this->page = $this->pageRepository->get($id);
 
@@ -41,20 +48,16 @@ class Page{
 
 
     public function __get($name){
-        print_r($name);
         return $this->page->$name;
     }
 	
 	public function render()
 	{
-		//$this->content = $this->renderPhpFromContent($this->content);
-		//$this->content = $this->renderMacroFromContent($this->content);
-		//$this->content = $this->renderContentModule($this->content);
 		if($this->secure && (isset($_SESSION['public']['connectedToPage_'.$this->id]) || isset($_SESSION['member_connected'])))
 		{
 			$this->renderComponent();	
 		}
-		if(!$this->secure)
+		else if($this->securityType == 'none')
 		{
 			$this->renderComponent();	
 		}
@@ -62,7 +65,7 @@ class Page{
 	}
 	
     public function exists() {
-        return isset($this->page);
+        return isset($this->page) && $this->page->exists();
     }
 
     public function doSecurityAction() {
@@ -139,13 +142,6 @@ class Page{
     public function reload() {
         return redirect(self::GetUrl($this->page->id));
     }
-
-    private function renderView($viewName, $viewData = array(), $renderOnlyContent = true) {
-        extract($viewData);
-        ob_start();
-        require(ROOT . '/mvc/' . $viewName . '.php');
-        $this->content .= ob_get_clean();
-    }
 		
     public static function RenderSpecialContent($content)
     {
@@ -154,7 +150,7 @@ class Page{
     }
 
     public function renderMacroFromContent($content) {
-			$content = preg_replace_callback(
+        $content = preg_replace_callback(
             '#\[macro\=(.+)\]\[\/macro\]#iUs',
             function($matches) {
 
@@ -176,42 +172,30 @@ class Page{
     }
 
     public function getComponentsViewArray(){
-        $stmt = Dbs::select('*')
-            ->from('om_module')
-            ->where('fkPage', '=', '?')
-            ->andwhere('isComponent', '=', '1')
-            ->orderby('moduleOrder', 'ASC')
-            ->prepare(array($this->id))
-            ->run()
-            ->getAllArray();
+
+        $components = $this->moduleRepository->getAllComponentsByPage($this->id);
+
 
         $views = array();
-        foreach($stmt as $c)
+        foreach($components as $component)
         {
-            $stmt = Dbs::select('plugName')
-                ->from('om_plugin')
-                ->where('id', '=', '?')
-                ->prepare(array($c['fkPlugin']))
-                ->run();
 
-            $pluginName = $stmt->getRow(0)->getString('plugName');
+            $instance = Plugin::FInstance($component->plugin->name);
 
-            $pluginClassName = 'Omega\\Plugin\\'. ucFirst($pluginName) .'\\FController' . ucFirst($pluginName);
-            $instance = new $pluginClassName();
-            $instance->idComponent = $c['id'];
+            $instance->idComponent = $component->id;
+
             // register css and js of the component
-            OmegaUtil::addDependencies($instance->registerDependencies());
+            OmegaUtils::addDependencies($instance->registerDependencies());
 
-            $data = Type::GetValues($c['fkPlugin'], $c['id'], $this->id);
-            $args = json_decode($c['moduleParam'], true);
+            $data = Type::GetValues($component->plugin->id, $component->id, $this->id);
 
-            // force using an other view defined in the settings of the component
+            $args = json_decode($component->param, true);
+
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
                 $t = explode('/',  $args['settings']['pluginTemplate']);
-                $theme = $t[0];
                 $plugin = $t[1];
                 $template = $t[2];
-                $path = Path::Combine(THEMEPATH, $theme, 'template', $plugin, $template);
+                $path = 'theme::template.'.$plugin.'.'.$template;
                 $instance->forceView($path);
             }
 
@@ -219,65 +203,55 @@ class Page{
             if(!$isHidden) {
                 $content = $instance->display($args, $data);
 
-                $compId = '';
+                $compId = null;
+                $isWrapped = false;
                 $backgroundColor = 'transparent';
                 $title = 'No title';
                 if (isset($args['settings'])) {
                     $backgroundColor = isset($args['settings']['bgColor']) ? $args['settings']['bgColor'] : 'transparent';
-                    $compId = isset($args['settings']['compId']) ? 'id="'.$args['settings']['compId'].'"' : '';
+                    $compId = isset($args['settings']['compId']) ? 'id="'.$args['settings']['compId'].'"' : null;
                     $title = isset($args['settings']['compTitle']) ? $args['settings']['compTitle'] : 'No title';
                 }
+                $style = $backgroundColor == 'transparent' ? null : 'style="background-color: ' . $backgroundColor . ';"';
 
-                $component = $content;
-
-                $style = $backgroundColor == 'transparent' ? '' : 'style="background-color: ' . $backgroundColor . ';"';
-                $views[] = array(
-                    'html' => '<section '.$compId.' ' . $style . ' class="component-container">' . $component . '</section>',
+                $views[] = [
+                    'html' => $this->content .= view('public.section')->with([
+                        'compId' => $compId,
+                        'style' => $style,
+                        'isWrapped' => $isWrapped,
+                        'content' => $content,
+                    ])->render(),
                     'title' => $title
-                );
+                ];
             }
         }
         return $views;
     }
 
     private function renderComponent() {
-		
-        $stmt = Dbs::select('*')
-            ->from('om_module')
-            ->where('fkPage', '=', '?')
-            ->andwhere('isComponent', '=', '1')
-            ->orderby('moduleOrder', 'ASC')
-            ->prepare(array($this->id))
-            ->run()
-            ->getAllArray();
 
-        foreach($stmt as $c)
+        $components = $this->moduleRepository->getAllComponentsByPage($this->id);
+
+        foreach($components as $component)
         {
-            $stmt = Dbs::select('plugName')
-                ->from('om_plugin')
-                ->where('id', '=', '?')
-                ->prepare(array($c['fkPlugin']))
-                ->run();
 
-            $pluginName = $stmt->getRow(0)->getString('plugName');
+            $instance = Plugin::FInstance($component->plugin->name);
 
-            $pluginClassName = 'Omega\\Plugin\\'. ucFirst($pluginName) .'\\FController' . ucFirst($pluginName);
-            $instance = new $pluginClassName();
-            $instance->idComponent = $c['id'];
+            $instance->idComponent = $component->id;
+
             // register css and js of the component
+            OmegaUtils::addDependencies($instance->registerDependencies());
 
-            OmegaUtil::addDependencies($instance->registerDependencies());
+            $data = Type::GetValues($component->plugin->id, $component->id, $this->id);
 
-            $data = Type::GetValues($c['fkPlugin'], $c['id'], $this->id);
-            $args = json_decode($c['moduleParam'], true);
+            $args = json_decode($component->param, true);
 
             // force using an other view defined in the settings of the component
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
                 $t = explode('/',  $args['settings']['pluginTemplate']);
-                $theme = $t[0];
                 $plugin = $t[1];
                 $template = $t[2];
-                $path = Path::Combine(THEMEPATH, $theme, 'template', $plugin, $template);
+                $path = 'theme::template.'.$plugin.'.'.$template;
                 $instance->forceView($path);
             }
 
@@ -285,52 +259,41 @@ class Page{
             if(!$isHidden) {
                 $content = $instance->display($args, $data);
 
-                $compId = '';
+                $compId = null;
                 $isWrapped = true;
                 $backgroundColor = 'transparent';
                 if (isset($args['settings'])) {
                     $isWrapped = isset($args['settings']['isWrapped']) ? $args['settings']['isWrapped'] : true;
                     $backgroundColor = isset($args['settings']['bgColor']) ? $args['settings']['bgColor'] : 'transparent';
-                    $compId = isset($args['settings']['compId']) ? 'id="'.$args['settings']['compId'].'"' : '';
+                    $compId = isset($args['settings']['compId']) ? 'id="'.$args['settings']['compId'].'"' : null;
                 }
+                $style = $backgroundColor == 'transparent' ? null : 'style="background-color: ' . $backgroundColor . ';"';
 
-                if ($isWrapped) {
-                    $component = '<div class="om-wrapper">' . $content . '</div>';
-                } else {
-                    $component = $content;
-                }
-                $style = $backgroundColor == 'transparent' ? '' : 'style="background-color: ' . $backgroundColor . ';"';
-                $this->content .= '<section '.$compId.' ' . $style . ' class="component-container">' . $component . '</section>';
+                $this->content .= view('public.section')->with([
+                    'compId' => $compId,
+                    'style' => $style,
+                    'isWrapped' => $isWrapped,
+                    'content' => $content,
+                ])->render();
             }
         }
     }
 
-    public function RenderCssTheme()
+    public function getCssTheme()
     {
-        if($this->cssTheme != 'none')
-        {
-
+        if($this->cssTheme != 'none') {
             $path = Path::Combine(
-                theme_path(om_config('om_template_name')),
-                'css',
-                'theme',
-                $this->cssTheme);
-
-            if(!file_exists($path))
-                return;
-
-
-            $url = Url::CombAndAbs(
-                ABSPATH,
-                'theme',
-                Config::get('om_template_name'),
-                'css',
-                'theme',
+                theme_css_path(om_config('om_theme_name')),
                 $this->cssTheme
             );
 
-            return '<link rel="stylesheet" href="'.$url.'" />';
+            if(!file_exists($path))
+                return [];
+
+            $url = theme_asset_csstheme($this->cssTheme);
+            return [$url];
         }
+        return [];
     }
 
     public function isVisibleTitle(){

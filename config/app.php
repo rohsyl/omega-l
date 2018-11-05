@@ -165,6 +165,9 @@ return [
 
         //https://github.com/tightenco/ziggy
         Tightenco\Ziggy\ZiggyServiceProvider::class,
+
+        //Omega utils service provider
+        Omega\Providers\UtilsServiceProvider::class,
     ],
 
     /*
@@ -218,6 +221,11 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
 
         'Toast' => Grimthorr\LaravelToast\Facade::class,
+
+        // OmegaCMS Facades
+        'Entity' => Omega\Facades\Entity::class,
+        'ModuleArea' => Omega\Facades\ModuleArea::class,
+        'OmegaUtils' => \Omega\Facades\OmegaUtils::class,
     ],
 
 ];

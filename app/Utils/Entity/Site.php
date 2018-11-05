@@ -17,7 +17,7 @@ class Site{
     public function __construct($template_name = null){
 
         $this->name = om_config('om_site_title');
-        $this->slogan =om_config('om_site_slogan');
+        $this->slogan = om_config('om_site_slogan');
         $this->url = om_config('om_web_adress');
         $this->template_name = !isset($template_name) ? om_config('om_theme_name') : $template_name;
         $this->template_directory_uri = Url::Absolute(Url::Combine($this->url, 'theme', $this->template_name));

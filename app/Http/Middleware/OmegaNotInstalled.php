@@ -3,7 +3,7 @@
 namespace Omega\Http\Middleware;
 
 use Closure;
-use Omega\Utils\OmegaUtils;
+use Omega\Facades\OmegaUtils;
 
 class OmegaNotInstalled
 {

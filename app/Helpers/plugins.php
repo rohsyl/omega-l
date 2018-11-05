@@ -9,13 +9,18 @@ use Omega\Models\Plugin;
 use Illuminate\Database\Eloquent\Collection;
 use Omega\Utils\Plugin\PluginMeta;
 use Omega\Repositories\PluginRepository;
+use Omega\Utils\Path;
 
 if(!function_exists('plugin_path')){
     /**
      * @return string
      */
-    function plugin_path(){
-        return base_path('omega/plugin');
+    function plugin_path($name = null){
+        $path = base_path('omega/plugin');
+        if(isset($name)){
+            return Path::Combine($path, $name);
+        }
+        return $path;
     }
 }
 

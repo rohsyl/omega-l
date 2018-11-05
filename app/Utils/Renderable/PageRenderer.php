@@ -10,11 +10,12 @@ namespace Omega\Utils\Renderable;
 
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Facades\View;
 use Omega\Models\Lang;
 use Omega\Models\Theme;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\ThemeRepository;
-use Omega\Utils\Entity\Entity;
+use Omega\Facades\Entity;
 use Omega\Utils\Entity\Menu;
 use Omega\Utils\Entity\Page;
 use Omega\Utils\Path;
@@ -80,9 +81,9 @@ class PageRenderer implements Renderable
         }
 
 
-        Entity::SetPage(new Page($this->id));
+        Entity::setPage(new Page($this->id));
 
-        Entity::SetMenu(new Menu());
+        Entity::setMenu(new Menu());
         Entity::Menu()->setCurrentPage(Entity::Page());
         $themePath = $this->getThemePath(Entity::Site());
 
@@ -108,30 +109,27 @@ class PageRenderer implements Renderable
     {
         if($page->exists())
             $page->render();
+        else
+            $page->content = '404';
 
-        $indexPath = Path::Combine($themePath, 'index.php');
-        $headerPath = Path::Combine($themePath, 'header.php');
         $modelPath = Path::Combine($themePath, 'template', $page->model);
 
         // we load body and footer before the header so every assets is listed
         // in the Html object and then we can do a render of CSS and JS in the header
-        ob_start();
         if(!isset($page->model) || $page->model == 'default' || empty($page->model)) {
-            include_once($indexPath);
+            $pageBodyAndFooter = view('theme::index')->render();
         }
         else if (file_exists($modelPath)) {
-            include_once($modelPath);
+            $pageBodyAndFooter = view('theme::template.'.without_ext($page->model))->render();
         }
         else {
-            include_once($indexPath);
+            $pageBodyAndFooter = view('theme::index')->render();
         }
-        $pageBodyAndFooter = ob_get_clean();
 
         // load the header and echo the body and footer
-        ob_start();
-        include_once($headerPath);
-        echo $pageBodyAndFooter;
-        return ob_get_clean();
+        $pageHeader = view('theme::header')->render();
+
+        return $pageHeader.$pageBodyAndFooter;
     }
 
 

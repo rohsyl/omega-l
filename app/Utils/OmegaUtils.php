@@ -5,17 +5,31 @@ namespace Omega\Utils;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Omega\Facades\Entity;
 
 class OmegaUtils{
 
-    public static function GetCurrentUserAvatar()
+    private $dependencies;
+
+    private $htmlRequireHelper;
+
+    public function __construct()
+    {
+        $this->htmlRequireHelper = new HtmlRequire();
+        $this->dependencies = [
+            'css' => [],
+            'js' => []
+        ];
+    }
+
+    public function GetCurrentUserAvatar()
     {
         $user = Auth::user();
 
         return self::GetUserAvatar($user);
     }
 
-    public static function GetUserAvatar($user){
+    public function GetUserAvatar($user){
         $mediaId = $user->avatar;
         $hasAvatar = isset($mediaId) && !empty($mediaId);
 
@@ -30,17 +44,17 @@ class OmegaUtils{
         }
     }
 
-    public static function GetCurrentUserName()
+    public function GetCurrentUserName()
     {
         return Auth::user()->username;
     }
 
-    public static function GetCurrentUserFullName()
+    public function GetCurrentUserFullName()
     {
         return Auth::user()->fullname;
     }
 
-    public static function getInstalledPlugin()
+    public function getInstalledPlugin()
     {
         /*$plugins = Dbs::select('plugName')
             ->from('om_plugin')
@@ -50,20 +64,20 @@ class OmegaUtils{
         return $plugins;*/
     }
 
-    public static function renderMeta()
+    public function renderMeta()
     {
-        /*
-        echo '<meta name="description" content="' . Config::get('om_seo_description') . '">
-        <meta name="keywords" content="' . Config::get('om_seo_keyword') . '">';*/
+        return view('public.meta')->with([
+            'descr' => om_config('om_seo_description'),
+            'keywords' => om_config('om_seo_keyword')
+        ]);
     }
 
 
-    public static function isInstalled()
-    {
+    public function isInstalled() {
         return Schema::hasTable('configs');
     }
 
-    public static function member_IsInGroup($idMember, $idGroup)
+    public function member_IsInGroup($idMember, $idGroup)
     {
 /*
         $count = Dbs::select('count(*) as nbr')
@@ -75,44 +89,45 @@ class OmegaUtils{
         return $count > 0;*/
     }
 
-    public static function addDependencies($dep)
-    {
-        /*global $dependencies;
+    public function addDependencies($dep = null) {
         if(isset($dep['css']))
         {
             foreach($dep['css'] as $css)
             {
-                if(!in_array ($css , $dependencies['css']))
-                    $dependencies['css'][] = $css;
+                if(!in_array ($css , $this->dependencies['css']))
+                    $this->dependencies['css'][] = $css;
             }
         }
         if(isset($dep['js']))
         {
             foreach($dep['js'] as $js)
             {
-                if(!in_array ($js , $dependencies['js']))
-                    $dependencies['js'][] = $js;
+                if(!in_array ($js , $this->dependencies['js']))
+                    $this->dependencies['js'][] = $js;
             }
-        }*/
+        }
+
     }
 
-    public static function renderDependencies()
+    public function renderDependencies()
     {
-        /*global $dependencies;
+        $this->addDependencies([
+            'css' => Entity::Page()->getCssTheme()
+        ]);
 
-        $htmlHelper = new Html();
-
-        foreach($dependencies['css'] as $css)
+        foreach($this->dependencies['css'] as $css)
         {
-            $htmlHelper->requireCss($css);
+            $this->htmlRequireHelper->requireCss($css);
         }
-        foreach($dependencies['js'] as $js)
+        foreach($this->dependencies['js'] as $js)
         {
-            $htmlHelper->requireJs($js);
+            $this->htmlRequireHelper->requireJs($js);
         }
 
-        $htmlHelper->renderCss();
-        $htmlHelper->renderJs();*/
+        return
+            $this->htmlRequireHelper->renderCss()
+            .
+            $this->htmlRequireHelper->renderJs();
     }
 
 }

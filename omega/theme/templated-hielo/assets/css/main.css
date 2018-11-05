@@ -3099,7 +3099,7 @@
 		.wrapper.style3 {
 			background-color: #000;
 			color: #bfbfbf;
-			background-image: url(../../images/bg.jpg);
+			background-image: url(../images/bg.jpg);
 			background-size: cover;
 			background-attachment: fixed;
 			background-position: center;
@@ -4310,3 +4310,10 @@
 			}
 
 		}
+
+
+
+.om-wrapper{
+	max-width: 1000px;
+	margin: 0 auto;
+}

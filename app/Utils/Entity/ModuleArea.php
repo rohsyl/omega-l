@@ -1,5 +1,5 @@
 <?php
-namespace Omega\Library\Entity;
+namespace Omega\Utils\Entity;
 
 use Omega\Repositories\ModuleAreaRepository;
 
@@ -10,7 +10,7 @@ use Omega\Repositories\ModuleAreaRepository;
  */
 class ModuleArea{
 
-    private static function GetRepository(){
+    private function GetRepository(){
         return new ModuleAreaRepository(new \Omega\Models\ModuleArea());
     }
 
@@ -20,10 +20,10 @@ class ModuleArea{
      * @param $theme string The name of the theme
      * @return bool true if success
      */
-	public static function Create($name, $theme)
+	public function Create($name, $theme)
 	{
-	    if(!self::GetRepository()->exists($name, $theme)){
-            $ma = self::GetRepository()->create($name, $theme);
+	    if(!$this->GetRepository()->exists($name, $theme)){
+            $ma = $this->GetRepository()->create($name, $theme);
             if(!isset($ma)){
                 return false;
             }
@@ -37,8 +37,8 @@ class ModuleArea{
      * @param $theme string The name of the theme
      * @return bool
      */
-	public static function Delete($name, $theme) {
-        return  self::GetRepository()->deleteByName($name, $theme);
+	public function Delete($name, $theme) {
+        return  $this->GetRepository()->deleteByName($name, $theme);
 	}
 
     /**
@@ -47,8 +47,8 @@ class ModuleArea{
      * @param $theme string The name of the theme
      * @return bool True if exists
      */
-	public static function Exists($name, $theme){
-        return  self::GetRepository()->exists($name, $theme);
+	public function Exists($name, $theme){
+        return  $this->GetRepository()->exists($name, $theme);
     }
 
     /**
@@ -58,7 +58,7 @@ class ModuleArea{
      * @param $name string The name of the modulearea
      * @param $theme string The name of the theme
      */
-	public static function Display($page, $name, $theme)
+	public function Display($page, $name, $theme)
 	{
 	    /*
         if(self::Exists($name, $theme)){

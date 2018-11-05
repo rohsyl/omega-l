@@ -5,6 +5,7 @@ use Omega\Utils\Url;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MemberRepository;
 use Omega\Repositories\MenuRepository;
+use Omega\Facades\Entity;
 
 class Menu{
 
@@ -183,7 +184,7 @@ class Menu{
 					
 				} else {
 				
-					$z .= sprintf($html['li_nochildren'], $this->PrepareUrl($url, $lang), $title, strtolower(Util::toTextKey($title)));
+					$z .= sprintf($html['li_nochildren'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)));
 					
 				}
 				
@@ -209,7 +210,7 @@ class Menu{
 		$html = $this->menuHtmlStruct;
 		$z = '';
 
-		if(Ini::Get('omega.member.enable')) {
+		if(config('omega.member.enabled')) {
 
 			$title = '<span class="glyphicon glyphicon-user"></span> <span class="hidden-md hidden-lg">'.__('Member') .'</span>';
 			$url = '#';

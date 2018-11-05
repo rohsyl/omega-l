@@ -58,11 +58,11 @@
                 <li class="sidebar-search" style="padding:0px">
                     <a href="{{ route('profile') }}">
                         <div class="userAvatarContainer-mini">
-                            {!! \Omega\Utils\OmegaUtils::GetCurrentUserAvatar() !!}
+                            {!! OmegaUtils::GetCurrentUserAvatar() !!}
                         </div>
                         <span class="userAvatarContainer-mini-username">
-                        <span class="bold">{{ \Omega\Utils\OmegaUtils::GetCurrentUserFullName() }}</span><br />
-                        <span>{{ \Omega\Utils\OmegaUtils::GetCurrentUserName() }}</span>
+                        <span class="bold">{{ OmegaUtils::GetCurrentUserFullName() }}</span><br />
+                        <span>{{ OmegaUtils::GetCurrentUserName() }}</span>
                     </span>
                     </a>
                 </li>

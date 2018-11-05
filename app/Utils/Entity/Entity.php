@@ -9,86 +9,86 @@ class Entity{
     /**
      * @var Page
      */
-    private static $page;
+    private $page;
 
     /**
      * @var Menu
      */
-    private static $menu;
+    private $menu;
 
     /**
      * @var Site
      */
-    private static $site;
+    private $site;
 
     /**
      * @var Lang
      */
-    private static $lang;
+    private $lang;
 
     /**
      * @param $page Page
      */
-    public static function SetPage($page){
-        self::$page = $page;
+    public function setPage($page){
+        $this->page = $page;
     }
 
     /**
      * @param $menu Menu
      */
-    public static function SetMenu($menu){
-        self::$menu = $menu;
+    public function setMenu($menu){
+        $this->menu = $menu;
     }
 
     /**
      * @param $site Site
      */
-    public static function SetSite($site){
-        self::$site = $site;
+    public function setSite($site){
+        $this->site = $site;
     }
 
     /**
      * @param $lang Lang
      */
-    public static function SetLang($lang){
-        self::$lang = $lang;
+    public function setLang($lang){
+        $this->lang = $lang;
     }
 
     /**
      * @return Menu
      */
-    public static function Menu(){
-        return self::$menu;
+    public function Menu(){
+        return $this->menu;
     }
 
     /**
      * @return Page
      */
-    public static function Page(){
-        return self::$page;
+    public function Page(){
+        return $this->page;
     }
 
     /**
      * @return Site
      */
-    public static function Site(){
-        return self::$site;
+    public function Site(){
+        return $this->site;
     }
 
     /**
      * @return Lang
      */
-    public static function Lang(){
-        return self::$lang;
+    public function Lang(){
+        return $this->lang;
     }
 
     /**
      * @return null|string
      */
-    public static function LangSlug(){
+    public function LangSlug(){
 
-        if(self::Lang() !== null){
-            return self::Lang()->slug;
+        if($this->Lang() !== null){
+            return $this->Lang()->slug;
         }
         return null;
     }
