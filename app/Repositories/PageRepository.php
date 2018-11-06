@@ -129,7 +129,7 @@ class PageRepository
     public function create($inputs){
         $page = new Page();
         $page->name = $inputs['name'];
-        $page->slug = unique_slug($page, $page->name);
+        $page->slug = unique_slug($page, str_slug($page->name));
         if(isset($inputs['lang']))
             $page->lang = $inputs['lang'];
         $page->fkPageParent = $inputs['parent'];
@@ -148,7 +148,7 @@ class PageRepository
         $page->name = $inputs['name'];
         $page->showSubtitle = $inputs['showSubtitle'];
         $page->subtitle = $inputs['subtitle'];
-        $page->slug = $inputs['slug'];
+        $page->slug = unique_slug($page, str_slug($inputs['slug']));
         $page->model = $inputs['model'];
         $page->cssTheme = $inputs['cssTheme'];
         $page->keyWords = $inputs['keyword'];

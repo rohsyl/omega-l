@@ -57,6 +57,8 @@ define('AUTHORIZED_FILE_TYPE_INLINE', trim($afti, '|'));
 use Illuminate\Support\Facades\Route;
 use Collective\Html\FormFacade;
 use Omega\Models\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 if (!function_exists('add_action')) {
     /**
@@ -241,15 +243,50 @@ if(!function_exists('remove_by_key')) {
 if(!function_exists('unique_slug')) {
     /**
      * Generate a slug and ensure it is unique in the database
+     * It will ensure that the slug is not reserved for cms
+     * purpose.
      * @param $model object
      * @param $input string
      * @param string $key The key
      * @return string The slug
      */
-    function unique_slug($model, $input, $key = 'slug' ){
+    function unique_slug($model, $slug, $key = 'slug' ){
         $i = null;
-        $slug = str_slug($input);
-        while($model->where($key, $slug.$i)->exists()){
+        $suffix = null;
+
+        $reservedSlugs = config('omega.reserved_slug');
+        foreach($reservedSlugs as $rs){
+            if(substr($rs, 0, 1) == '$'){
+
+                $table = substr($rs, 1, strpos($rs, '.') - 1);
+                $column = substr($rs, strpos($rs, '.') + 1);
+
+
+                if(exists_in_db($table, $column, $slug)){
+                    $suffix = str_random(3);
+                }
+            }
+            else{
+                if($slug == $rs){
+                    $suffix = str_random(3);
+                }
+            }
+        }
+
+
+        if(isset($suffix))
+            $slug .= '-' . strtolower($suffix);
+
+        $query = function() use ($key, $slug, $model, $i){
+            $query = $model->where($key, $slug.$i);
+            if(isset($model->id)){
+                $query->where('id', '!=', $model->id);
+            }
+            return $query;
+        };
+
+
+        while($query()->exists()){
             if(!isset($i))
                 $i = 1;
             else
@@ -259,6 +296,23 @@ if(!function_exists('unique_slug')) {
     }
 }
 
+if(!function_exists('exists_in_db')) {
+    /**
+     * Return true if the given value exists in the table.column
+     * @param $table string The name of the table
+     * @param $column string The name of the column
+     * @param $value string The value
+     * @return bool
+     */
+    function exists_in_db($table, $column, $value)
+    {
+
+        if (!Schema::hasTable($table) || !Schema::hasColumn($table, $column))
+            return false;
+
+        return DB::table($table)->where($column, $value)->exists();
+    }
+}
 
 if(!function_exists('clean_text')) {
     /**

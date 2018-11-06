@@ -12,13 +12,22 @@ return [
         'level' => 2
     ],
 
-
+    /**
+     * Set default Controller and action to be called at the root of the admin
+     */
     'mvc' => [
         'defaultcontroller' => 'DashboardController',
         'defaultaction' => 'index'
     ],
 
+    /**
+     * Member part
+     * TODO: implement the public part
+     */
     'member' => [
+        /**
+         * Keep it disabled until it's implemented
+         */
         'enabled' => false,
 
         'password' => [
@@ -46,6 +55,9 @@ return [
         ]
     ],
 
+    /**
+     * Define the icon to be used in the
+     */
     'media' => [
         'icons' => [
             'folder_icon_class' => 'glyphicon glyphicon-folder-open',
@@ -56,4 +68,16 @@ return [
             'videoext_icon_class' => 'glyphicon glyphicon-play',
         ],
     ],
+
+
+    /**
+     * These string must not be used as page slug
+     * You can put here some static string
+     * or even database table column.
+     * Exemple :
+     * $[table_name].[column_name]
+     */
+    'reserved_slug' => [
+        'admin', 'module', '$langs.slug'
+    ]
 ];

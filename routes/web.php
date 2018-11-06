@@ -12,17 +12,17 @@
 */
 
 
-/**
+/********************************************************************
  * Omega CMS must be installed to acces all these routes
  * The *om_not_installed* middleware check if omega is installed,
  * if it's not the case, it redirect the user to the installation
  * page.
- */
+ ********************************************************************/
 Route::middleware('om_not_installed')->group(function(){
 
-    /**
+    /********************************************************************
      * Public routes
-     */
+     ********************************************************************/
 
     // Homepage
     Route::get('/', 'PublicController@home')
@@ -49,14 +49,15 @@ Route::middleware('om_not_installed')->group(function(){
 
     }
 
+
     // Modules
-    Route::prefix('/modules')->group(function(){
+    Route::prefix('/module')->group(function(){
         Route::get('language/change/{target}/{referer?}', 'PublicControllers\LanguageController@change')->name('public.language.change');
     });
 
-    /**
+    /********************************************************************
      * Public admin routes
-     */
+     ********************************************************************/
     Route::prefix('/admin')->group(function(){
         Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
         Route::post('login', 'Auth\LoginController@login');
@@ -68,9 +69,9 @@ Route::middleware('om_not_installed')->group(function(){
 
 
 
-    /**
+    /********************************************************************
      * Private admin routes
-     */
+     ********************************************************************/
     Route::group(['middleware' => 'auth'], function () {
         Route::prefix('admin')->group(function(){
             Route::get('/', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
@@ -228,11 +229,12 @@ Route::middleware('om_not_installed')->group(function(){
     });
 });
 
-/**
+
+/********************************************************************
  * The installation must be done only one time.
  * The *om_is_installed* middleware check if omega is installed,
  * if it's the case all these route will return a 404 error.
- */
+ ********************************************************************/
 Route::middleware('om_is_installed')->group(function(){
     Route::prefix('/install')->group(function(){
 
