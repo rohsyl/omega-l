@@ -1,5 +1,5 @@
 @if(Session::has('toasts'))
-	<script type="text/javascript" defer>
+	<script type="text/javascript">
 		$(function(){
 			toastr.options = {
 				"closeButton": true,
@@ -8,7 +8,7 @@
 			};
 
 			@foreach(Session::get('toasts') as $toast)
-				toastr["{{ $toast['level'] }}"]("{{ $toast['message'] }}","{{ $toast['title'] }}");
+			toastr["{{ $toast['level'] }}"]("{{ $toast['message'] }}","{{ $toast['title'] }}");
 			@endforeach
 		});
 	</script>

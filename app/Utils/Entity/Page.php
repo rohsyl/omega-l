@@ -3,7 +3,9 @@ namespace Omega\Utils\Entity;
 
 use Illuminate\Support\Facades\DB;
 use Omega\Facades\OmegaUtils;
+use Omega\Models\Lang;
 use Omega\Models\Module;
+use Omega\Repositories\LangRepository;
 use Omega\Repositories\ModuleRepository;
 use Omega\Repositories\PageRepository;
 use Omega\Models\Page as PageModel;
@@ -12,6 +14,22 @@ use Omega\Utils\Plugin\Plugin;
 use Omega\Utils\Plugin\Type;
 
 class Page{
+
+    private static $static_pageRepository;
+    private static $static_langRepository;
+
+    public static function GetPageRepository(){
+        if(self::$static_pageRepository == null){
+            self::$static_pageRepository = new PageRepository(new PageModel());
+        }
+        return self::$static_pageRepository;
+    }
+    public static function GetLangRepository(){
+        if(self::$static_langRepository == null){
+            self::$static_langRepository = new LangRepository(new Lang());
+        }
+        return self::$static_langRepository;
+    }
 
     private $pageRepository;
     private $moduleRepository;
@@ -25,7 +43,7 @@ class Page{
 
     public function __construct($id = 0) {
 
-        $this->pageRepository = new PageRepository(new PageModel());
+        $this->pageRepository = self::GetPageRepository();
         $this->moduleRepository = new ModuleRepository(new Module());
 
         $this->page = $this->pageRepository->get($id);
@@ -325,47 +343,51 @@ class Page{
                 return abort(404);
             }
         }
-        if(isset($lang) && $page->lang != $lang){
-            session(['front_lang' => $lang]);
-            $home_page_id = self::GetCorrespondingInLang($home_page_id, $lang);
+
+
+        if(om_config('om_enable_front_langauge')) {
+            if(!isset($lang)){
+                $lang = om_config('om_default_front_langauge');
+                session(['front_lang' => $lang]);
+            }
+
+
+            if(isset($lang) && $page->lang != $lang){
+                session(['front_lang' => $lang]);
+                $home_page_id = self::GetCorrespondingInLang($home_page_id, $lang);
+            }
         }
+
         return $home_page_id;
     }
 
-    public static function GetId($url){
-        $langEnabled = LangManager::isEnabled();
-        $parsedUrl = explode('/', $url);
-        $page_idText = $langEnabled ? $parsedUrl[1] : $parsedUrl[0];
+    public static function GetId($slug, $lang = null){
 
-        $stmt = Dbs::select('id', 'pageLang')
-            ->from('om_page')
-            ->where('idText', 'LIKE', '?')
-            ->prepare(array($page_idText))
-            ->run();
+        $page = self::GetPageRepository()->getBySlug($slug);
 
-        if($stmt->length() == 1){
+        if(isset($page)){
 
-            $pId = $stmt->getInt(0, 'id');
-            $pageLang = $stmt->getString(0, 'pageLang');
-
-            //Util::printR(array($pageLang, $_SESSION['front_lang'], $parsedUrl));
-            //Library\Util\Util::printR($pId);
-
-            if(!$langEnabled){
-                return $pId;
+            if(!om_config('om_enable_front_langauge')) {
+                return $page->id;
             }
 
-            if($pageLang != $parsedUrl[0]){
-                $_SESSION['front_lang'] = $pageLang;
+            if(!self::GetLangRepository()->exists($lang)){
+                return abort('404');
+            }
+
+
+            if($page->lang != $lang){
+
+                session(['front_lang' => $lang]);
 
                 // get page in other lang
-                $pId = self::GetCorrespondingInLang($pId, $_SESSION['front_lang']);
+                $pId = self::GetCorrespondingInLang($page->id, $lang);
 
                 // redirect to new page if id not null, else 404
-                Redirect::toUrl(self::GetUrl($pId));
+                return redirect(self::GetUrl($pId));
             }
 
-            return $pId;
+            return $page->id;
 
         } else {
 
@@ -375,20 +397,14 @@ class Page{
     }
 
     public static function GetUrl($id){
-        $idText = Dbs::select('idText')
-            ->from('om_page')
-            ->where('id', '=', '?')
-            ->prepare(array($id))
-            ->runScalar();
-
-        if(LangManager::isEnabled()){
-            $lang = $_SESSION['front_lang'];
-            if(!isset($lang)){
-                $lang = LangManager::getCurrentLang()->slug;
+        $page = self::GetPageRepository()->get($id);
+        if(om_config('om_enable_front_langauge')) {
+            if(!session()->has('front_lang')){
+                session(['front_lang' => $page->lang]);
             }
-            return Url::CombAndAbs(ABSPATH, $lang, $idText);
+            return url('/' . $page->lang . '/' . $page->slug);
         }
-        return Url::CombAndAbs(ABSPATH, $idText);
+        return url('/' . $page->slug);
     }
 
     public static function GetCorrespondingInLang($id, $langSlug){

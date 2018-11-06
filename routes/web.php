@@ -24,14 +24,35 @@ Route::middleware('om_not_installed')->group(function(){
      * Public routes
      */
 
-    Route::get('/{lang?}/', 'PublicController@home')
-        ->where(['lang' => '[a-z]{2}'])
+    // Homepage
+    Route::get('/', 'PublicController@home')
         ->name('public');
 
 
+    if(!om_config('om_enable_front_langauge')) {
 
+        // Page by slug
+        Route::get('/{slug}', 'PublicController@slug')
+            ->name('public.byslug');
+    }
+    else {
 
+        // Homepage with lang
+        Route::get('/{lang}', 'PublicController@home_with_lang')
+            ->where(['lang' => '[a-z]{2}'])
+            ->name('public.homelang');
 
+        // Page by slug and lang
+        Route::get('/{lang}/{slug}', 'PublicController@slug_and_lang')
+            ->where(['lang' => '[a-z]{2}'])
+            ->name('public.bylangandslug');
+
+    }
+
+    // Modules
+    Route::prefix('/modules')->group(function(){
+        Route::get('language/change/{target}/{referer?}', 'PublicControllers\LanguageController@change')->name('public.language.change');
+    });
 
     /**
      * Public admin routes
@@ -173,6 +194,7 @@ Route::middleware('om_not_installed')->group(function(){
 
             Route::get('apparence/theme', 'ApparenceController@theme')->name('theme.index');
             Route::get('apparence/theme/detail/{name}', 'ApparenceController@theme_detail')->name('theme.detail');
+            Route::get('apparence/theme/publish/{name}', 'ApparenceController@theme_publish')->name('theme.publish');
             Route::get('apparence/theme/detail/{name}/ma/list', 'ApparenceController@theme_ma_list')->name('theme.detail.ma.list');
             Route::get('apparence/theme/detail/{name}/ma/add', 'ApparenceController@theme_ma_add')->name('theme.detail.ma.add');
             Route::post('apparence/theme/detail/{name}/ma/create', 'ApparenceController@theme_ma_create')->name('theme.detail.ma.create');

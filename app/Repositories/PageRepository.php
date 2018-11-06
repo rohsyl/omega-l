@@ -31,6 +31,15 @@ class PageRepository
     }
 
     /**
+     * Get a page by slug
+     * @param $slug strin
+     * @return Page|null
+     */
+    public function getBySlug($slug){
+        return $this->page->where('slug', $slug)->first();
+    }
+
+    /**
      * Soft-delete a page
      * @param $id int
      * @return int

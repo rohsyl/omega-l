@@ -15,6 +15,11 @@ class LangRepository{
     public function get($id){
         return $this->lang->find($id);
     }
+
+    public function exists($slug){
+        return $this->lang->where('slug', $slug)->exists();
+    }
+
     public function getBySlug($slug){
         return $this->lang->where('slug', $slug)->first();
     }

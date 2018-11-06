@@ -16,6 +16,14 @@ require('summernote');
 require('sortablejs');
 require('ace-builds');
 
+// make toastr gobally available
+import toastr from 'toastr';
+window.toastr = toastr;
+
+// make Sortable gobally available
+import Sortable from 'sortablejs';
+window.Sortable = Sortable;
+
 require('./assets/metisMenu.min');
 require('./assets/sb-admin-2.min');
 require('./assets/jquery.nestable');

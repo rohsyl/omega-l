@@ -27,10 +27,6 @@
     @routes
     <script src="{{ asset('js/bundle.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
-    <!--
-    <script src="{{ asset('js/jquery.ui.touch-punch.min.js') }}" defer></script>
-    <script src="{{ asset('js/jquery.finger.js') }}" defer></script>
-    -->
     <script src="{{ route('language.loadforjs') }}"></script>
     <script src="{{ route('js.loadmain') }}"></script>
 

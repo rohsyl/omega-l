@@ -7,7 +7,7 @@
 <html>
 <head>
 
-    <title>{{ Entity::Site()->name }} - {{ Entity::Page()->title }}</title>
+    <title>{{ Entity::Site()->name }} - {{ Entity::Page()->name }}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {!! OmegaUtils::renderMeta() !!}

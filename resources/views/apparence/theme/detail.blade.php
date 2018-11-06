@@ -24,6 +24,28 @@
                     @endif
                 </div>
             </div>
+            @if($isCurrent)
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{ __('Assets') }}
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-warning">
+                        <p>
+                            <strong>{{ __('Warning !') }}</strong><br />
+                            {!!
+                                __('Publishing the assets will override the files under :path_public by the originals assets in the :path_theme', [
+                                    'path_public' => '<code>/public/theme/</code>',
+                                    'path_theme' => '<code>/omega/theme/'.$theme->name.'/assets/</code>'
+                                ])
+                            !!}
+                        </p>
+                        <br />
+                        <a href="{{ route('theme.publish', ['name' => $theme->name]) }}" class="btn btn-warning">Publish</a>
+                    </div>
+                </div>
+            </div>
+            @endif
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {{ __('Module area') }}<a href="#" id="btnAddModulearea" class="btn btn-xs btn-primary" style="float:right;">Add</a>
@@ -38,7 +60,7 @@
                 </div>
                 <div class="panel-body">
                     @foreach($templates as $t)
-                        <p>{{ prettify_text(without_ext($t)) }}</p>
+                        <p>{{ prettify_text(without_ext(without_ext($t))) }}</p>
                     @endforeach
                 </div>
             </div>

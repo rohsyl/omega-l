@@ -10,6 +10,7 @@ namespace Omega\Utils\Renderable;
 
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\View;
 use Omega\Models\Lang;
 use Omega\Models\Theme;
@@ -19,12 +20,14 @@ use Omega\Facades\Entity;
 use Omega\Utils\Entity\Menu;
 use Omega\Utils\Entity\Page;
 use Omega\Utils\Path;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PageRenderer implements Renderable
 {
 
     private $id = null;
     private $lang = null;
+    private $slug = null;
 
 
     private $langRepository;
@@ -47,9 +50,21 @@ class PageRenderer implements Renderable
         if(!$this->langRepository->isEnabled()) $this->lang = null;
 
 
-        // if no id set, then we will get the id of the homepage
-        if($this->id == null){
+        // if no id and no slug are set, then we will get the id of the homepage
+        if($this->id == null && $this->slug == null){
             $this->id = Page::GetHome($this->lang);
+        }
+
+
+        if(isset($this->slug)){
+            $res = Page::GetId($this->slug, $this->lang);
+
+            if($res instanceof RedirectResponse)
+                return $res;
+            else if($res instanceof HttpException)
+                return $res;
+
+            $this->id = $res;
         }
 
 
@@ -57,6 +72,10 @@ class PageRenderer implements Renderable
     }
 
 
+    public function withSlug($slug){
+        $this->slug = $slug;
+        return $this;
+    }
 
     public function withId($id){
         $this->id = $id;
@@ -75,9 +94,8 @@ class PageRenderer implements Renderable
      * @return mixed The rendered content
      */
     private function renderById(){
-
-        if($this->id == '_404') {
-            return abord(404);
+        if($this->id == '_404' || $this->id == null) {
+            return abort(404);
         }
 
 

@@ -250,17 +250,22 @@ class Menu{
 			$url = '#';
 
 			$current_page = Entity::Page()->id;
-			$current_page = $current_page != 0 ? $current_page : $_SERVER["REQUEST_URI"];
+			$current_page = $current_page != 0 ? $current_page : url()->previous();
 			$languages = $this->langRepository->allEnabled();
 
 			$subItems = '';
 			foreach($languages as $lang)
 			{
-				$urlLang = PController::Url('language', 'change',array(
-				    'target' => $lang->slug,
-                    'referer' => $current_page
-                ), true);
-				$htmlType = $_SESSION['front_lang'] == $lang->slug ? 'li_nochildrenactiv' : 'li_nochildren';
+			    if(session('front_lang') == $lang->slug){
+                    $urlLang = Page::GetUrl($current_page);
+                }
+                else{
+                    $urlLang = route('public.language.change', [
+                        'target' => $lang->slug,
+                        'referer' => $current_page
+                    ]);
+                }
+				$htmlType = session('front_lang') == $lang->slug ? 'li_nochildrenactiv' : 'li_nochildren';
 				$subItems .= sprintf($html[$htmlType], $urlLang, $lang->name, $lang->slug);
 			}
 

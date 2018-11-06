@@ -3,6 +3,7 @@
 namespace Omega\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Omega\Http\Requests\Apparence\Menu\CreateRequest;
 use Omega\Http\Requests\Apparence\Menu\UpdateRequest;
 use Omega\Http\Requests\Apparence\Theme\CreateModuleAreaRequest;
@@ -50,9 +51,24 @@ class ApparenceController extends AdminController
 
     public function theme_detail($name) {
         return view('apparence.theme.detail')->with([
+            'isCurrent' => $this->themeRepository->getCurrentThemeName() == $name,
             'theme' => $this->themeRepository->getByName($name),
             'templates' => $this->themeRepository->getThemeTemplate($name)
         ]);
+    }
+
+    public function theme_publish($name) {
+
+        $code = Artisan::call('omega:theme:publish');
+
+        $output = Artisan::output();
+
+        if($code === 0)
+            toast()->success(__('Publish done !'));
+        else
+            toast()->error(__('Error') . '<br />' . $output);
+
+        return redirect()->back();
     }
 
     public function theme_ma_list($name){
