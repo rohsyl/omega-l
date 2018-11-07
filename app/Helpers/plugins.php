@@ -24,6 +24,17 @@ if(!function_exists('plugin_path')){
     }
 }
 
+
+if(!function_exists('plugin_asset')) {
+    /**
+     * @return string
+     */
+    function plugin_asset($name, $path)
+    {
+        return asset('plugin/' . $name . '/' . $path);
+    }
+}
+
 if(!function_exists('to_meta')){
 
     /**

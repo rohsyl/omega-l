@@ -8,7 +8,7 @@
         @php $meta = new \Omega\Utils\Plugin\PluginMeta($plugin->name); @endphp
         <div class="col-sm-4">
             <div class="component-container" data-pluginid="{{ $plugin->id }}" >
-                <div class="component-image" style="background-image: url('{{ \Omega\Utils\Url::CombAndAbs(url('../omega/plugin'), '/'.$plugin->name.'/image/component-logo.png') }}');"></div>
+                <div class="component-image" style="background-image: url('{{ plugin_asset($plugin->name, 'images/component-logo.png') }}');"></div>
                 <div class="component-title">{{ $meta->getTitle() }}</div>
             </div>
         </div>

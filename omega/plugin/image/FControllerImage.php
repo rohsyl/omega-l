@@ -1,29 +1,29 @@
 <?php
-namespace Omega\Plugin\Image;
+namespace OmegaPlugin\Image;
 
-use Omega\Library\Plugin\FController;
+use Omega\Utils\Plugin\FController;
 
-	class FControllerImage extends  FController {
+class FControllerImage extends  FController {
 
 
-		public function __construct() {
-			parent::__construct('image');
-		}
-		
-		public function registerDependencies()
-		{
-			return array(
-				'css' => array(
-					'plugin/image/css/style.css'
-				),
-				'js' => array(
-                    'plugin/image/js/parallax.min.js'
-				)
-			);
-		}
+    public function __construct() {
+        parent::__construct('image');
+    }
 
-		public function display( $args, $data) {
-            $placement = isset($args['placement']) ? $args['placement'] : 'content';
-			return $this->view( $data );
-		}
-	}
+    public function registerDependencies()
+    {
+        return [
+            'css' => [
+                $this->asset('css/style.css')
+            ],
+            'js' => [
+                $this->asset('js/parallax.min.js')
+            ]
+        ];
+    }
+
+    public function display( $args, $data) {
+        //$placement = isset($args['placement']) ? $args['placement'] : 'content';
+        return $this->view('display')->with($data);
+    }
+}

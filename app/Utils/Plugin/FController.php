@@ -58,5 +58,11 @@ abstract class FController {
     public abstract function registerDependencies();
 
     public abstract function display($args, $data);
+
+
+
+    protected function asset($path){
+        return plugin_asset($this->name, $path);
+    }
 }
 

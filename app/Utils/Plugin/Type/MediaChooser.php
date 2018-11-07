@@ -78,7 +78,7 @@ class MediaChooser extends ATypeEntry {
         $v = $this->getValue();
         if(isset($v)) {
             if (!$param['multiple']) {
-                return new Media($v);
+                return Media::Get($v);
             } else {
                 $values = isset($v) ? json_decode($v, true) : array();
                 return $values;

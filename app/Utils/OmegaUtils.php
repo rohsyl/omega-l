@@ -4,6 +4,7 @@ namespace Omega\Utils;
 
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Omega\Facades\Entity;
 
@@ -56,12 +57,9 @@ class OmegaUtils{
 
     public function getInstalledPlugin()
     {
-        /*$plugins = Dbs::select('plugName')
-            ->from('om_plugin')
-            ->run()
-            ->getAllArray();
-
-        return $plugins;*/
+        return DB::table('plugins')
+            ->select('name')
+            ->get();
     }
 
     public function renderMeta()
