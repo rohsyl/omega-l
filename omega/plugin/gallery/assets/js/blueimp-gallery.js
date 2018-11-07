@@ -15,19 +15,19 @@
 /* global define, window, document, DocumentTouch */
 
 ;(function (factory) {
-  'use strict'
+  'use strict';
   if (typeof define === 'function' && define.amd) {
     // Register as an anonymous AMD module:
     define(['./blueimp-helper'], factory)
   } else {
     // Browser globals:
-    window.blueimp = window.blueimp || {}
+    window.blueimp = window.blueimp || {};
     window.blueimp.Gallery = factory(
       window.blueimp.helper || window.jQuery
     )
   }
 }(function ($) {
-  'use strict'
+  'use strict';
 
   function Gallery (list, options) {
     if (document.body.style.maxHeight === undefined) {
@@ -43,12 +43,12 @@
       this.console.log(
         'blueimp Gallery: No or empty list provided as first argument.',
         list
-      )
+      );
       return
     }
-    this.list = list
-    this.num = list.length
-    this.initOptions(options)
+    this.list = list;
+    this.num = list.length;
+    this.initOptions(options);
     this.initialize()
   }
 
@@ -206,7 +206,7 @@
       var support = {
         touch: window.ontouchstart !== undefined ||
           (window.DocumentTouch && document instanceof DocumentTouch)
-      }
+      };
       var transitions = {
         webkitTransition: {
           end: 'webkitTransitionEnd',
@@ -224,27 +224,27 @@
           end: 'transitionend',
           prefix: ''
         }
-      }
-      var prop
+      };
+      var prop;
       for (prop in transitions) {
         if (transitions.hasOwnProperty(prop) &&
           element.style[prop] !== undefined) {
-          support.transition = transitions[prop]
-          support.transition.name = prop
+          support.transition = transitions[prop];
+          support.transition.name = prop;
           break
         }
       }
       function elementTests () {
-        var transition = support.transition
-        var prop
-        var translateZ
-        document.body.appendChild(element)
+        var transition = support.transition;
+        var prop;
+        var translateZ;
+        document.body.appendChild(element);
         if (transition) {
-          prop = transition.name.slice(0, -9) + 'ransform'
+          prop = transition.name.slice(0, -9) + 'ransform';
           if (element.style[prop] !== undefined) {
-            element.style[prop] = 'translateZ(0)'
+            element.style[prop] = 'translateZ(0)';
             translateZ = window.getComputedStyle(element)
-              .getPropertyValue(transition.prefix + 'transform')
+              .getPropertyValue(transition.prefix + 'transform');
             support.transform = {
               prefix: transition.prefix,
               name: prop,
@@ -254,12 +254,12 @@
           }
         }
         if (element.style.backgroundSize !== undefined) {
-          support.backgroundSize = {}
-          element.style.backgroundSize = 'contain'
+          support.backgroundSize = {};
+          element.style.backgroundSize = 'contain';
           support.backgroundSize.contain = window
             .getComputedStyle(element)
-            .getPropertyValue('background-size') === 'contain'
-          element.style.backgroundSize = 'cover'
+            .getPropertyValue('background-size') === 'contain';
+          element.style.backgroundSize = 'cover';
           support.backgroundSize.cover = window
             .getComputedStyle(element)
             .getPropertyValue('background-size') === 'cover'
@@ -281,15 +281,15 @@
       window.mozRequestAnimationFrame,
 
     initialize: function () {
-      this.initStartIndex()
+      this.initStartIndex();
       if (this.initWidget() === false) {
         return false
       }
-      this.initEventListeners()
+      this.initEventListeners();
       // Load the slide at the given index:
-      this.onslide(this.index)
+      this.onslide(this.index);
       // Manually trigger the slideend event for the initial slide:
-      this.ontransitionend()
+      this.ontransitionend();
       // Start the automatic slideshow if applicable:
       if (this.options.startSlideshow) {
         this.play()
@@ -297,11 +297,11 @@
     },
 
     slide: function (to, speed) {
-      window.clearTimeout(this.timeout)
-      var index = this.index
-      var direction
-      var naturalDirection
-      var diff
+      window.clearTimeout(this.timeout);
+      var index = this.index;
+      var direction;
+      var naturalDirection;
+      var diff;
       if (index === to || this.num === 1) {
         return
       }
@@ -313,30 +313,30 @@
           to = this.circle(to)
         }
         // 1: backward, -1: forward:
-        direction = Math.abs(index - to) / (index - to)
+        direction = Math.abs(index - to) / (index - to);
         // Get the actual position of the slide:
         if (this.options.continuous) {
-          naturalDirection = direction
-          direction = -this.positions[this.circle(to)] / this.slideWidth
+          naturalDirection = direction;
+          direction = -this.positions[this.circle(to)] / this.slideWidth;
           // If going forward but to < index, use to = slides.length + to
           // If going backward but to > index, use to = -slides.length + to
           if (direction !== naturalDirection) {
             to = -direction * this.num + to
           }
         }
-        diff = Math.abs(index - to) - 1
+        diff = Math.abs(index - to) - 1;
         // Move all the slides between index and to in the right direction:
         while (diff) {
-          diff -= 1
+          diff -= 1;
           this.move(
             this.circle((to > index ? to : index) - diff - 1),
             this.slideWidth * direction,
             0
           )
         }
-        to = this.circle(to)
-        this.move(index, this.slideWidth * direction, speed)
-        this.move(to, 0, speed)
+        to = this.circle(to);
+        this.move(index, this.slideWidth * direction, speed);
+        this.move(to, 0, speed);
         if (this.options.continuous) {
           this.move(
             this.circle(to - direction),
@@ -345,7 +345,7 @@
           )
         }
       } else {
-        to = this.circle(to)
+        to = this.circle(to);
         this.animate(index * -this.slideWidth, to * -this.slideWidth, speed)
       }
       this.onslide(to)
@@ -372,9 +372,9 @@
     },
 
     play: function (time) {
-      var that = this
-      window.clearTimeout(this.timeout)
-      this.interval = time || this.options.slideshowInterval
+      var that = this;
+      window.clearTimeout(this.timeout);
+      this.interval = time || this.options.slideshowInterval;
       if (this.elements[this.index] > 1) {
         this.timeout = this.setTimeout(
           (!this.requestAnimationFrame && this.slide) || function (to, speed) {
@@ -393,13 +393,13 @@
     },
 
     pause: function () {
-      window.clearTimeout(this.timeout)
-      this.interval = null
+      window.clearTimeout(this.timeout);
+      this.interval = null;
       this.container.removeClass(this.options.playingClass)
     },
 
     add: function (list) {
-      var i
+      var i;
       if (!list.concat) {
         // Make a real array out of the list to add:
         list = Array.prototype.slice.call(list)
@@ -408,40 +408,40 @@
         // Make a real array out of the Gallery list:
         this.list = Array.prototype.slice.call(this.list)
       }
-      this.list = this.list.concat(list)
-      this.num = this.list.length
+      this.list = this.list.concat(list);
+      this.num = this.list.length;
       if (this.num > 2 && this.options.continuous === null) {
-        this.options.continuous = true
+        this.options.continuous = true;
         this.container.removeClass(this.options.leftEdgeClass)
       }
       this.container
         .removeClass(this.options.rightEdgeClass)
-        .removeClass(this.options.singleClass)
+        .removeClass(this.options.singleClass);
       for (i = this.num - list.length; i < this.num; i += 1) {
-        this.addSlide(i)
+        this.addSlide(i);
         this.positionSlide(i)
       }
-      this.positions.length = this.num
+      this.positions.length = this.num;
       this.initSlides(true)
     },
 
     resetSlides: function () {
-      this.slidesContainer.empty()
-      this.unloadAllSlides()
+      this.slidesContainer.empty();
+      this.unloadAllSlides();
       this.slides = []
     },
 
     handleClose: function () {
-      var options = this.options
-      this.destroyEventListeners()
+      var options = this.options;
+      this.destroyEventListeners();
       // Cancel the slideshow:
-      this.pause()
-      this.container[0].style.display = 'none'
+      this.pause();
+      this.container[0].style.display = 'none';
       this.container
         .removeClass(options.displayClass)
         .removeClass(options.singleClass)
         .removeClass(options.leftEdgeClass)
-        .removeClass(options.rightEdgeClass)
+        .removeClass(options.rightEdgeClass);
       if (options.hidePageScrollbars) {
         document.body.style.overflow = this.bodyOverflowStyle
       }
@@ -454,13 +454,13 @@
     },
 
     close: function () {
-      var that = this
+      var that = this;
       function closeHandler (event) {
         if (event.target === that.container[0]) {
           that.container.off(
             that.support.transition.end,
             closeHandler
-          )
+          );
           that.handleClose()
         }
       }
@@ -471,7 +471,7 @@
         this.container.on(
           this.support.transition.end,
           closeHandler
-        )
+        );
         this.container.removeClass(this.options.displayClass)
       } else {
         this.handleClose()
@@ -484,15 +484,15 @@
     },
 
     move: function (index, dist, speed) {
-      this.translateX(index, dist, speed)
+      this.translateX(index, dist, speed);
       this.positions[index] = dist
     },
 
     translate: function (index, x, y, speed) {
-      var style = this.slides[index].style
-      var transition = this.support.transition
-      var transform = this.support.transform
-      style[transition.name + 'Duration'] = speed + 'ms'
+      var style = this.slides[index].style;
+      var transition = this.support.transition;
+      var transform = this.support.transform;
+      style[transition.name + 'Duration'] = speed + 'ms';
       style[transform.name] = 'translate(' + x + 'px, ' + y + 'px)' +
       (transform.translateZ ? ' translateZ(0)' : '')
     },
@@ -507,17 +507,17 @@
 
     animate: function (from, to, speed) {
       if (!speed) {
-        this.slidesContainer[0].style.left = to + 'px'
+        this.slidesContainer[0].style.left = to + 'px';
         return
       }
-      var that = this
-      var start = new Date().getTime()
+      var that = this;
+      var start = new Date().getTime();
       var timer = window.setInterval(function () {
-        var timeElap = new Date().getTime() - start
+        var timeElap = new Date().getTime() - start;
         if (timeElap > speed) {
-          that.slidesContainer[0].style.left = to + 'px'
-          that.ontransitionend()
-          window.clearInterval(timer)
+          that.slidesContainer[0].style.left = to + 'px';
+          that.ontransitionend();
+          window.clearInterval(timer);
           return
         }
         that.slidesContainer[0].style.left = (((to - from) *
@@ -557,7 +557,7 @@
         ;(event.originalEvent || event).touches = [{
           pageX: event.pageX,
           pageY: event.pageY
-        }]
+        }];
         this.ontouchstart(event)
       }
     },
@@ -567,22 +567,22 @@
         (event.originalEvent || event).touches = [{
           pageX: event.pageX,
           pageY: event.pageY
-        }]
+        }];
         this.ontouchmove(event)
       }
     },
 
     onmouseup: function (event) {
       if (this.touchStart) {
-        this.ontouchend(event)
+        this.ontouchend(event);
         delete this.touchStart
       }
     },
 
     onmouseout: function (event) {
       if (this.touchStart) {
-        var target = event.target
-        var related = event.relatedTarget
+        var target = event.target;
+        var related = event.relatedTarget;
         if (!related || (related !== target &&
           !$.contains(target, related))) {
           this.onmouseup(event)
@@ -596,16 +596,16 @@
       }
       // jQuery doesn't copy touch event properties by default,
       // so we have to access the originalEvent object:
-      var touches = (event.originalEvent || event).touches[0]
+      var touches = (event.originalEvent || event).touches[0];
       this.touchStart = {
         // Remember the initial touch coordinates:
         x: touches.pageX,
         y: touches.pageY,
         // Store the time to determine touch duration:
         time: Date.now()
-      }
+      };
       // Helper variable to detect scroll movement:
-      this.isScrolling = undefined
+      this.isScrolling = undefined;
       // Reset delta values:
       this.touchDelta = {}
     },
@@ -616,11 +616,11 @@
       }
       // jQuery doesn't copy touch event properties by default,
       // so we have to access the originalEvent object:
-      var touches = (event.originalEvent || event).touches[0]
-      var scale = (event.originalEvent || event).scale
-      var index = this.index
-      var touchDeltaX
-      var indices
+      var touches = (event.originalEvent || event).touches[0];
+      var scale = (event.originalEvent || event).scale;
+      var index = this.index;
+      var touchDeltaX;
+      var indices;
       // Ensure this is a one touch swipe and not, e.g. a pinch:
       if (touches.length > 1 || (scale && scale !== 1)) {
         return
@@ -632,8 +632,8 @@
       this.touchDelta = {
         x: touches.pageX - this.touchStart.x,
         y: touches.pageY - this.touchStart.y
-      }
-      touchDeltaX = this.touchDelta.x
+      };
+      touchDeltaX = this.touchDelta.x;
       // Detect if this is a vertical scroll movement (run only once per touch):
       if (this.isScrolling === undefined) {
         this.isScrolling = this.isScrolling ||
@@ -641,9 +641,9 @@
       }
       if (!this.isScrolling) {
         // Always prevent horizontal scroll:
-        event.preventDefault()
+        event.preventDefault();
         // Stop the slideshow:
-        window.clearTimeout(this.timeout)
+        window.clearTimeout(this.timeout);
         if (this.options.continuous) {
           indices = [
             this.circle(index + 1),
@@ -660,8 +660,8 @@
             (index === this.num - 1 && touchDeltaX < 0))
               ? (Math.abs(touchDeltaX) / this.slideWidth + 1)
               : 1
-          )
-          indices = [index]
+          );
+          indices = [index];
           if (index) {
             indices.push(index - 1)
           }
@@ -670,7 +670,7 @@
           }
         }
         while (indices.length) {
-          index = indices.pop()
+          index = indices.pop();
           this.translateX(index, touchDeltaX + this.positions[index], 0)
         }
       } else if (this.options.closeOnSwipeUpOrDown) {
@@ -682,62 +682,62 @@
       if (this.options.stopTouchEventsPropagation) {
         this.stopPropagation(event)
       }
-      var index = this.index
-      var speed = this.options.transitionSpeed
-      var slideWidth = this.slideWidth
-      var isShortDuration = Number(Date.now() - this.touchStart.time) < 250
+      var index = this.index;
+      var speed = this.options.transitionSpeed;
+      var slideWidth = this.slideWidth;
+      var isShortDuration = Number(Date.now() - this.touchStart.time) < 250;
       // Determine if slide attempt triggers next/prev slide:
       var isValidSlide =
       (isShortDuration && Math.abs(this.touchDelta.x) > 20) ||
-        Math.abs(this.touchDelta.x) > slideWidth / 2
+        Math.abs(this.touchDelta.x) > slideWidth / 2;
       // Determine if slide attempt is past start or end:
       var isPastBounds = (!index && this.touchDelta.x > 0) ||
-        (index === this.num - 1 && this.touchDelta.x < 0)
+        (index === this.num - 1 && this.touchDelta.x < 0);
       var isValidClose = !isValidSlide && this.options.closeOnSwipeUpOrDown &&
         ((isShortDuration && Math.abs(this.touchDelta.y) > 20) ||
-        Math.abs(this.touchDelta.y) > this.slideHeight / 2)
-      var direction
-      var indexForward
-      var indexBackward
-      var distanceForward
-      var distanceBackward
+        Math.abs(this.touchDelta.y) > this.slideHeight / 2);
+      var direction;
+      var indexForward;
+      var indexBackward;
+      var distanceForward;
+      var distanceBackward;
       if (this.options.continuous) {
         isPastBounds = false
       }
       // Determine direction of swipe (true: right, false: left):
-      direction = this.touchDelta.x < 0 ? -1 : 1
+      direction = this.touchDelta.x < 0 ? -1 : 1;
       if (!this.isScrolling) {
         if (isValidSlide && !isPastBounds) {
-          indexForward = index + direction
-          indexBackward = index - direction
-          distanceForward = slideWidth * direction
-          distanceBackward = -slideWidth * direction
+          indexForward = index + direction;
+          indexBackward = index - direction;
+          distanceForward = slideWidth * direction;
+          distanceBackward = -slideWidth * direction;
           if (this.options.continuous) {
-            this.move(this.circle(indexForward), distanceForward, 0)
+            this.move(this.circle(indexForward), distanceForward, 0);
             this.move(this.circle(index - 2 * direction), distanceBackward, 0)
           } else if (indexForward >= 0 &&
             indexForward < this.num) {
             this.move(indexForward, distanceForward, 0)
           }
-          this.move(index, this.positions[index] + distanceForward, speed)
+          this.move(index, this.positions[index] + distanceForward, speed);
           this.move(
             this.circle(indexBackward),
             this.positions[this.circle(indexBackward)] + distanceForward,
             speed
-          )
-          index = this.circle(indexBackward)
+          );
+          index = this.circle(indexBackward);
           this.onslide(index)
         } else {
           // Move back into position
           if (this.options.continuous) {
-            this.move(this.circle(index - 1), -slideWidth, speed)
-            this.move(index, 0, speed)
+            this.move(this.circle(index - 1), -slideWidth, speed);
+            this.move(index, 0, speed);
             this.move(this.circle(index + 1), slideWidth, speed)
           } else {
             if (index) {
               this.move(index - 1, -slideWidth, speed)
             }
-            this.move(index, 0, speed)
+            this.move(index, 0, speed);
             if (index < this.num - 1) {
               this.move(index + 1, slideWidth, speed)
             }
@@ -755,13 +755,13 @@
 
     ontouchcancel: function (event) {
       if (this.touchStart) {
-        this.ontouchend(event)
+        this.ontouchend(event);
         delete this.touchStart
       }
     },
 
     ontransitionend: function (event) {
-      var slide = this.slides[this.index]
+      var slide = this.slides[this.index];
       if (!event || slide === event.target) {
         if (this.interval) {
           this.play()
@@ -774,16 +774,16 @@
     },
 
     oncomplete: function (event) {
-      var target = event.target || event.srcElement
-      var parent = target && target.parentNode
-      var index
+      var target = event.target || event.srcElement;
+      var parent = target && target.parentNode;
+      var index;
       if (!target || !parent) {
         return
       }
-      index = this.getNodeIndex(parent)
-      $(parent).removeClass(this.options.slideLoadingClass)
+      index = this.getNodeIndex(parent);
+      $(parent).removeClass(this.options.slideLoadingClass);
       if (event.type === 'error') {
-        $(parent).addClass(this.options.slideErrorClass)
+        $(parent).addClass(this.options.slideErrorClass);
         this.elements[index] = 3 // Fail
       } else {
         this.elements[index] = 2 // Done
@@ -813,32 +813,32 @@
       switch (event.which || event.keyCode) {
         case 13: // Return
           if (this.options.toggleControlsOnReturn) {
-            this.preventDefault(event)
+            this.preventDefault(event);
             this.toggleControls()
           }
-          break
+          break;
         case 27: // Esc
           if (this.options.closeOnEscape) {
-            this.close()
+            this.close();
             // prevent Esc from closing other things
             event.stopImmediatePropagation()
           }
-          break
+          break;
         case 32: // Space
           if (this.options.toggleSlideshowOnSpace) {
-            this.preventDefault(event)
+            this.preventDefault(event);
             this.toggleSlideshow()
           }
-          break
+          break;
         case 37: // Left
           if (this.options.enableKeyboardNavigation) {
-            this.preventDefault(event)
+            this.preventDefault(event);
             this.prev()
           }
-          break
+          break;
         case 39: // Right
           if (this.options.enableKeyboardNavigation) {
-            this.preventDefault(event)
+            this.preventDefault(event);
             this.next()
           }
           break
@@ -846,47 +846,47 @@
     },
 
     handleClick: function (event) {
-      var options = this.options
-      var target = event.target || event.srcElement
-      var parent = target.parentNode
+      var options = this.options;
+      var target = event.target || event.srcElement;
+      var parent = target.parentNode;
       function isTarget (className) {
         return $(target).hasClass(className) ||
         $(parent).hasClass(className)
       }
       if (isTarget(options.toggleClass)) {
         // Click on "toggle" control
-        this.preventDefault(event)
+        this.preventDefault(event);
         this.toggleControls()
       } else if (isTarget(options.prevClass)) {
         // Click on "prev" control
-        this.preventDefault(event)
+        this.preventDefault(event);
         this.prev()
       } else if (isTarget(options.nextClass)) {
         // Click on "next" control
-        this.preventDefault(event)
+        this.preventDefault(event);
         this.next()
       } else if (isTarget(options.closeClass)) {
         // Click on "close" control
-        this.preventDefault(event)
+        this.preventDefault(event);
         this.close()
       } else if (isTarget(options.playPauseClass)) {
         // Click on "play-pause" control
-        this.preventDefault(event)
+        this.preventDefault(event);
         this.toggleSlideshow()
       } else if (parent === this.slidesContainer[0]) {
         // Click on slide background
         if (options.closeOnSlideClick) {
-          this.preventDefault(event)
+          this.preventDefault(event);
           this.close()
         } else if (options.toggleControlsOnSlideClick) {
-          this.preventDefault(event)
+          this.preventDefault(event);
           this.toggleControls()
         }
       } else if (parent.parentNode &&
         parent.parentNode === this.slidesContainer[0]) {
         // Click on displayed element
         if (options.toggleControlsOnSlideClick) {
-          this.preventDefault(event)
+          this.preventDefault(event);
           this.toggleControls()
         }
       }
@@ -896,7 +896,7 @@
       if (this.options.emulateTouchEvents &&
         this.touchDelta && (Math.abs(this.touchDelta.x) > 20 ||
         Math.abs(this.touchDelta.y) > 20)) {
-        delete this.touchDelta
+        delete this.touchDelta;
         return
       }
       return this.handleClick(event)
@@ -919,7 +919,7 @@
       if (!this.options.continuous) {
         this.updateEdgeClasses(index)
       }
-      this.loadElements(index)
+      this.loadElements(index);
       if (this.options.unloadElements) {
         this.unloadElements(index)
       }
@@ -927,16 +927,16 @@
     },
 
     onslide: function (index) {
-      this.index = index
-      this.handleSlide(index)
+      this.index = index;
+      this.handleSlide(index);
       this.setTimeout(this.options.onslide, [index, this.slides[index]])
     },
 
     setTitle: function (index) {
-      var text = this.slides[index].firstChild.title
-      var titleElement = this.titleElement
+      var text = this.slides[index].firstChild.title;
+      var titleElement = this.titleElement;
       if (titleElement.length) {
-        this.titleElement.empty()
+        this.titleElement.empty();
         if (text) {
           titleElement[0].appendChild(document.createTextNode(text))
         }
@@ -944,38 +944,38 @@
     },
 
     setTimeout: function (func, args, wait) {
-      var that = this
+      var that = this;
       return func && window.setTimeout(function () {
         func.apply(that, args || [])
       }, wait || 0)
     },
 
     imageFactory: function (obj, callback) {
-      var that = this
-      var img = this.imagePrototype.cloneNode(false)
-      var url = obj
-      var backgroundSize = this.options.stretchImages
-      var called
-      var element
-      var title
+      var that = this;
+      var img = this.imagePrototype.cloneNode(false);
+      var url = obj;
+      var backgroundSize = this.options.stretchImages;
+      var called;
+      var element;
+      var title;
       function callbackWrapper (event) {
         if (!called) {
           event = {
             type: event.type,
             target: element
-          }
+          };
           if (!element.parentNode) {
             // Fix for IE7 firing the load event for
             // cached images before the element could
             // be added to the DOM:
             return that.setTimeout(callbackWrapper, [event])
           }
-          called = true
-          $(img).off('load error', callbackWrapper)
+          called = true;
+          $(img).off('load error', callbackWrapper);
           if (backgroundSize) {
             if (event.type === 'load') {
               element.style.background = 'url("' + url +
-                '") center no-repeat'
+                '") center no-repeat';
               element.style.backgroundSize = backgroundSize
             }
           }
@@ -983,36 +983,36 @@
         }
       }
       if (typeof url !== 'string') {
-        url = this.getItemProperty(obj, this.options.urlProperty)
+        url = this.getItemProperty(obj, this.options.urlProperty);
         title = this.getItemProperty(obj, this.options.titleProperty)
       }
       if (backgroundSize === true) {
         backgroundSize = 'contain'
       }
       backgroundSize = this.support.backgroundSize &&
-        this.support.backgroundSize[backgroundSize] && backgroundSize
+        this.support.backgroundSize[backgroundSize] && backgroundSize;
       if (backgroundSize) {
         element = this.elementPrototype.cloneNode(false)
       } else {
-        element = img
+        element = img;
         img.draggable = false
       }
       if (title) {
         element.title = title
       }
-      $(img).on('load error', callbackWrapper)
-      img.src = url
+      $(img).on('load error', callbackWrapper);
+      img.src = url;
       return element
     },
 
     createElement: function (obj, callback) {
-      var type = obj && this.getItemProperty(obj, this.options.typeProperty)
+      var type = obj && this.getItemProperty(obj, this.options.typeProperty);
       var factory = (type && this[type.split('/')[0] + 'Factory']) ||
-        this.imageFactory
-      var element = obj && factory.call(this, obj, callback)
-      var srcset = this.getItemProperty(obj, this.options.srcsetProperty)
+        this.imageFactory;
+      var element = obj && factory.call(this, obj, callback);
+      var srcset = this.getItemProperty(obj, this.options.srcsetProperty);
       if (!element) {
-        element = this.elementPrototype.cloneNode(false)
+        element = this.elementPrototype.cloneNode(false);
         this.setTimeout(callback, [{
           type: 'error',
           target: element
@@ -1021,7 +1021,7 @@
       if (srcset) {
         element.setAttribute('srcset', srcset)
       }
-      $(element).addClass(this.options.slideContentClass)
+      $(element).addClass(this.options.slideContentClass);
       return element
     },
 
@@ -1031,8 +1031,8 @@
           this.elements[index] = $(this.slides[index])
             .hasClass(this.options.slideErrorClass) ? 3 : 2
         } else {
-          this.elements[index] = 1 // Loading
-          $(this.slides[index]).addClass(this.options.slideLoadingClass)
+          this.elements[index] = 1; // Loading
+          $(this.slides[index]).addClass(this.options.slideLoadingClass);
           this.slides[index].appendChild(this.createElement(
             this.list[index],
             this.proxyListener
@@ -1042,31 +1042,31 @@
     },
 
     loadElements: function (index) {
-      var limit = Math.min(this.num, this.options.preloadRange * 2 + 1)
-      var j = index
-      var i
+      var limit = Math.min(this.num, this.options.preloadRange * 2 + 1);
+      var j = index;
+      var i;
       for (i = 0; i < limit; i += 1) {
         // First load the current slide element (0),
         // then the next one (+1),
         // then the previous one (-2),
         // then the next after next (+2), etc.:
-        j += i * (i % 2 === 0 ? -1 : 1)
+        j += i * (i % 2 === 0 ? -1 : 1);
         // Connect the ends of the list to load slide elements for
         // continuous navigation:
-        j = this.circle(j)
+        j = this.circle(j);
         this.loadElement(j)
       }
     },
 
     unloadElements: function (index) {
       var i,
-        diff
+        diff;
       for (i in this.elements) {
         if (this.elements.hasOwnProperty(i)) {
-          diff = Math.abs(index - i)
+          diff = Math.abs(index - i);
           if (diff > this.options.preloadRange &&
             diff + this.options.preloadRange < this.num) {
-            this.unloadSlide(i)
+            this.unloadSlide(i);
             delete this.elements[i]
           }
         }
@@ -1074,17 +1074,17 @@
     },
 
     addSlide: function (index) {
-      var slide = this.slidePrototype.cloneNode(false)
-      slide.setAttribute('data-index', index)
-      this.slidesContainer[0].appendChild(slide)
+      var slide = this.slidePrototype.cloneNode(false);
+      slide.setAttribute('data-index', index);
+      this.slidesContainer[0].appendChild(slide);
       this.slides.push(slide)
     },
 
     positionSlide: function (index) {
-      var slide = this.slides[index]
-      slide.style.width = this.slideWidth + 'px'
+      var slide = this.slides[index];
+      slide.style.width = this.slideWidth + 'px';
       if (this.support.transform) {
-        slide.style.left = (index * -this.slideWidth) + 'px'
+        slide.style.left = (index * -this.slideWidth) + 'px';
         this.move(
           index, this.index > index
             ? -this.slideWidth
@@ -1096,23 +1096,23 @@
 
     initSlides: function (reload) {
       var clearSlides,
-        i
+        i;
       if (!reload) {
-        this.positions = []
-        this.positions.length = this.num
-        this.elements = {}
-        this.imagePrototype = document.createElement('img')
-        this.elementPrototype = document.createElement('div')
-        this.slidePrototype = document.createElement('div')
-        $(this.slidePrototype).addClass(this.options.slideClass)
-        this.slides = this.slidesContainer[0].children
+        this.positions = [];
+        this.positions.length = this.num;
+        this.elements = {};
+        this.imagePrototype = document.createElement('img');
+        this.elementPrototype = document.createElement('div');
+        this.slidePrototype = document.createElement('div');
+        $(this.slidePrototype).addClass(this.options.slideClass);
+        this.slides = this.slidesContainer[0].children;
         clearSlides = this.options.clearSlides ||
         this.slides.length !== this.num
       }
-      this.slideWidth = this.container[0].offsetWidth
-      this.slideHeight = this.container[0].offsetHeight
+      this.slideWidth = this.container[0].offsetWidth;
+      this.slideHeight = this.container[0].offsetHeight;
       this.slidesContainer[0].style.width =
-        (this.num * this.slideWidth) + 'px'
+        (this.num * this.slideWidth) + 'px';
       if (clearSlides) {
         this.resetSlides()
       }
@@ -1124,7 +1124,7 @@
       }
       // Reposition the slides before and after the given index:
       if (this.options.continuous && this.support.transform) {
-        this.move(this.circle(this.index - 1), -this.slideWidth, 0)
+        this.move(this.circle(this.index - 1), -this.slideWidth, 0);
         this.move(this.circle(this.index + 1), this.slideWidth, 0)
       }
       if (!this.support.transform) {
@@ -1135,9 +1135,9 @@
 
     unloadSlide: function (index) {
       var slide,
-        firstChild
-      slide = this.slides[index]
-      firstChild = slide.firstChild
+        firstChild;
+      slide = this.slides[index];
+      firstChild = slide.firstChild;
       if (firstChild !== null) {
         slide.removeChild(firstChild)
       }
@@ -1145,14 +1145,14 @@
 
     unloadAllSlides: function () {
       var i,
-        len
+        len;
       for (i = 0, len = this.slides.length; i < len; i++) {
         this.unloadSlide(i)
       }
     },
 
     toggleControls: function () {
-      var controlsClass = this.options.controlsClass
+      var controlsClass = this.options.controlsClass;
       if (this.container.hasClass(controlsClass)) {
         this.container.removeClass(controlsClass)
       } else {
@@ -1179,19 +1179,19 @@
         /\[(?:'([^']+)'|"([^"]+)"|(\d+))\]|(?:(?:^|\.)([^\.\[]+))/g,
         function (str, singleQuoteProp, doubleQuoteProp, arrayIndex, dotProp) {
           var prop = dotProp || singleQuoteProp || doubleQuoteProp ||
-            (arrayIndex && parseInt(arrayIndex, 10))
+            (arrayIndex && parseInt(arrayIndex, 10));
           if (str && obj) {
             obj = obj[prop]
           }
         }
-      )
+      );
       return obj
     },
 
     getDataProperty: function (obj, property) {
       if (obj.getAttribute) {
         var prop = obj.getAttribute('data-' +
-          property.replace(/([A-Z])/g, '-$1').toLowerCase())
+          property.replace(/([A-Z])/g, '-$1').toLowerCase());
         if (typeof prop === 'string') {
           if (/^(true|false|null|-?\d+(\.\d+)?|\{[\s\S]*\}|\[[\s\S]*\])$/
               .test(prop)) {
@@ -1205,9 +1205,9 @@
     },
 
     getItemProperty: function (obj, property) {
-      var prop = obj[property]
+      var prop = obj[property];
       if (prop === undefined) {
-        prop = this.getDataProperty(obj, property)
+        prop = this.getDataProperty(obj, property);
         if (prop === undefined) {
           prop = this.getNestedProperty(obj, property)
         }
@@ -1216,16 +1216,16 @@
     },
 
     initStartIndex: function () {
-      var index = this.options.index
-      var urlProperty = this.options.urlProperty
-      var i
+      var index = this.options.index;
+      var urlProperty = this.options.urlProperty;
+      var i;
       // Check if the index is given as a list object:
       if (index && typeof index !== 'number') {
         for (i = 0; i < this.num; i += 1) {
           if (this.list[i] === index ||
             this.getItemProperty(this.list[i], urlProperty) ===
             this.getItemProperty(index, urlProperty)) {
-            index = i
+            index = i;
             break
           }
         }
@@ -1235,18 +1235,18 @@
     },
 
     initEventListeners: function () {
-      var that = this
-      var slidesContainer = this.slidesContainer
+      var that = this;
+      var slidesContainer = this.slidesContainer;
       function proxyListener (event) {
         var type = that.support.transition &&
         that.support.transition.end === event.type
           ? 'transitionend'
-          : event.type
+          : event.type;
         that['on' + type](event)
       }
-      $(window).on('resize', proxyListener)
-      $(document.body).on('keydown', proxyListener)
-      this.container.on('click', proxyListener)
+      $(window).on('resize', proxyListener);
+      $(document.body).on('keydown', proxyListener);
+      this.container.on('click', proxyListener);
       if (this.support.touch) {
         slidesContainer
           .on('touchstart touchmove touchend touchcancel', proxyListener)
@@ -1265,11 +1265,11 @@
     },
 
     destroyEventListeners: function () {
-      var slidesContainer = this.slidesContainer
-      var proxyListener = this.proxyListener
-      $(window).off('resize', proxyListener)
-      $(document.body).off('keydown', proxyListener)
-      this.container.off('click', proxyListener)
+      var slidesContainer = this.slidesContainer;
+      var proxyListener = this.proxyListener;
+      $(window).off('resize', proxyListener);
+      $(document.body).off('keydown', proxyListener);
+      this.container.off('click', proxyListener);
       if (this.support.touch) {
         slidesContainer
           .off('touchstart touchmove touchend touchcancel', proxyListener)
@@ -1293,37 +1293,37 @@
     },
 
     initWidget: function () {
-      var that = this
+      var that = this;
       function openHandler (event) {
         if (event.target === that.container[0]) {
           that.container.off(
             that.support.transition.end,
             openHandler
-          )
+          );
           that.handleOpen()
         }
       }
-      this.container = $(this.options.container)
+      this.container = $(this.options.container);
       if (!this.container.length) {
         this.console.log(
           'blueimp Gallery: Widget container not found.',
           this.options.container
-        )
+        );
         return false
       }
       this.slidesContainer = this.container.find(
         this.options.slidesContainer
-      ).first()
+      ).first();
       if (!this.slidesContainer.length) {
         this.console.log(
           'blueimp Gallery: Slides container not found.',
           this.options.slidesContainer
-        )
+        );
         return false
       }
       this.titleElement = this.container.find(
         this.options.titleElement
-      ).first()
+      ).first();
       if (this.num === 1) {
         this.container.addClass(this.options.singleClass)
       }
@@ -1340,24 +1340,24 @@
       }
       if (this.options.hidePageScrollbars) {
         // Hide the page scrollbars:
-        this.bodyOverflowStyle = document.body.style.overflow
+        this.bodyOverflowStyle = document.body.style.overflow;
         document.body.style.overflow = 'hidden'
       }
-      this.container[0].style.display = 'block'
-      this.initSlides()
+      this.container[0].style.display = 'block';
+      this.initSlides();
       this.container.addClass(this.options.displayClass)
     },
 
     initOptions: function (options) {
       // Create a copy of the prototype options:
-      this.options = $.extend({}, this.options)
+      this.options = $.extend({}, this.options);
       // Check if carousel mode is enabled:
       if ((options && options.carousel) ||
         (this.options.carousel && (!options || options.carousel !== false))) {
         $.extend(this.options, this.carouselOptions)
       }
       // Override any given options:
-      $.extend(this.options, options)
+      $.extend(this.options, options);
       if (this.num < 3) {
         // 1 or 2 slides cannot be displayed continuous,
         // remember the original option by setting to null instead of false:
@@ -1371,7 +1371,7 @@
       }
     }
 
-  })
+  });
 
   return Gallery
-}))
+}));

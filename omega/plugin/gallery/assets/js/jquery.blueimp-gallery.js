@@ -12,7 +12,7 @@
 /* global define, window, document */
 
 ;(function (factory) {
-  'use strict'
+  'use strict';
   if (typeof define === 'function' && define.amd) {
     define([
       'jquery',
@@ -25,16 +25,16 @@
     )
   }
 }(function ($, Gallery) {
-  'use strict'
+  'use strict';
 
   // Global click handler to open links with data-gallery attribute
   // in the Gallery lightbox:
   $(document).on('click', '[data-gallery]', function (event) {
     // Get the container id from the data-gallery attribute:
-    var id = $(this).data('gallery')
-    var widget = $(id)
+    var id = $(this).data('gallery');
+    var widget = $(id);
     var container = (widget.length && widget) ||
-          $(Gallery.prototype.options.container)
+          $(Gallery.prototype.options.container);
     var callbacks = {
       onopen: function () {
         container
@@ -61,7 +61,7 @@
           .trigger('closed')
           .removeData('gallery')
       }
-    }
+    };
     var options = $.extend(
       // Retrieve custom options from data-attributes
       // on the Gallery widget:
@@ -72,12 +72,12 @@
         event: event
       },
       callbacks
-    )
+    );
     // Select all links with the same data-gallery attribute:
-    var links = $('[data-gallery="' + id + '"]')
+    var links = $('[data-gallery="' + id + '"]');
     if (options.filter) {
       links = links.filter(options.filter)
     }
     return new Gallery(links, options)
   })
-}))
+}));

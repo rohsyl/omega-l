@@ -12,10 +12,10 @@
 /* global define, window, document */
 
 ;(function () {
-  'use strict'
+  'use strict';
 
   function extend (obj1, obj2) {
-    var prop
+    var prop;
     for (prop in obj2) {
       if (obj2.hasOwnProperty(prop)) {
         obj1[prop] = obj2[prop]
@@ -30,46 +30,46 @@
       // so we simply return a new instance:
       return new Helper(query)
     }
-    this.length = 0
+    this.length = 0;
     if (query) {
       if (typeof query === 'string') {
         query = this.find(query)
       }
       if (query.nodeType || query === query.window) {
         // Single HTML element
-        this.length = 1
+        this.length = 1;
         this[0] = query
       } else {
         // HTML element collection
-        var i = query.length
-        this.length = i
+        var i = query.length;
+        this.length = i;
         while (i) {
-          i -= 1
+          i -= 1;
           this[i] = query[i]
         }
       }
     }
   }
 
-  Helper.extend = extend
+  Helper.extend = extend;
 
   Helper.contains = function (container, element) {
     do {
-      element = element.parentNode
+      element = element.parentNode;
       if (element === container) {
         return true
       }
-    } while (element)
+    } while (element);
     return false
-  }
+  };
 
   Helper.parseJSON = function (string) {
     return window.JSON && JSON.parse(string)
-  }
+  };
 
   extend(Helper.prototype, {
     find: function (query) {
-      var container = this[0] || document
+      var container = this[0] || document;
       if (typeof query === 'string') {
         if (container.querySelectorAll) {
           query = container.querySelectorAll(query)
@@ -91,13 +91,13 @@
     },
 
     addClass: function (className) {
-      var i = this.length
-      var element
+      var i = this.length;
+      var element;
       while (i) {
-        i -= 1
-        element = this[i]
+        i -= 1;
+        element = this[i];
         if (!element.className) {
-          element.className = className
+          element.className = className;
           return this
         }
         if (this.hasClass(className)) {
@@ -109,27 +109,27 @@
     },
 
     removeClass: function (className) {
-      var regexp = new RegExp('(^|\\s+)' + className + '(\\s+|$)')
-      var i = this.length
-      var element
+      var regexp = new RegExp('(^|\\s+)' + className + '(\\s+|$)');
+      var i = this.length;
+      var element;
       while (i) {
-        i -= 1
-        element = this[i]
+        i -= 1;
+        element = this[i];
         element.className = element.className.replace(regexp, ' ')
       }
       return this
     },
 
     on: function (eventName, handler) {
-      var eventNames = eventName.split(/\s+/)
-      var i
-      var element
+      var eventNames = eventName.split(/\s+/);
+      var i;
+      var element;
       while (eventNames.length) {
-        eventName = eventNames.shift()
-        i = this.length
+        eventName = eventNames.shift();
+        i = this.length;
         while (i) {
-          i -= 1
-          element = this[i]
+          i -= 1;
+          element = this[i];
           if (element.addEventListener) {
             element.addEventListener(eventName, handler, false)
           } else if (element.attachEvent) {
@@ -141,15 +141,15 @@
     },
 
     off: function (eventName, handler) {
-      var eventNames = eventName.split(/\s+/)
-      var i
-      var element
+      var eventNames = eventName.split(/\s+/);
+      var i;
+      var element;
       while (eventNames.length) {
-        eventName = eventNames.shift()
-        i = this.length
+        eventName = eventNames.shift();
+        i = this.length;
         while (i) {
-          i -= 1
-          element = this[i]
+          i -= 1;
+          element = this[i];
           if (element.removeEventListener) {
             element.removeEventListener(eventName, handler, false)
           } else if (element.detachEvent) {
@@ -161,11 +161,11 @@
     },
 
     empty: function () {
-      var i = this.length
-      var element
+      var i = this.length;
+      var element;
       while (i) {
-        i -= 1
-        element = this[i]
+        i -= 1;
+        element = this[i];
         while (element.hasChildNodes()) {
           element.removeChild(element.lastChild)
         }
@@ -177,14 +177,14 @@
       return new Helper(this[0])
     }
 
-  })
+  });
 
   if (typeof define === 'function' && define.amd) {
     define(function () {
       return Helper
     })
   } else {
-    window.blueimp = window.blueimp || {}
+    window.blueimp = window.blueimp || {};
     window.blueimp.helper = Helper
   }
-}())
+}());

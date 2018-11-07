@@ -141,8 +141,12 @@ class VideoExternal
     }
 
     public function getVideoThumbnail(){
-        if(!isset($this->ext) && empty($this->ext))
+        if(!isset($this->media->ext) || empty($this->media->ext))
             return null;
-        return Url::CombAndAbs(url('/'), 'media', $this->media->id, $this->media->id.'.'.$this->ext);
+        return Url::Combine(url('/'), 'media', $this->media->id, $this->media->id.'.'.$this->media->ext );
+    }
+
+    public function __get($property){
+        return $this->media->$property;
     }
 }

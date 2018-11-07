@@ -12,7 +12,7 @@
 /* global define, window, document, $f */
 
 ;(function (factory) {
-  'use strict'
+  'use strict';
   if (typeof define === 'function' && define.amd) {
     // Register as an anonymous AMD module:
     define([
@@ -27,7 +27,7 @@
     )
   }
 }(function ($, Gallery) {
-  'use strict'
+  'use strict';
 
   if (!window.postMessage) {
     return Gallery
@@ -43,19 +43,19 @@
     vimeoPlayerIdPrefix: 'vimeo-player-',
     // Require a click on the native Vimeo player for the initial playback:
     vimeoClickToPlay: true
-  })
+  });
 
   var textFactory = Gallery.prototype.textFactory ||
-                      Gallery.prototype.imageFactory
+                      Gallery.prototype.imageFactory;
   var VimeoPlayer = function (url, videoId, playerId, clickToPlay) {
-    this.url = url
-    this.videoId = videoId
-    this.playerId = playerId
-    this.clickToPlay = clickToPlay
-    this.element = document.createElement('div')
+    this.url = url;
+    this.videoId = videoId;
+    this.playerId = playerId;
+    this.clickToPlay = clickToPlay;
+    this.element = document.createElement('div');
     this.listeners = {}
-  }
-  var counter = 0
+  };
+  var counter = 0;
 
   $.extend(VimeoPlayer.prototype, {
     canPlayType: function () {
@@ -63,17 +63,17 @@
     },
 
     on: function (type, func) {
-      this.listeners[type] = func
+      this.listeners[type] = func;
       return this
     },
 
     loadAPI: function () {
-      var that = this
-      var apiUrl = '//f.vimeocdn.com/js/froogaloop2.min.js'
-      var scriptTags = document.getElementsByTagName('script')
-      var i = scriptTags.length
-      var scriptTag
-      var called
+      var that = this;
+      var apiUrl = '//f.vimeocdn.com/js/froogaloop2.min.js';
+      var scriptTags = document.getElementsByTagName('script');
+      var i = scriptTags.length;
+      var scriptTag;
+      var called;
       function callback () {
         if (!called && that.playOnReady) {
           that.play()
@@ -81,18 +81,18 @@
         called = true
       }
       while (i) {
-        i -= 1
+        i -= 1;
         if (scriptTags[i].src === apiUrl) {
-          scriptTag = scriptTags[i]
+          scriptTag = scriptTags[i];
           break
         }
       }
       if (!scriptTag) {
-        scriptTag = document.createElement('script')
+        scriptTag = document.createElement('script');
         scriptTag.src = apiUrl
       }
-      $(scriptTag).on('load', callback)
-      scriptTags[0].parentNode.insertBefore(scriptTag, scriptTags[0])
+      $(scriptTag).on('load', callback);
+      scriptTags[0].parentNode.insertBefore(scriptTag, scriptTags[0]);
       // Fix for cached scripts on IE 8:
       if (/loaded|complete/.test(scriptTag.readyState)) {
         callback()
@@ -100,18 +100,18 @@
     },
 
     onReady: function () {
-      var that = this
-      this.ready = true
+      var that = this;
+      this.ready = true;
       this.player.addEvent('play', function () {
-        that.hasPlayed = true
+        that.hasPlayed = true;
         that.onPlaying()
-      })
+      });
       this.player.addEvent('pause', function () {
         that.onPause()
-      })
+      });
       this.player.addEvent('finish', function () {
         that.onPause()
-      })
+      });
       if (this.playOnReady) {
         this.play()
       }
@@ -119,30 +119,30 @@
 
     onPlaying: function () {
       if (this.playStatus < 2) {
-        this.listeners.playing()
+        this.listeners.playing();
         this.playStatus = 2
       }
     },
 
     onPause: function () {
-      this.listeners.pause()
+      this.listeners.pause();
       delete this.playStatus
     },
 
     insertIframe: function () {
-      var iframe = document.createElement('iframe')
+      var iframe = document.createElement('iframe');
       iframe.src = this.url
         .replace('VIDEO_ID', this.videoId)
-        .replace('PLAYER_ID', this.playerId)
-      iframe.id = this.playerId
-      this.element.parentNode.replaceChild(iframe, this.element)
+        .replace('PLAYER_ID', this.playerId);
+      iframe.id = this.playerId;
+      this.element.parentNode.replaceChild(iframe, this.element);
       this.element = iframe
     },
 
     play: function () {
-      var that = this
+      var that = this;
       if (!this.playStatus) {
-        this.listeners.play()
+        this.listeners.play();
         this.playStatus = 1
       }
       if (this.ready) {
@@ -157,12 +157,12 @@
           this.player.api('play')
         }
       } else {
-        this.playOnReady = true
+        this.playOnReady = true;
         if (!window.$f) {
           this.loadAPI()
         } else if (!this.player) {
-          this.insertIframe()
-          this.player = $f(this.element)
+          this.insertIframe();
+          this.player = $f(this.element);
           this.player.addEvent('ready', function () {
             that.onReady()
           })
@@ -174,25 +174,25 @@
       if (this.ready) {
         this.player.api('pause')
       } else if (this.playStatus) {
-        delete this.playOnReady
-        this.listeners.pause()
+        delete this.playOnReady;
+        this.listeners.pause();
         delete this.playStatus
       }
     }
 
-  })
+  });
 
   $.extend(Gallery.prototype, {
     VimeoPlayer: VimeoPlayer,
 
     textFactory: function (obj, callback) {
-      var options = this.options
-      var videoId = this.getItemProperty(obj, options.vimeoVideoIdProperty)
+      var options = this.options;
+      var videoId = this.getItemProperty(obj, options.vimeoVideoIdProperty);
       if (videoId) {
         if (this.getItemProperty(obj, options.urlProperty) === undefined) {
           obj[options.urlProperty] = '//vimeo.com/' + videoId
         }
-        counter += 1
+        counter += 1;
         return this.videoFactory(
           obj,
           callback,
@@ -207,7 +207,7 @@
       return textFactory.call(this, obj, callback)
     }
 
-  })
+  });
 
   return Gallery
-}))
+}));

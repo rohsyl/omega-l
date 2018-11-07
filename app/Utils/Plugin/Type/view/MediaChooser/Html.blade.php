@@ -16,7 +16,7 @@
             $mediaItem['thumbnail'] = $media->getThumbnail(120, 68);
         }
         if($media->type == \Omega\Utils\Entity\Media::EXTERNAL_VIDEO){
-            $media = new \Omega\Utils\Entity\VideoExternal($mediaId);
+            $media = new \Omega\Utils\Entity\VideoExternal($media);
             $mediaItem['thumbnail'] = $media->getVideoThumbnail();
         }
         $medias[] = $mediaItem;
@@ -157,35 +157,30 @@
             return $mediaContainer.children().length;
         }
 
-        $('.{{ $uid }}-media', '#{{ $uid }}-media-container').each(function () {
-            var cell = $(this);
-            //cell.width(cell.width());
-            cell.css('background-color', '#ffffff');
-        });
-        $( '#{{ $uid }}-media-container' ).sortable({
-            itemPath: '>',
-            itemSelector: '.{{ $uid }}-media',
-            helper: function(e, tr)
-            {
-                var $originals = tr.children();
-                var $helper = tr.clone();
-                $helper.children().each(function(index)
-                {
-                    // Set helper cell sizes to match the original sizes
-                    $(this).width($originals.eq(index).width());
-                });
-                return $helper;
-            },
-            placeholder: '{{ $uid }}-sortable-placeholder',
-            update: function( event, ui ) {
-                var i = 0;
-                $('#{{ $uid }}-media-container .{{ $uid }}-media').each(function(i) {
-                    var $inputOrder = $(this).find('input[name^="{{ $uid }}-media-order"]');
-                    $inputOrder.val(i);
-                    i++;
-                });
-            }
-        }).disableSelection();
+
+
+        createSortable();
+        function createSortable(){
+            var sortable = document.getElementById('{{ $uid }}-media-container');
+            Sortable.create(sortable, {
+                group: 'sort-{{ $uid }}',
+                animation: 150,
+                //handle: '.glyphicon-move',
+                ghostClass: 'sortable-ghost',  // Class name for the drop placeholder
+                draggable: '.{{ $uid }}-media',  // Specifies which items inside the element should be draggable
+                // Changed sorting within list
+                onEnd: function (/**Event*/evt) {
+                    $('#{{ $uid }}-media-container .{{ $uid }}-media').each(function(i) {
+                        var $inputOrder = $(this).find('input[name^="{{ $uid }}-media-order"]');
+                        $inputOrder.val(i);
+                    });
+                },
+
+
+            });
+        }
+
+
     });
 </script>
 <style>

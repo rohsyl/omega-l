@@ -1,51 +1,53 @@
-<?php
-use Omega\Library\Entity\Media;
-?>
 
-<?php
+
+@php
 global $carouselHeight;
 $carouselHeight = 500;
-if(!function_exists('gallery_get_image')){
-    function gallery_get_image($media){
+if(!function_exists('gallery_get_image_slider')){
+    function gallery_get_image_slider($media){
         global  $carouselHeight;
         $imageWidth = $media->getWidth();
         $imageHeight = $media->getHeight();
         $thumbnailWidth = round($carouselHeight / $imageHeight * $imageWidth);
-        ?>
-        <div class="item" style="width:<?php echo $thumbnailWidth ?>;">
+
+        return '
+        <div class="item" style="width:'. $thumbnailWidth . '">
             <picture>
-                <source srcset="<?php echo $media->GetThumbnail($carouselHeight, $carouselHeight) ?>" media="(max-width: 768px)">
-                <img src="<?php echo $media->GetThumbnail($thumbnailWidth, $carouselHeight) ?>" />
+                <source srcset="' . $media->GetThumbnail($carouselHeight, $carouselHeight) . '" media="(max-width: 768px)">
+                <img src="' . $media->GetThumbnail($thumbnailWidth, $carouselHeight) . '" />
             </picture>
-        </div>
-        <?php
+        </div>';
     }
 }
-?>
+@endphp
 
 <div class="plugin plugin-gallery" data-plugin-placement="content">
-    <?php if(isset($medias)) : ?>
-    <div class="owl-carousel owl-carousel-image <?php echo $this->unique('slider') ?>">
-        <?php foreach($medias as $mediaItem) : ?>
+    @if(isset($medias))
+    <div class="owl-carousel owl-carousel-image {{ $unique('slide') }}">
+        @foreach($medias as $mediaItem)
 
-            <?php
-            $m = new Media($mediaItem['id']);
+            @php
+            // TODO : Display video_ext type
+            $m = \Omega\Utils\Entity\Media::Get($mediaItem['id']);
             $mType = $m->getType();
-            if($mType == Media::T_PICTURE){
-                gallery_get_image($m);
+            if($mType == \Omega\Utils\Entity\Media::T_PICTURE){
+                echo gallery_get_image_slider($m);
             }
-            elseif($mType == Media::T_FOLDER){
-                $children = $m->getChildren(array(Media::T_VIDEO_EXT, Media::T_PICTURE));
+            elseif($mType == \Omega\Utils\Entity\Media::T_FOLDER){
+                $children = $m->getChildren([
+                    //\Omega\Utils\Entity\Media::T_VIDEO_EXT,
+                    \Omega\Utils\Entity\Media::T_PICTURE
+                ]);
                 foreach($children as $media){
-                    gallery_get_image($media);
+                    echo gallery_get_image_slider($media);
                 }
             }
-            ?>
-        <?php endforeach ?>
+            @endphp
+        @endforeach
     </div>
     <script>
         $(function(){
-            $(".<?php echo $this->unique('slider') ?>").owlCarousel({
+            $(".{{ $unique('slide') }}").owlCarousel({
                 margin: 10,
                 loop:true,
                 autoWidth:true,
@@ -77,7 +79,7 @@ if(!function_exists('gallery_get_image')){
             });
         });
     </script>
-    <?php else : ?>
+    @else
         Nothing to display... slider
-    <?php endif ?>
+    @endif
 

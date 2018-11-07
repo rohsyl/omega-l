@@ -12,7 +12,7 @@
 /* global blueimp, $ */
 
 $(function () {
-  'use strict'
+  'use strict';
 
   // Load demo images from flickr:
   $.ajax({
@@ -27,30 +27,30 @@ $(function () {
     dataType: 'jsonp',
     jsonp: 'jsoncallback'
   }).done(function (result) {
-    var carouselLinks = []
-    var linksContainer = $('#links')
-    var baseUrl
+    var carouselLinks = [];
+    var linksContainer = $('#links');
+    var baseUrl;
     // Add the demo images as links with thumbnails to the page:
     $.each(result.photos.photo, function (index, photo) {
       baseUrl = 'https://farm' + photo.farm + '.static.flickr.com/' +
-      photo.server + '/' + photo.id + '_' + photo.secret
+      photo.server + '/' + photo.id + '_' + photo.secret;
       $('<a/>')
         .append($('<img>').prop('src', baseUrl + '_s.jpg'))
         .prop('href', baseUrl + '_b.jpg')
         .prop('title', photo.title)
         .attr('data-gallery', '')
-        .appendTo(linksContainer)
+        .appendTo(linksContainer);
       carouselLinks.push({
         href: baseUrl + '_c.jpg',
         title: photo.title
       })
-    })
+    });
     // Initialize the Gallery as image carousel:
     blueimp.Gallery(carouselLinks, {
       container: '#blueimp-image-carousel',
       carousel: true
     })
-  })
+  });
 
   // Initialize the Gallery as video carousel:
   blueimp.Gallery([
@@ -93,4 +93,4 @@ $(function () {
     container: '#blueimp-video-carousel',
     carousel: true
   })
-})
+});

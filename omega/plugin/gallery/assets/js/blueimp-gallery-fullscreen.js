@@ -12,7 +12,7 @@
 /* global define, window, document */
 
 ;(function (factory) {
-  'use strict'
+  'use strict';
   if (typeof define === 'function' && define.amd) {
     // Register as an anonymous AMD module:
     define([
@@ -27,15 +27,15 @@
     )
   }
 }(function ($, Gallery) {
-  'use strict'
+  'use strict';
 
   $.extend(Gallery.prototype.options, {
     // Defines if the gallery should open in fullscreen mode:
     fullScreen: false
-  })
+  });
 
-  var initialize = Gallery.prototype.initialize
-  var close = Gallery.prototype.close
+  var initialize = Gallery.prototype.initialize;
+  var close = Gallery.prototype.close;
 
   $.extend(Gallery.prototype, {
     getFullScreenElement: function () {
@@ -70,7 +70,7 @@
     },
 
     initialize: function () {
-      initialize.call(this)
+      initialize.call(this);
       if (this.options.fullScreen && !this.getFullScreenElement()) {
         this.requestFullScreen(this.container[0])
       }
@@ -83,7 +83,7 @@
       close.call(this)
     }
 
-  })
+  });
 
   return Gallery
-}))
+}));
