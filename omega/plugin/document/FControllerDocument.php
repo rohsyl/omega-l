@@ -1,34 +1,33 @@
 <?php
-namespace Omega\Plugin\Document;
+namespace OmegaPlugin\Document;
 
-use Omega\Library\Plugin\FController;
+
+use Omega\Utils\Plugin\FController;
 
 class FControllerDocument extends FController {
 
     public function __construct(){
         parent::__construct('document');
-        $this->includeFile('library.php');
-
+        //$this->includeFile('library.php');
     }
 
     public function registerDependencies() {
-        return array(
-            'css' => array(
-                'plugin/document/css/style.css',
-                'assets/bootstrap_composant/css/bootstrap-grid.min.css'
-            ),
-            'js' => array(
-            )
-        );
+        return [
+            'css' => [
+                $this->asset('css/styles.css'),
+            ],
+            'js' => [
+            ]
+        ];
     }
 
     public function display($args, $data) {
         $placement = isset($args['placement']) ? $args['placement'] : 'content';
         if($placement == 'modulearea') {
-            return $this->partialView('display-modulearea', $data);
+            return $this->view('display_modulearea')->with($data);
         }
         else {
-            return $this->partialView('display-content', $data);
+            return $this->view('display_content')->with($data);
         }
     }
 }

@@ -1,9 +1,4 @@
 <?php
-use Omega\Library\Entity\Media;
-use Omega\Library\Util\Url;
-?>
-
-<?php
 global $displayFilesize;
 $displayFilesize = $filesize['filesize'];
 
@@ -41,7 +36,7 @@ if(!function_exists('document_get_item_content')){
         <?php foreach($documents as $document) : ?>
 
             <?php
-            $m = new Media($document['id']);
+            $m = \Omega\Utils\Entity\Media::Get($document['id']);
             $mType = $m->getType();
             if($mType == Media::T_FOLDER){
                 $children = $m->getChildren(array(Media::T_DOCUMENT));
