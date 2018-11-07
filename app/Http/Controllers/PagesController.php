@@ -271,8 +271,13 @@ class PagesController extends AdminController
             $this->pageLangRelRepository->clearRelIfLangChanged($page, $request->all());
         }
 
+        $mr = $this->menuRepository;
         // update the page basic data
-        $this->pageRepository->update($page, $request->all());
+        // update the name and slug in all menus
+        $this->pageRepository->update($page, $request->all(), function($name, $slug, $page) use ($mr) {
+            $mr->updateNameInCustomMenu($name, $page);
+            $mr->updateSlugInCustomMenu($slug, $page);
+        });
 
         // save the page relations
         if($enabledLang){
@@ -320,6 +325,7 @@ class PagesController extends AdminController
                 );
                 break;
         }
+
 
         // Save all component fields
         $cs = $this->moduleRepository->getAllComponentsByPage($id);

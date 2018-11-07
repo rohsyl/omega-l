@@ -141,14 +141,23 @@ class PageRepository
      * Update a page
      * @param $page
      * @param $inputs
+     * @param $beforeSaveClosure \Closure
      * @return mixed
      */
-    public function update($page, $inputs){
+    public function update($page, $inputs, $beforeSaveClosure = null){
+
+        $name = $inputs['name'];
+        $slug = unique_slug($page, str_slug($inputs['slug']));
+
+        // callback to update name and slug in menus
+        if(isset($beforeSaveClosure))
+            $beforeSaveClosure($name, $slug, $page);
+
         $page->showName = $inputs['showName'];
-        $page->name = $inputs['name'];
+        $page->name = $name;
         $page->showSubtitle = $inputs['showSubtitle'];
         $page->subtitle = $inputs['subtitle'];
-        $page->slug = unique_slug($page, str_slug($inputs['slug']));
+        $page->slug = $slug;
         $page->model = $inputs['model'];
         $page->cssTheme = $inputs['cssTheme'];
         $page->keyWords = $inputs['keyword'];

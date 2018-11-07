@@ -289,6 +289,7 @@ class Page{
 
                 $this->content .= view('public.section')->with([
                     'compId' => $compId,
+                    'plugin' => $component->plugin,
                     'style' => $style,
                     'isWrapped' => $isWrapped,
                     'content' => $content,

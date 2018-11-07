@@ -81,4 +81,42 @@ class MenuRepository
             ->where('lang', $lang)
             ->first();
     }
+
+    public function updateNameInCustomMenu($newTitle, $page) {
+
+        if($page->name != $newTitle) {
+            $menus = $this->getAllWhereJsonLike($page->name);
+            foreach ($menus as $menu) {
+                $oldKey = '"title":"'.$page->name.'"';
+                $newKey = '"title":"'.$newTitle.'"';
+                $menu->json = str_replace($oldKey, $newKey, $menu->json);
+                $success = $menu->save();
+                if(!$success) return false;
+            }
+        }
+        return true;
+    }
+
+    public function updateSlugInCustomMenu($newAlias, $page) {
+
+        if($page->slug != $newAlias) {
+            $menus = $this->getAllWhereJsonLike($page->slug);
+
+            foreach ($menus as $menu) {
+                $oldKey = '"url":"'.$page->slug.'"';
+                $newKey = '"url":"'.$newAlias.'"';
+                $menu->json = str_replace($oldKey, $newKey, $menu->json);
+                $success = $menu->save();
+                if(!$success) return false;
+            }
+        }
+        return true;
+    }
+
+
+    private function getAllWhereJsonLike($clause){
+        $clause = '%'.$clause.'%';
+        return $this->menu->where('json', 'like', $clause)->get();
+    }
+
 }
