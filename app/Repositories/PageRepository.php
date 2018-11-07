@@ -129,6 +129,7 @@ class PageRepository
     public function create($inputs){
         $page = new Page();
         $page->name = $inputs['name'];
+        $page->showSubtitle = false;
         $page->slug = unique_slug($page, str_slug($page->name));
         if(isset($inputs['lang']))
             $page->lang = $inputs['lang'];

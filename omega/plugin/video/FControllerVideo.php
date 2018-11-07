@@ -1,8 +1,8 @@
 <?php
-namespace Omega\Plugin\Video;
+namespace OmegaPlugin\Video;
 
-use Omega\Library\Plugin\FController;
-use Omega\Library\Util\Util;
+
+use Omega\Utils\Plugin\FController;
 
 class FControllerVideo extends  FController {
 
@@ -13,18 +13,18 @@ class FControllerVideo extends  FController {
 
     public function registerDependencies()
     {
-        return array(
-            'css' => array(
-                'plugin/video/css/style.css'
-            ),
-            'js' => array(
-            )
-        );
+        return [
+            'css' => [
+                $this->asset('css/styles.css')
+            ],
+            'js' => [
+            ]
+        ];
     }
 
     public function display( $args, $data) {
         $m['src'] = isset($data['video']->path) ? $this->getFrameSrc($data['video']->path) : '';
-        return $this->view( $m );
+        return $this->view('display')->with($m);
     }
 
     private function getFrameSrc($url)
