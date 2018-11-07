@@ -128,4 +128,14 @@ class OmegaUtils{
             $this->htmlRequireHelper->renderJs();
     }
 
+    public function renderOmegaAssets(){
+        $css = asset('css/public.css');
+        $js = asset('js/public.js');
+
+        $html = '';
+        $html .= '<link href="'.$css.'" rel="stylesheet" />';
+        $html .= '<script language="JavaScript" src="'.$js.'"></script>';
+
+        return $html;
+    }
 }

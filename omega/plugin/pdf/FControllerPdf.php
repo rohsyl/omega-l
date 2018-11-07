@@ -1,26 +1,25 @@
 <?php
-namespace Omega\Plugin\Pdf;
+namespace OmegaPlugin\Pdf;
 
-use Omega\Library\Plugin\FController;
+use Omega\Utils\Plugin\FController;
 
-	class FControllerPdf extends  FController {
+class FControllerPdf extends  FController {
 
+    public function __construct() {
+        parent::__construct('pdf');
+    }
 
-		public function __construct() {
-			parent::__construct('pdf');
-		}
-		
-		public function registerDependencies()
-		{
-			return array(
-				'css' => array(
-				),
-				'js' => array(
-				)
-			);
-		}
+    public function registerDependencies()
+    {
+        return [
+            'css' => [
+            ],
+            'js' => [
+            ]
+        ];
+    }
 
-		public function display( $args, $data ) {
-			return $this->view( $data );
-		}
-	}
+    public function display( $args, $data ) {
+        return $this->view('display')->with( $data );
+    }
+}

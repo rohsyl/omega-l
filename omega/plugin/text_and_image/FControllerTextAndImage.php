@@ -1,13 +1,12 @@
 <?php
-namespace OmegaPlugin\Teaser;
+namespace OmegaPlugin\TextAndImage;
 
 use Omega\Utils\Plugin\FController;
 
-class FControllerTeaser extends  FController {
-
+class FControllerTextAndImage extends  FController {
 
     public function __construct() {
-        parent::__construct('teaser');
+        parent::__construct('text_and_image');
     }
 
     public function registerDependencies()
@@ -16,12 +15,11 @@ class FControllerTeaser extends  FController {
             'css' => [
                 $this->asset('css/styles.css')
             ],
-            'js' => [
-            ]
+            'js' => []
         ];
     }
 
-    public function display( $args, $data ) {
-        return $this->view('display')->with( $data );
+    public function display($args , $data) {
+        return $this->view('display')->with($data);
     }
 }

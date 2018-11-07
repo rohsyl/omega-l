@@ -21,6 +21,7 @@ use Omega\Models\User;
  * @method static boolean isInstalled()
  * @method static void addDependencies(array $dependencies)
  * @method static string renderDependencies()
+ * @method static string renderOmegaAssets()
  *
  * @see \Omega\Utils\OmegaUtils
  */

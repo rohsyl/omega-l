@@ -13,7 +13,7 @@ class FControllerText extends  FController {
     {
         return [
             'css' => [
-
+                $this->asset('css/styles.css')
             ],
             'js' => [
 

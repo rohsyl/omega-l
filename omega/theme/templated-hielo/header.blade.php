@@ -12,6 +12,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {!! OmegaUtils::renderMeta() !!}
 
+    <!-- OmegaCMS assets -->
+    {!! OmegaUtils::renderOmegaAssets() !!}
+
     <!-- Styles -->
     <link href="{{ theme_asset('css/main.css') }}" rel="stylesheet"/>
 

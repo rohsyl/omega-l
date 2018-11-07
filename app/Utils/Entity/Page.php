@@ -267,9 +267,10 @@ class Page{
             // force using an other view defined in the settings of the component
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
                 $t = explode('/',  $args['settings']['pluginTemplate']);
+                $theme = $t[0];
                 $plugin = $t[1];
                 $template = $t[2];
-                $path = 'theme::template.'.$plugin.'.'.$template;
+                $path = Path::Combine(theme_path($theme), 'template', $plugin, $template);
                 $instance->forceView($path);
             }
 

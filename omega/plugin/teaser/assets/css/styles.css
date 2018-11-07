@@ -2,24 +2,24 @@
 
 }
 
-    .teaser .teaser-image{
+    .teaser-item .teaser-image{
         max-width: 100%;
     }
 
-    .teaser .teaser-text{
+    .teaser-item .teaser-text{
         margin-top : 5px;
         font-size: 0.8em;
     }
 
-        .teaser .teaser-text p:empty, .teaser-text p{
+        .teaser-item .teaser-text p:empty, .teaser-text p{
             margin: 0;
         }
-
-.teaser a:hover{
+.teaser-item a,
+.teaser-item a:hover{
     text-transform: none;
     text-decoration: none;
     cursor: pointer;
 }
-.teaser a:hover .teaser-image{
+.teaser-item a:hover .teaser-image{
     cursor: pointer;
 }

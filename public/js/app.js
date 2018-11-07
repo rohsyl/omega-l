@@ -46347,9 +46347,11 @@ __webpack_require__(63);
 __webpack_require__(50);
 __webpack_require__(65);
 
+// make toastr gobally available
 
 window.toastr = __WEBPACK_IMPORTED_MODULE_1_toastr___default.a;
 
+// make Sortable gobally available
 
 window.Sortable = __WEBPACK_IMPORTED_MODULE_2_sortablejs___default.a;
 
