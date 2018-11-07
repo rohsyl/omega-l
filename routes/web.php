@@ -18,42 +18,8 @@
  * if it's not the case, it redirect the user to the installation
  * page.
  ********************************************************************/
-Route::middleware('om_not_installed')->group(function(){
+Route::middleware('om_not_installed')->group(function() {
 
-    /********************************************************************
-     * Public routes
-     ********************************************************************/
-
-    // Homepage
-    Route::get('/', 'PublicController@home')
-        ->name('public');
-
-
-    if(!om_config('om_enable_front_langauge')) {
-
-        // Page by slug
-        Route::get('/{slug}', 'PublicController@slug')
-            ->name('public.byslug');
-    }
-    else {
-
-        // Homepage with lang
-        Route::get('/{lang}', 'PublicController@home_with_lang')
-            ->where(['lang' => '[a-z]{2}'])
-            ->name('public.homelang');
-
-        // Page by slug and lang
-        Route::get('/{lang}/{slug}', 'PublicController@slug_and_lang')
-            ->where(['lang' => '[a-z]{2}'])
-            ->name('public.bylangandslug');
-
-    }
-
-
-    // Modules
-    Route::prefix('/module')->group(function(){
-        Route::get('language/change/{target}/{referer?}', 'PublicControllers\LanguageController@change')->name('public.language.change');
-    });
 
     /********************************************************************
      * Public admin routes
@@ -66,8 +32,6 @@ Route::middleware('om_not_installed')->group(function(){
         Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
         Route::post('password/reset', 'Auth\ResetPasswordController@reset');
     });
-
-
 
     /********************************************************************
      * Private admin routes
@@ -226,6 +190,44 @@ Route::middleware('om_not_installed')->group(function(){
             Route::get('linkchooser/bc/{id}', 'LinkChooserController@getBreadcrumb')->name('linkchooser.bc');
             Route::get('linkchooser/dc/{id}', 'LinkChooserController@getDirectoryContent')->name('linkchooser.dc');
         });
+    });
+
+
+    /********************************************************************
+     * Public routes
+     ********************************************************************/
+
+    // Homepage
+    Route::get('/', 'PublicController@home')
+        ->name('public');
+
+
+    if (OmegaUtils::isInstalled()) {
+        if (!om_config('om_enable_front_langauge')) {
+
+            // Page by slug
+            Route::get('/{slug}', 'PublicController@slug')
+                ->name('public.byslug');
+        } else {
+
+            // Homepage with lang
+            Route::get('/{lang}', 'PublicController@home_with_lang')
+                ->where(['lang' => '[a-z]{2}'])
+                ->name('public.homelang');
+
+            // Page by slug and lang
+            Route::get('/{lang}/{slug}', 'PublicController@slug_and_lang')
+                ->where(['lang' => '[a-z]{2}'])
+                ->name('public.bylangandslug');
+
+        }
+    }
+
+
+
+    // Modules
+    Route::prefix('/module')->group(function(){
+        Route::get('language/change/{target}/{referer?}', 'PublicControllers\LanguageController@change')->name('public.language.change');
     });
 });
 

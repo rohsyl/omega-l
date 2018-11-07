@@ -1,5 +1,5 @@
 <?php
-use Omega\Library\Entity\ModuleArea;
+use Omega\Facades\ModuleArea;
 use Omega\Utils\Theme\Installer;
 
 /**

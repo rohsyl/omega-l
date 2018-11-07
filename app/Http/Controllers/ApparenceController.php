@@ -97,8 +97,19 @@ class ApparenceController extends AdminController
     }
 
     public function theme_useit($name) {
+
         $this->themeRepository->setCurrentThemeName($name);
         toast()->success(__('Theme set'));
+
+
+        $code = Artisan::call('omega:theme:publish');
+        $output = Artisan::output();
+        if($code === 0)
+            toast()->success(__('Theme publised !'));
+        else
+            toast()->error(__('Error') . '<br />' . $output);
+
+        
         return redirect()->route('theme.index');
     }
 

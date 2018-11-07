@@ -3,13 +3,17 @@
 namespace Omega\Http\Controllers;
 
 use Omega\Facades\Entity;
+use Omega\Facades\OmegaUtils;
 use Omega\Utils\Entity\Site;
 
 class PublicController extends Controller
 {
 
     public function __construct() {
-        Entity::setSite(new Site());
+
+        if(OmegaUtils::isInstalled()){
+            Entity::setSite(new Site());
+        }
     }
 
     public function home() {

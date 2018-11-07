@@ -9,16 +9,13 @@
 
     <title>OmegaCMS | {{ __('Install') }}</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="{{ asset('/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('/css/omega.install.css') }}" rel="stylesheet">
-    <link href="{{ asset('/css/omega.custom.css') }}" rel="stylesheet">
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <script src="{{ asset('/js/jquery-2.0.3.min.js') }}"></script>
-    <script src="{{ asset('/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('/js/omega.install.js') }}"></script>
+    <!-- Scripts -->
+    @routes
+    <script src="{{ asset('js/bundle.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
     <!--[if lt IE 9]>
     <script src="{{ asset('/js/html5shiv.js') }}"></script>

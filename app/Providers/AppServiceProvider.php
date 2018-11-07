@@ -22,7 +22,9 @@ class AppServiceProvider extends ServiceProvider
 
         FormFacade::component('omMediaChooser', 'components.form.mediachooser', ['name', 'label', 'value' => null, 'attributes' => []]);
 
-
+        if(!OmegaUtils::isInstalled()){
+            return;
+        }
 
         $currentThemeName = om_config('om_theme_name');
         // Add a namespace to access theme views
