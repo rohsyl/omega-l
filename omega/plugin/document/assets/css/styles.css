@@ -1,4 +1,14 @@
 
+.plugin-document{
+    margin: 15px 0;
+}
+
+@media all and (max-width: 786px){
+    .plugin-document{
+        margin: 15px;
+    }
+}
+
 .document-type
 {
 	font-size :40px;
@@ -39,19 +49,19 @@
 .link:focus{
     color : #777 ;
 }
-.plugin-document a{
+.plugin-document-container a{
 	text-decoration : none;
 }
-.plugin-document[data-plugin-placement="modulearea"] h3
+.plugin-document-container[data-plugin-placement="modulearea"] h3
 {
     margin-bottom : 10px;
 }
-.plugin-document[data-plugin-placement="modulearea"] .document-item
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item
 {
 	position : relative;
 	padding : 0px 0 0 25px;
 }
-.plugin-document[data-plugin-placement="modulearea"] .document-type
+.plugin-document-container[data-plugin-placement="modulearea"] .document-type
 {
     font-size :18px;
     -webkit-transition: all 0.5s;
@@ -60,14 +70,14 @@
     -o-transition: all 0.5s;
     transition: all 0.5s;
 }
-.plugin-document[data-plugin-placement="modulearea"] .document-item .doc-icon
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item .doc-icon
 {
 	position : absolute;
 	left : 0px;
 	top : -2px;
 	font-size : 20px;
 }
-.plugin-document[data-plugin-placement="modulearea"] .document-item .text
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item .text
 {
 	font-size : 14px;
 	line-height : 10px;
@@ -79,7 +89,7 @@
         -o-transition: all 0.5s;
         transition: all 0.5s;
 }
-.plugin-document[data-plugin-placement="modulearea"] .document-item .text span
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item .text span
 {
 	font-size : 12px;
 	display : block;
@@ -92,52 +102,52 @@
     transition: all 0.5s;
 }
 
-.plugin-document .document-item a:hover .text
+.plugin-document-container .document-item a:hover .text
 {
 	color : #000;
 }
-.plugin-document .document-item a:hover .text span
+.plugin-document-container .document-item a:hover .text span
 {
 	color : #aaa;
 }
 
-.plugin-document .document-item a:hover .word{
+.plugin-document-container .document-item a:hover .word{
 	color : #1A345D ;
 }
-.plugin-document .document-item a:hover .excel{
+.plugin-document-container .document-item a:hover .excel{
 	color : #0F3621 ;
 }
-.plugin-document .document-item a:hover .powerpoint{
+.plugin-document-container .document-item a:hover .powerpoint{
 	color : #91301A ;
 }
-.plugin-document .document-item a:hover .adobe{
+.plugin-document-container .document-item a:hover .adobe{
 	color : #771304 ;
 }
 
 
 
 
-.plugin-document[data-plugin-placement="content"] .document-item
+.plugin-document-container[data-plugin-placement="content"] .document-item
 {
     position : relative;
     padding : 0px 5px 25px 45px;
 }
 @media (max-width: 768px) {
 
-    .plugin-document[data-plugin-placement="content"] .document-item
+    .plugin-document-container[data-plugin-placement="content"] .document-item
     {
         position : relative;
         padding : 0px 5px 25px 45px;
         width : auto;
     }
 }
-.plugin-document[data-plugin-placement="content"] .document-item .doc-icon
+.plugin-document-container[data-plugin-placement="content"] .document-item .doc-icon
 {
     position : absolute;
     left : 0px;
     top : 5px;
 }
-.plugin-document[data-plugin-placement="content"] .document-item .text
+.plugin-document-container[data-plugin-placement="content"] .document-item .text
 {
     font-size : 14px;
     line-height : 10px;
@@ -149,7 +159,7 @@
     -o-transition: all 0.5s;
     transition: all 0.5s;
 }
-.plugin-document[data-plugin-placement="content"] .document-item .text span
+.plugin-document-container[data-plugin-placement="content"] .document-item .text span
 {
     font-size : 12px;
     display : block;

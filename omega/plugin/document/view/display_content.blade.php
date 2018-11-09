@@ -1,91 +1,60 @@
-<?php
+@php
 global $displayFilesize;
 $displayFilesize = $filesize['filesize'];
 
 if(!function_exists('document_get_item_content')){
     function document_get_item_content($media){
         global $displayFilesize;
-        ?>
+
+        $html = '
         <div class="col-md-6 col-sm-12">
             <div class="document-item">
-                <a target="_blank" href="<?php echo Url::CombAndAbs(ABSPATH, $media->path) ?>">
-                    <span class="doc-icon"><i class="<?php echo getClassByExt($media->ext) ?> <?php echo getIconByExt($media->ext) ?>"></i></span>
-                    <span class="text">
-                        <?php if(isset($media->title) && !empty($media->title)) : ?>
-                            <?php echo $media->title ?>
-                            <span>
-                                <?php echo $media->description ?>
-                                <?php echo isset($displayFilesize) && $displayFilesize ? '('.formatBytes($media->getFilesize()).')' : '' ?>
-                            </span>
-                        <?php else : ?>
-                            <?php echo $media->name.'.'.$media->ext ?>
-                            <?php echo isset($displayFilesize) && $displayFilesize ? '<span>'.formatBytes($media->getFilesize()).'</span>' : '' ?>
-                        <?php endif ?>
+                <a target="_blank" href="' . asset($media->path) . '">
+                    <span class="doc-icon">
+                        <i class="' . \OmegaPlugin\document\utils\DocumentUtils::getClassByExt($media->ext) . ' ' . \OmegaPlugin\document\utils\DocumentUtils::getIconByExt($media->ext) . '"></i>
                     </span>
+                    <span class="text">';
+        if(isset($media->title) && !empty($media->title)){
+            $html .=  $media->title . '
+                            <span>
+                                ' . $media->description . '
+                                ' . ( isset($displayFilesize) && $displayFilesize ? '('.\OmegaPlugin\document\utils\DocumentUtils::formatBytes($media->getFilesize()).')' : '' ) . '
+                            </span>';
+        }
+        else{
+            $html .= $media->name.'.'.$media->ext . '
+                            ' . ( isset($displayFilesize) && $displayFilesize ? '<span>'.\OmegaPlugin\document\utils\DocumentUtils::formatBytes($media->getFilesize()).'</span>' : '' );
+        }
+        $html .= '</span>
                 </a>
             </div>
-        </div>
-        <?php
+        </div>';
+        return $html;
     }
 }
-?>
+@endphp
 
-<div class="plugin plugin-document" data-plugin-placement="content">
-<?php if(isset($documents)) : ?>
+<div class="plugin-document-container" data-plugin-placement="content">
+@if(isset($documents))
     <div class="row">
-        <?php foreach($documents as $document) : ?>
+        @foreach($documents as $document)
 
-            <?php
+            @php
             $m = \Omega\Utils\Entity\Media::Get($document['id']);
             $mType = $m->getType();
-            if($mType == Media::T_FOLDER){
-                $children = $m->getChildren(array(Media::T_DOCUMENT));
+            if($mType == \Omega\Utils\Entity\Media::T_FOLDER){
+                $children = $m->getChildren(array(\Omega\Utils\Entity\Media::T_DOCUMENT));
                 foreach($children as $media){
-                    document_get_item_content($media);
+                    echo document_get_item_content($media);
                 }
             }
             else{
-                document_get_item_content($m);
+                echo document_get_item_content($m);
             }
-            ?>
-
-
-            <?php /*
-            <div class="col-md-6 col-sm-12">
-                <?php if($document['type'] == 'media') : ?>
-                    <?php $media = new Media($document['id']); ?>
-                    <div class="document-item">
-                        <a target="_blank" href="<?php echo Url::CombAndAbs(ABSPATH, $media->path) ?>">
-                            <span class="doc-icon"><i class="<?php echo getClassByExt($media->ext) ?> <?php echo getIconByExt($media->ext) ?>"></i></span>
-                            <span class="text">
-                                <?php if(isset($media->title) && !empty($media->title)) : ?>
-                                    <?php echo $media->title ?>
-                                    <span>
-                                        <?php echo $media->description ?>
-                                        <?php echo isset($displayFilesize) && $displayFilesize ? '('.formatBytes($media->getFilesize()).')' : '' ?>
-                                    </span>
-                                <?php else : ?>
-                                    <?php echo $media->name.'.'.$media->ext ?>
-                                    <?php echo isset($displayFilesize) && $displayFilesize ? '<span>'.formatBytes($media->getFilesize()).'</span>' : '' ?>
-                                <?php endif ?>
-                            </span>
-                        </a>
-                    </div>
-                <?php elseif($document['type'] == 'link') : ?>
-                    <div class="document-item">
-                        <a target="_blank" href="<?php echo $document['url'] ?>">
-                            <span class="doc-icon"><i class="fa fa-link document-type link"></i></span>
-                            <span class="text">
-                                <?php echo $document['title'] ?>
-                                <span><?php echo $document['description'] ?></span>
-                            </span>
-                        </a>
-                    </div>
-                <?php endif ?>
-            </div> */ ?>
-        <?php endforeach ?>
+            @endphp
+        @endforeach
     </div>
-<?php else : ?>
-    Nothing to display...
-<?php endif ?>
+@else
+    {{ __('Nothing to display...') }}
+@endif
 </div>

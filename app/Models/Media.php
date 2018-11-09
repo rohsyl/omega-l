@@ -136,7 +136,7 @@ class Media extends Model implements InterfaceMediaConstant
     }
 
     public function getType(){
-        return $this->getTypeByExt($this->ext);
+        return $this->getTypeByExt();
     }
 
     public function getWidth()
@@ -187,7 +187,7 @@ class Media extends Model implements InterfaceMediaConstant
         return $m;
     }
 
-    private function getTypeByExt($ext){
+    public function getTypeByExt(){
         return self::GetMediaRepository()->GetType($this);
     }
 
