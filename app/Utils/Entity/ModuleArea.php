@@ -1,7 +1,10 @@
 <?php
 namespace Omega\Utils\Entity;
 
+use Omega\Facades\OmegaUtils;
 use Omega\Repositories\ModuleAreaRepository;
+use Omega\Utils\Plugin\Plugin;
+use Omega\Utils\Plugin\Type;
 
 /**
  * Helper for ModuleArea.
@@ -60,44 +63,40 @@ class ModuleArea{
      */
 	public function Display($page, $name, $theme)
 	{
-	    /*
+        $html = __('This modulearea does not exists...');
         if(self::Exists($name, $theme)){
 
-            $contents = ModuleAreaManager::GetModuleAreaContentOnPage($page->id, $name, $theme);
+            $modulearea = self::GetRepository()->getByNameAndThemeNameWithRel($name, $theme);
 
-            if(sizeof($contents) > 0)
+
+            $html = '';
+            foreach($modulearea->positions as $position)
             {
-                ob_start();
-                foreach($contents as $c)
+                if(!isset($position->fkPage) || $position->fkPage == $page->id)
                 {
-                    $data = Type::GetValues($c->fkPlugin, $c->moduleId, $page->id);
-                    $plugin_param = json_decode($c->moduleParam, true);
+
+                    $data = Type::GetValues($position->module->plugin->id, $position->module->id, $page->id);
+                    $plugin_param = json_decode($position->module->param, true);
 
                     $plugin_param['placement'] = 'modulearea';
 
-                    $pluginNameUc = ucFirst($c->plugName);
-                    $pluginName = 'Omega\\Plugin\\'.$pluginNameUc.'\\FController'.$pluginNameUc;
-                    $plugin = new $pluginName();
+                    $plugin = Plugin::FInstance($position->module->plugin->name);
+
 
                     if(method_exists($plugin, 'display'))
                     {
-                        echo $plugin->display($plugin_param, $data);
+
+                        $html .= $plugin->display($plugin_param, $data);
                         if(method_exists($plugin, 'registerDependencies'))
                         {
-                            OmegaUtil::addDependencies($plugin->registerDependencies());
+                            OmegaUtils::addDependencies($plugin->registerDependencies());
                         }
                     }
                 }
-                $html = ob_get_clean();
-            }
-            else{
-                $html = '&nbsp;';
+
             }
         }
-        else {
-            $html = "This modulearea does not exists...";
-        }
-		echo $html;*/
+		return $html;
 	}
 	
 }

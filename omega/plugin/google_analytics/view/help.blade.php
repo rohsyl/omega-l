@@ -1,4 +1,6 @@
+@extends('layouts.plugin')
 
+@section('plugin_content')
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">How to place the Google Analytics module in a modulearea</h3>
@@ -15,7 +17,12 @@
             <li>Click on the <i class="fa fa-star-o"></i> to display it on all pages (<i class="fa fa-star"></i> means that the module will be displayed on all pages)</li>
             <li>Enjoy!</li>
         </ul>
+        <div class="alert-info alert">
+            <i class="fa fa-info-circle"></i> This module will display nothing on the page...
+        </div>
         <br />
-        <p><a href="<?php echo $this->getAdminLink('index') ?>" class="btn btn-default"><i class="fa fa-angle-left"></i> Back</a></p>
+        <p><a href="{{ route_plugin('google_analytics', 'index') }}" class="btn btn-default"><i class="fa fa-angle-left"></i> Back</a></p>
     </div>
 </div>
+
+@endsection

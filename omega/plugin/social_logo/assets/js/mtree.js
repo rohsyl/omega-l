@@ -23,7 +23,7 @@
   // Get node elements, and add classes for styling
   var node = $('.mtree li:has(ul)');  
   node.each(function(index, val) {
-    $(this).children(':first-child').css('cursor', 'pointer')
+    $(this).children(':first-child').css('cursor', 'pointer');
     $(this).addClass('mtree-node mtree-' + ((collapsed) ? 'closed' : 'open'));
     $(this).children('ul').addClass('mtree-level-' + ($(this).parentsUntil($('ul.mtree'), 'ul').length + 1));
   });

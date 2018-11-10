@@ -1,14 +1,14 @@
 <?php
-namespace Omega\Plugin\Sociallogo;
+namespace OmegaPlugin\SocialLogo;
 
-use Omega\Library\Plugin\FController;
+use Omega\Utils\Plugin\FController;
 
-class FControllerSociallogo extends  FController {
+class FControllerSocialLogo extends  FController {
 
     private $socialNetwork;
 
     public function __construct() {
-        parent::__construct('sociallogo');
+        parent::__construct('social_logo');
         $this->socialNetwork = json_decode(file_get_contents($this->root . DS . 'socialnetworklist.json'), true);
     }
 
@@ -16,8 +16,7 @@ class FControllerSociallogo extends  FController {
     {
         return array(
             'css' => array(
-                'assets/css/font-awesome.min.css',
-                'plugin/sociallogo/css/style.css'
+                $this->asset('css/styles.css')
             ),
             'js' => array(
             )
@@ -30,6 +29,6 @@ class FControllerSociallogo extends  FController {
         $m['title'] = isset($userParam['title']) ? $userParam['title'] : '';
         $m['socialNetworks'] = $this->socialNetwork;
 
-        return $this->view( $m );
+        return $this->view('display')->with($m);
     }
 }

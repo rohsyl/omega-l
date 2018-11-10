@@ -20,8 +20,27 @@ class ModuleAreaRepository
         $this->moduleArea = $moduleArea;
     }
 
+    /**
+     * @param $areaName
+     * @param $themeName
+     * @return ModuleArea
+     */
     public function getByNameAndThemeName($areaName, $themeName){
         return $this->moduleArea->where('name', $areaName)->where('theme', $themeName)->first();
+    }
+
+
+    /**
+     * @param $areaName
+     * @param $themeName
+     * @return ModuleArea
+     */
+    public function getByNameAndThemeNameWithRel($areaName, $themeName){
+        return $this->moduleArea
+            ->with('positions.module.plugin')
+            ->where('name', $areaName)
+            ->where('theme', $themeName)
+            ->first();
     }
 
     public function getAllModuleAreaByThemeName($themeName){
@@ -80,4 +99,31 @@ class ModuleAreaRepository
         return $modules;
     }
 
+    public function getContentOnPage($pageId, $name, $theme){
+
+        $dbh = self::GetPDO();
+        $stmt = $dbh->prepare("SELECT plugName, moduleParam, fkPlugin, om_module.id AS moduleId 
+                            FROM om_module_area 
+                            INNER JOIN om_position ON om_module_area.id = om_position.fkModuleArea
+                            INNER JOIN om_module ON om_module.id = om_position.fkModule
+                            INNER JOIN om_plugin ON om_plugin.id = om_module.fkPlugin
+                            WHERE om_module_area.areaName LIKE :areaName 
+                              AND om_module_area.areaTheme LIKE :areaTheme 
+                              AND (
+                                  om_position.fkPage = :fkPage
+                                  OR om_position.fkPage = 0)
+                            ORDER BY positionOrder ASC");
+        $stmt->bindParam(':areaName', $name);
+        $stmt->bindParam(':areaTheme', $theme);
+        $stmt->bindParam(':fkPage', $pageId);
+        $stmt->execute();
+
+        $elements = array();
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $entity = new ModuleAreaContentResult();
+            EntityFiller::Fill($entity, $row);
+            $elements[] = $entity;
+        }
+        return $elements;
+    }
 }
