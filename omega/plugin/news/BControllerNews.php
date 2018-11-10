@@ -1,161 +1,196 @@
 <?php
-namespace Omega\Plugin\News;
+namespace OmegaPlugin\News;
 
-use Omega\Library\Plugin\BController;
-use Omega\Library\Util\ParamUtil;
-use Omega\Library\Util\Redirect;
-use Omega\Library\Util\Form;
-use Omega\Library\Util\Message;
-use Omega\Library\Util\Util;
-use Omega\Plugin\News\Library\BLL\NewsCategoryManager;
-use Omega\Plugin\News\Library\BLL\NewsPostCategoryManager;
-use Omega\Plugin\News\Library\BLL\NewsPostManager;
-use Omega\Plugin\News\Library\DTO\NewsCategory;
-use Omega\Plugin\News\Library\DTO\NewsPost;
+use Illuminate\Support\Facades\Validator;
+use Omega\Utils\Plugin\BController;
+use OmegaPlugin\News\Models\Category;
+use OmegaPlugin\News\Models\Post;
+use OmegaPlugin\news\Repository\CategoryRepository;
+use OmegaPlugin\news\Repository\PostRepository;
+use OmegaPlugin\News\Request\CreatePostRequest;
 
 class BControllerNews extends  BController {
 
+    private $categoryRepository;
+    private $postRepository;
+
+    private $createRules = [
+        'title' => 'required|string'
+    ];
+
+    private $updateRules = [
+        'title' => 'required|string',
+        'brief' => 'nullable|string',
+        'text' => 'nullable|string',
+        'published_at' => 'nullable|date',
+        'image' => 'nullable|integer',
+        'categories.*' => 'required|integer',
+    ];
+
+
+    private $createCategoryRules = [
+        'name' => 'required|string'
+    ];
+
     public function __construct() {
         parent::__construct('news');
+        $this->categoryRepository = new CategoryRepository(new Category());
+        $this->postRepository = new PostRepository(new Post());
     }
 
     public function install() {
-        if(!$this->isInstalled()) {
-            parent::install();
-            parent::runSql($this->root.'/sql/install.sql');
-        }
+        parent::runSql($this->root.'/sql/install.sql');
+        return true;
+    }
+
+    public function uninstall() {
+        parent::runSql($this->root.'/sql/uninstall.sql');
+        return true;
     }
 
     public function index() {
-        $posts = NewsPostManager::GetAllPosts();
-
-        foreach($posts as $post){
-            $post->categories = NewsCategoryManager::GetAllCategoriesOfPost($post->id);
-        }
-
-        $m['posts'] = $posts;
-        return $this->view( $m );
+        return $this->view('index')->with([
+            'menu' => $this->view('menu')->render(),
+            'posts' => $this->postRepository->all()
+        ]);
     }
 
     public function add() {
+        return $this->view('add')->with([
+            'menu' => $this->view('menu')->render(),
+        ]);
+    }
 
-        $form = new Form('btnAdd');
-        if($form->isPosted())
-        {
+    public function create(){
 
-            $post = new NewsPost();
-            $post->title = $form->getValue('title');
-            $post->created = date('Y-m-d');
-            $post->fkUser = $_SESSION['id'];
+        $request = request();
+        $validator = Validator::make($request->all(), $this->createRules);
 
-            $id = NewsPostManager::Save($post);
-
-            Message::success('Article créé !');
-            Redirect::toUrl($this->getAdminLink('edit', array('id' => $id)));
+        if ($validator->fails()) {
+            return $this->redirect('add')
+                ->withErrors($validator)
+                ->withInput();
         }
 
-        return $this->view( array() );
+        $id = $this->postRepository->create($request->all());
+
+        toast()->success(__('Post created'));
+        return $this->redirect('edit', ['id' => $id]);
     }
 
     public function edit() {
-        if(ParamUtil::IsValidUrlParamId('id')){
-            $id = $_GET['id'];
-            $post = NewsPostManager::GetPost($id);
-            $postCategories = NewsPostCategoryManager::GetAllByPost($id);
-            $categories = NewsCategoryManager::GetAllCategories();
+        $request = request();
+        $id = $request->input('id');
 
-            $form = new Form('', 'btnSave');
+        $post = $this->postRepository->get($id);
+        $categories = $this->categoryRepository->all();
 
-            if($form->isPosted())
-            {
-                $post->title = $form->getValue('title');
-                $post->hat = $form->getValue('hat');
-                $post->idImage = $form->getValue('idImage');
-                $post->text = $form->getValue('text');
-                $post->created = date('Y-m-d H:i:s', strtotime($form->getValue('created')));
+        return $this->view('edit')->with([
+            'menu' => $this->view('menu')->render(),
+            'item' => $post,
+            'categories' => $categories,
+        ]);
 
-                $scategories = $form->getValue('categories');
-                NewsPostCategoryManager::RemovePostFromAllCategories($id);
-                foreach($scategories as $c){
-                    NewsPostCategoryManager::AddPostInCategory($id, $c);
-                }
+    }
 
-                NewsPostManager::Save($post);
+    public function save(){
+        $request = request();
+        $id = $request->get('id');
+        $validator = Validator::make($request->all(), $this->updateRules);
 
-                Message::success('News sauvegardée !');
-                Redirect::toUrl($this->getAdminLink('edit', array('id' => $id)));
-            }
-
-            $m['item'] = $post;
-            $m['postCategories'] = $postCategories;
-            $m['categories'] = $categories;
-            return $this->view( $m );
-
+        if ($validator->fails()) {
+            return $this->redirect('edit', ['id' => $id])
+                ->withErrors($validator)
+                ->withInput();
         }
+
+        $post = $this->postRepository->get($id);
+        $this->postRepository->save($post, $request->all());
+
+        toast()->success(__('Post updated'));
+        return $this->redirect('edit', ['id' => $id]);
     }
 
     public function delete() {
-        if(ParamUtil::IsValidUrlParamId('id')){
-            $id = $_GET['id'];
+        $request = request();
+        $id = $request->get('id');
 
-            NewsPostCategoryManager::RemovePostFromAllCategories($id);
-            NewsPostManager::Delete($id);
+        $this->postRepository->delete($id);
 
-            Redirect::toUrl($this->getAdminLink('index'));
-        }
+        toast()->success(__('Post deleted'));
+        return $this->redirect('edit', ['id' => $id]);
     }
 
     public function categories(){
-        $categories = NewsCategoryManager::GetAllCategories();
-        $m['categories'] = $categories;
-        return $this->view( $m );
+        return $this->view('categories')->with([
+            'menu' => $this->view('menu')->render(),
+            'categories' => $this->categoryRepository->all()
+        ]);
     }
 
     public function addcategory(){
 
-        $form = new Form('addCategory');
-        if($form->isPosted()){
-            if($form->checkValue('name')){
-                $category = new NewsCategory();
-                $category->name = $form->getValue('name');
-                $category->slug = Util::SlugifyText($category->name);
-                NewsCategoryManager::Save($category);
+        return $this->view('addcategory')->with([
+            'menu' => $this->view('menu')->render(),
+        ]);
+    }
 
-                Redirect::toUrl($this->getAdminLink('categories'));
-            }
+    public function createcategory(){
+
+        $request = request();
+        $validator = Validator::make($request->all(), $this->createCategoryRules);
+
+        if ($validator->fails()) {
+            return $this->redirect('addcategory')
+                ->withErrors($validator)
+                ->withInput();
         }
-        return $this->view();
+
+        $this->categoryRepository->create($request->all());
+
+        toast()->success(__('Category created'));
+        return $this->redirect('categories');
     }
 
     public function editcategory(){
-        if(ParamUtil::IsValidUrlParamId('id')){
-            $id = $_GET['id'];
-            $category = NewsCategoryManager::GetCategory($id);
+        $request = request();
+        $id = $request->get('id');
 
-            $form = new Form('editCategory');
-            if($form->isPosted()){
-                if($form->checkValue('name')){
-                    $category->name = $form->getValue('name');
-                    $category->slug = Util::SlugifyText($category->name);
-                    NewsCategoryManager::Save($category);
+        $category = $this->categoryRepository->get($id);
 
-                    Redirect::toUrl($this->getAdminLink('categories'));
-                }
-            }
+        return $this->view('editcategory')->with([
+            'menu' => $this->view('menu')->render(),
+            'category' => $category
+        ]);
+    }
 
-            $m['category'] = $category;
-            return $this->view($m);
+    public function savecategory(){
+        $request = request();
+        $id = $request->get('id');
+
+        $validator = Validator::make($request->all(), $this->createCategoryRules);
+
+        if ($validator->fails()) {
+            return $this->redirect('editcateogry', ['id' => $id])
+                ->withErrors($validator)
+                ->withInput();
         }
+
+        $category = $this->categoryRepository->get($id);
+        $this->categoryRepository->save($category, $request->all());
+
+
+        toast()->success(__('Category updated'));
+        return $this->redirect('categories');
     }
 
     public function deletecategory() {
-        if(ParamUtil::IsValidUrlParamId('id')){
-            $id = $_GET['id'];
+        $request = request();
+        $id = $request->get('id');
 
-            NewsPostCategoryManager::RemoveAllPostFromCategory($id);
-            NewsCategoryManager::Delete($id);
+        $this->categoryRepository->delete($id);
 
-            Redirect::toUrl($this->getAdminLink('categories'));
-        }
+        toast()->success(__('Category deleted'));
+        return $this->redirect('categories');
     }
 }

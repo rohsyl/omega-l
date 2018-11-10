@@ -42,4 +42,8 @@ class User extends Authenticatable
         }
         return null;
     }
+
+    public function displayName(){
+        return isset($this->fullname) ? $this->fullname : $this->username;
+    }
 }

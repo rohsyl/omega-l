@@ -134,8 +134,8 @@ class BController {
 	    return response()->json($data);
     }
 
-    protected function redirect($action){
-	    return redirect(route_plugin($this->name, $action));
+    protected function redirect($action, $param = []){
+	    return redirect(route_plugin($this->name, $action, $param));
     }
 
 	private function getIdFromDatabase() {
