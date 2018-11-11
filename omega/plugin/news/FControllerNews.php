@@ -31,43 +31,30 @@ class FControllerNews extends  FController {
         $categories = $data['categories'];
         $categories = array_keys($categories);
 
-        $view = isset($param['view']) ? $param['view'] : 'list';
         $placement = isset($param['placement']) ? $param['placement'] : 'content';
 
+        $request = request();
 
-        /*
-        if(isset($_GET['post']) && !empty($_GET['post'])) {
-            $idPost = $_GET['post'];
-            $post = NewsPostManager::GetPost($idPost);
-            $post->user = UserManager::GetUser($post->fkUser);
-            $newer = NewsPostManager::GetNewerPost($idPost, $categories);
-            $older = NewsPostManager::GetOlderPost($idPost, $categories);
+        if($request->has('post') && !empty($request->get('post'))) {
+            $id = $request->get('post');
+            $post = $this->postRepository->get($id);
 
-            $m['post'] = $post;
-            $m['newer'] = $newer;
-            $m['older'] = $older;
-            $m['placement'] = $placement;
-            return $this->partialView('display-item', $m);
-        }*/
+            $next = $this->postRepository->getNext($post, $categories);
+            $previous = $this->postRepository->getPrevious($post, $categories);
 
+            return $this->view('display_item')->with([
+                'post' => $post,
+                'next' => $next,
+                'previous' => $previous,
+                'placement' => $placement,
+            ]);
+        }
 
         $posts = $this->postRepository->allWithCategoriesAndPublishedAndNotArchived($categories, $count);
-
-
 
         $m['posts'] = $posts;
         $m['placement'] = $placement;
 
         return $this->view('display_list')->with($m);
-
-        /*
-        switch($view) {
-            case 'list' :
-                break;
-            case 'grid' :
-                return $this->view('display-grid', $m);
-                break;
-        }
-        return null;*/
     }
 }

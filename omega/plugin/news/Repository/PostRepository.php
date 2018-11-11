@@ -25,15 +25,49 @@ class PostRepository
         return $this->post->get();
     }
 
-    public function allWithCategoriesAndPublishedAndNotArchived($categories, $limit){
+    private function _allWithCategoriesAndPublishedAndNotArchived($categories){
         return $this->post
             ->join('news_post_category', 'news_post_category.fkPost', '=', 'news_post.id')
             ->join('news_category', 'news_post_category.fkCategory', '=', 'news_category.id')
             ->whereIn('news_category.id', $categories)
             ->whereDate('published_at', '<=', Carbon::today()->toDateString())
-            ->where('archived', 0)
+            ->where('archived', 0);
+    }
+
+    public function allWithCategoriesAndPublishedAndNotArchived($categories, $limit){
+        return $this->_allWithCategoriesAndPublishedAndNotArchived($categories)
+            ->select('news_post.*')
             ->limit($limit)
+            ->orderBy('published_at', 'DESC')
             ->get();
+    }
+
+    public function getNext($post, $categories){
+        return $this->_allWithCategoriesAndPublishedAndNotArchived($categories)
+            ->where('published_at', '>', function($q) use ($post)
+            {
+                $q->from('news_post')
+                    ->select('published_at')
+                    ->where('id', $post->id);
+            })
+            ->orderBy('published_at', 'ASC')
+            ->select('news_post.*')
+            ->limit(1)
+            ->first();
+    }
+
+    public function getPrevious($post, $categories){
+        return $this->_allWithCategoriesAndPublishedAndNotArchived($categories)
+            ->where('published_at', '<', function($q) use ($post)
+            {
+                $q->from('news_post')
+                    ->select('published_at')
+                    ->where('id', $post->id);
+            })
+            ->orderBy('published_at', 'ASC')
+            ->select('news_post.*')
+            ->limit(1)
+            ->first();
     }
 
     public function get($id){

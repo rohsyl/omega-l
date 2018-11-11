@@ -1,9 +1,13 @@
+.plugin-news-container{
+	margin: 15px 0;
+}
+
 .plugin-news .news-post
 {
 	width : 100%;
 	padding-bottom : 25px;
 	margin-bottom : 25px;
-	border-bottom : 2px solid #cfcfcf;
+	border-bottom : 1px solid #cfcfcf;
 }
 
 .plugin-news .news-post:last-child
