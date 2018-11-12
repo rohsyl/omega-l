@@ -27,7 +27,7 @@ class CreateMenusTable extends Migration
             $table->timestamps();
 
             $table->foreign('fkMemberGroup')
-                ->references('id')->on('medias')
+                ->references('id')->on('membergroups')
                 ->onDelete('set null');
         });
     }

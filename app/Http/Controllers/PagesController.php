@@ -137,10 +137,14 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function create(CreatePageRequest $request){
+        $inputs = $request->all();
+        $this->pageRepository->create($inputs);
 
-        $this->pageRepository->create($request->all());
+        $args = [];
+        if(isset($inputs['lang']))
+            $args['lang'] = $inputs['lang'];
 
-        return redirect()->route('admin.pages');
+        return redirect()->route('admin.pages', $args);
     }
 
     /**

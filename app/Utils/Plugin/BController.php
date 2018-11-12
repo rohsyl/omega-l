@@ -7,7 +7,7 @@ use Omega\Models\Plugin as PluginModel;
 use Omega\Utils\Path;
 use Illuminate\Support\Facades\View;
 
-class BController {
+class BController extends AbstractController{
 
 	protected $name;
 	protected $id;
@@ -118,7 +118,7 @@ class BController {
 		}
 	}
 
-	protected function view($name){
+    public function view($name){
         return View::file($this->root . DS . 'view' . DS . $name . '.blade.php')->with([
             'meta' => $this->getMeta()
         ]);
