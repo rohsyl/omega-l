@@ -2,23 +2,26 @@
 
 namespace OmegaPlugin\Contact\Mail;
 
+use http\Env\Request;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Omega\Utils\Plugin\Mailable\MailablePlugin;
 
 class ContactMail extends MailablePlugin
 {
     use Queueable, SerializesModels;
 
+    private $inputs;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($controller)
+    public function __construct($controller, $inputs)
     {
         parent::__construct($controller);
+        $this->inputs = $inputs;
     }
 
     /**
@@ -28,6 +31,10 @@ class ContactMail extends MailablePlugin
      */
     public function build()
     {
-        return $this->view('view.name');
+        $this->subject(__('Message of ' . $this->inputs['name']));
+        $this->from('noreply@' . request()->getHost(), 'Omega Contact');
+        $this->replyTo($this->inputs['mail']);
+        return $this->plugin_view('mail', $this->inputs);
+
     }
 }

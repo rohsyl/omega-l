@@ -1,6 +1,7 @@
 <?php
 namespace Omega\Utils\Entity;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Omega\Facades\OmegaUtils;
 use Omega\Models\Lang;
@@ -40,6 +41,17 @@ class Page{
     public $securityData;
 
     public $content;
+
+    private $needRedirect = false;
+    private $redirectTo = null;
+
+    /**
+     * @param mixed $content
+     */
+    public function setContent($content): void
+    {
+        $this->content = $content;
+    }
 
     public function __construct($id = 0) {
 
@@ -276,7 +288,15 @@ class Page{
 
             $isHidden = isset($args['settings']['isHidden']) ? $args['settings']['isHidden'] : false;
             if(!$isHidden) {
+
+
                 $content = $instance->display($args, $data);
+
+                if($content instanceof RedirectResponse){
+                    $this->needRedirect = true;
+                    $this->redirectTo = $content;
+                    return;
+                }
 
                 $compId = null;
                 $isWrapped = true;
@@ -325,6 +345,13 @@ class Page{
     }
 
 
+    public function needRedirect() {
+        return $this->needRedirect;
+    }
+
+    public function getRedirect() {
+        return $this->redirectTo;
+    }
 
 
     public static function GetHome($lang = null){

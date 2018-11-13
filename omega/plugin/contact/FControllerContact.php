@@ -1,9 +1,11 @@
 <?php
 namespace OmegaPlugin\Contact;
 
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Omega\Utils\Plugin\FController;
 use Omega\Utils\Url;
+use OmegaPlugin\Contact\Mail\ContactMail;
 
 
 class FControllerContact extends FController {
@@ -14,6 +16,7 @@ class FControllerContact extends FController {
     private $rules = [
         'name' => 'required|string',
         'mail' => 'required|email',
+        'phone' => 'nullable|string',
         'message' => 'required|string',
     ];
 
@@ -77,46 +80,12 @@ class FControllerContact extends FController {
                             ->withInput();
                     }
 
+                    $mail = $param['mail'];
 
-                    // Send mail
-                    /*
-                    $paramData = $param;
+                    Mail::to($mail)
+                        ->send(new ContactMail($this, $request->all()));
 
-
-                    $from = array();
-                    $from[] = MailHelper::GetFromAddress();
-                    $from[] =  $from[0];
-
-                    $replyTo = array();
-                    $replyTo[] = $form->getValue('mail');
-                    $replyTo[] = $form->getValue('name');
-
-                    $to = array();
-                    $to[] = $paramData['mail'];
-
-                    $subject = $this->buildSubject($form);
-                    $body = $this->buildBody($form, $paramData);
-
-                    $result = MailHelper::SendMail(
-                        $from,
-                        $replyTo,
-                        $to,
-                        $subject,
-                        $body,
-                        strip_tags($body),
-                        true
-                    );
-
-                    if ($result === true) {
-                        $m['message'] = $paramData['conf_message'];
-                        $m['messageType'] = 'success';
-                        $_POST = null;
-                    } else {
-                        $m['message'] = $result;
-                        $m['messageType'] = 'danger';
-                    }
-                    */
-
+                    return redirect()->back()->with('success', $param['conf_message']);
                 }
 
 
@@ -128,34 +97,5 @@ class FControllerContact extends FController {
                 return $this->view('display')->with($m);
                 break;
         }
-    }
-
-    private function buildBody($form, $paramData)
-    {
-        $message = $form->getValue('message');
-        $name = $form->getValue('name');
-        $phone = $form->getValue('phone');
-        $mail = $form->getValue('mail');
-
-        $body = '';
-        $body .= '<p>Nom : ' . $name . '</p>';
-        $body .= '<p>Mail : ' . $mail . '</p>';
-        $body .= '<p>Téléphone : ' . $phone . '</p>';
-        $body .= '<p>Message : <br /> "' . $message . '"</p>';
-        //$body .= '<p>' . $paramData['mail_sign'] . '</p>';
-
-        return $body;
-    }
-
-    private function buildSubject($form)
-    {
-        $name = $form->getValue('name');
-        $domaine = Url::ParseDomaine(ABSPATH);
-
-        $subject = 'Message de "';
-        $subject .= $name . '"';
-        $subject .= 'depuis ' . $domaine;
-
-        return $subject;
     }
 }

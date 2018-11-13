@@ -1,30 +1,49 @@
 <div class="plugin-contact-container">
 
-    <form action="" method="POST" class="form">
+    @if(session()->has('success'))
+        <div class="alert alert-success">
+            {{ session()->get('success') }}
+            @php session()->forget('success') @endphp
+        </div>
+    @endif
+
+    {{ Form::open(['url' => url()->current(), 'method' => 'post', 'class' => 'form'])  }}
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <input class="form-control" value="{{ old('name') }}" type="text" name="name" placeholder="Nom"/>
+                    {{ Form::text('name', old('name'), ['class' => 'form-control', 'placeholder' => __('Name') . '*']) }}
+                    @if($errors->has('name'))
+                        <span class="text-danger">{{ $errors->first('name') }}</span>
+                    @endif
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <input class="form-control" value="{{ old('mail') }}" type="text" name="mail" placeholder="E-mail"/>
+                    {{ Form::text('mail', old('mail'), ['class' => 'form-control', 'placeholder' => __('E-mail') . '*']) }}
+                    @if($errors->has('mail'))
+                        <span class="text-danger">{{ $errors->first('mail') }}</span>
+                    @endif
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <input class="form-control" value="{{ old('phone') }}" type="text" name="phone" placeholder="Téléphone"/>
+                    {{ Form::text('phone', old('phone'), ['class' => 'form-control', 'placeholder' => __('Phone')]) }}
+                    @if($errors->has('phone'))
+                        <span class="text-danger">{{ $errors->first('phone') }}</span>
+                    @endif
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <div>Message :</div>
+                {{ Form::label('message', __('Message')     . '*', ['class' => 'form-label']) }}
                 <div class="form-group">
-                    <textarea class="form-control" name="message">{{ old('message') }}</textarea>
+                    {{ Form::textarea('message', old('message'), ['class' => 'form-control']) }}
+                    @if($errors->has('message'))
+                        <span class="text-danger">{{ $errors->first('message') }}</span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -41,5 +60,5 @@
         <p class="text-right">
             <input type="submit" name="contactForm" class="btn btn-primary" value="Envoyer"/>
         </p>
-    </form>
+    {{ Form::close() }}
 </div>

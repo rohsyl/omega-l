@@ -88,6 +88,7 @@ class SettingsController extends AdminController
     }
     #endregion
 
+    /*
     #region smtp
     public function smtp() {
         $cryptedPassword = om_config('smtpAuthPasswd');
@@ -143,6 +144,7 @@ class SettingsController extends AdminController
         return redirect(route('admin.settings.smtp'));
     }
     #endregion
+    */
 
     #region member
     public function member() {

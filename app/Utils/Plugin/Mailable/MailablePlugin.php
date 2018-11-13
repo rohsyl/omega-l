@@ -20,8 +20,8 @@ class MailablePlugin extends Mailable
         $this->controller = $controller;
     }
 
-    public function view($view, array $data = [])
+    public function plugin_view($view, array $data = [])
     {
-        return $this->controller->view($view)->with($data);
+        return $this->html($this->controller->view($view)->with($data)->render());
     }
 }

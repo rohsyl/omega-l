@@ -8,10 +8,7 @@
 
 namespace Omega\Utils\Renderable;
 
-
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\View;
 use Omega\Models\Lang;
 use Omega\Models\Theme;
 use Omega\Repositories\LangRepository;
@@ -22,7 +19,7 @@ use Omega\Utils\Entity\Page;
 use Omega\Utils\Path;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class PageRenderer implements Renderable
+class PageRenderer
 {
 
     private $id = null;
@@ -42,9 +39,9 @@ class PageRenderer implements Renderable
     /**
      * Get the evaluated contents of the object.
      *
-     * @return string
+     * @return mixed
      */
-    public function render()
+    public function get()
     {
         // if lang not enabled, force lang to null.
         if(!$this->langRepository->isEnabled()) $this->lang = null;
@@ -130,6 +127,10 @@ class PageRenderer implements Renderable
         else
             $page->content = '404';
 
+        if($page->needRedirect()){
+            return $page->getRedirect();
+        }
+
         $modelPath = Path::Combine($themePath, 'template', $page->model);
 
         // we load body and footer before the header so every assets is listed
@@ -147,7 +148,7 @@ class PageRenderer implements Renderable
         // load the header and echo the body and footer
         $pageHeader = view('theme::header')->render();
 
-        return $pageHeader.$pageBodyAndFooter;
+        return new PageRenderable($pageHeader.$pageBodyAndFooter);
     }
 
 

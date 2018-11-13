@@ -55,8 +55,8 @@ Route::middleware('om_not_installed')->group(function() {
                 Route::get('delete/{slug}', 'SettingsController@langfdelete')->name('admin.settings.flang.langfdelete');
                 Route::get('seo', 'SettingsController@seo')->name('admin.settings.seo');
                 Route::post('seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
-                Route::get('smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
-                Route::post('smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
+                //Route::get('smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
+                //Route::post('smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
                 Route::get('member', 'SettingsController@member')->name('admin.settings.member');
                 Route::post('member', 'SettingsController@saveMember')->name('admin.settings.member.save');
                 Route::get('advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
@@ -198,7 +198,7 @@ Route::middleware('om_not_installed')->group(function() {
      ********************************************************************/
 
     // Homepage
-    Route::get('/', 'PublicController@home')
+    Route::any('/', 'PublicController@home')
         ->name('public');
 
 
@@ -206,17 +206,17 @@ Route::middleware('om_not_installed')->group(function() {
         if (!om_config('om_enable_front_langauge')) {
 
             // Page by slug
-            Route::get('/{slug}', 'PublicController@slug')
+            Route::any('/{slug}', 'PublicController@slug')
                 ->name('public.byslug');
         } else {
 
             // Homepage with lang
-            Route::get('/{lang}', 'PublicController@home_with_lang')
+            Route::any('/{lang}', 'PublicController@home_with_lang')
                 ->where(['lang' => '[a-z]{2}'])
                 ->name('public.homelang');
 
             // Page by slug and lang
-            Route::get('/{lang}/{slug}', 'PublicController@slug_and_lang')
+            Route::any('/{lang}/{slug}', 'PublicController@slug_and_lang')
                 ->where(['lang' => '[a-z]{2}'])
                 ->name('public.bylangandslug');
 

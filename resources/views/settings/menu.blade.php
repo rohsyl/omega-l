@@ -11,10 +11,12 @@
              <a href="{{ route('admin.settings.seo') }}">{{ __('SEO') }}
              </a>
     </li>
+    {{--
     <li {!! class_active_route('admin.settings.smtp') !!}>
              <a href="{{ route('admin.settings.smtp') }}">{{ __('SMTP') }}
              </a>
     </li>
+    --}}
     <li {!! class_active_route('admin.settings.member') !!}>
              <a href="{{ route('admin.settings.member') }}">{{ __('Member') }}
              </a>
