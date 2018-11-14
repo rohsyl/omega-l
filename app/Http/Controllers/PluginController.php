@@ -27,28 +27,48 @@ class PluginController extends AdminController
         ]);
     }
 
-    public function install($name){
-        $this->pluginRepository->create($name);
+    public function install($name, $confirm = false){
+        if($confirm)
+        {
+            $this->pluginRepository->create($name);
 
-        $result = PluginUtils::Call($name, 'install');
+            $result = PluginUtils::Call($name, 'install');
 
-        if(!$result){
-            $this->pluginRepository->destroy($name);
-            toast()->error(__('Action not found (Do an "composer dumpautoload")'));
-            return redirect()->route('admin.plugins');
+            if(!$result){
+                $this->pluginRepository->destroy($name);
+                toast()->error(__('Action not found (Do an "composer dumpautoload")'));
+                return redirect()->route('admin.plugins');
+            }
+
+            toast()->success(__('Plugin installed succesfully.') . ' ' . camelize_plugin($name));
+            return redirect()->route('admin.plugins'); }
+        else {
+            return view('plugin.confirm')->with([
+                'message' => __('Do you really want to install this plugin ?') ,
+                'routeYes' => route('admin.plugins.install', ['name' => $name, 'confirm' => 1]),
+                'routeNo' => route('admin.plugins'),
+            ]);
         }
-
-        toast()->success(__('Plugin installed succesfully.') . ' ' . camelize_plugin($name));
-        return redirect()->route('admin.plugins');
     }
 
-    public function uninstall($name){
-        PluginUtils::Call($name, 'uninstall');
+    public function uninstall($name, $confirm = false){
 
-        $this->pluginRepository->destroy($name);
+        if($confirm)
+        {
+            PluginUtils::Call($name, 'uninstall');
 
-        toast()->success(__('Plugin uninstalled succesfully.') . ' ' . camelize_plugin($name));
-        return redirect()->route('admin.plugins');
+            $this->pluginRepository->destroy($name);
+
+            toast()->success(__('Plugin uninstalled succesfully.') . ' ' . camelize_plugin($name));
+            return redirect()->route('admin.plugins');
+        }
+        else {
+            return view('plugin.confirm')->with([
+                'message' => __('Do you really want to uninstall this plugin ?') ,
+                'routeYes' => route('admin.plugins.uninstall', ['name' => $name, 'confirm' => 1]),
+                'routeNo' => route('admin.plugins'),
+            ]);
+        }
     }
 
 
