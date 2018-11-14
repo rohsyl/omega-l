@@ -85,8 +85,14 @@ class ModuleArea{
 
                     if(method_exists($plugin, 'display'))
                     {
+                        $content = $plugin->display($plugin_param, $data);
 
-                        $html .= $plugin->display($plugin_param, $data);
+                        $html .= view('public.module')->with([
+                            'content' => $content,
+                            'plugin' => $plugin,
+                        ])->render();
+
+
                         if(method_exists($plugin, 'registerDependencies'))
                         {
                             OmegaUtils::addDependencies($plugin->registerDependencies());

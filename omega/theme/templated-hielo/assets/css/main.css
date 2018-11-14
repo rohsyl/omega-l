@@ -4317,3 +4317,10 @@
 	max-width: 1000px;
 	margin: 0 auto;
 }
+@media screen and (max-width: 736px) {
+
+	.plugin {
+		margin: 0 15px;
+	}
+
+}

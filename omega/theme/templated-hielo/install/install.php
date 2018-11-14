@@ -14,4 +14,5 @@ return Installer::For('templated-hielo')
     ])
     ->postInstall(function($name){
         ModuleArea::Create('footer', $name);
+        ModuleArea::Create('sidebar', $name);
     });

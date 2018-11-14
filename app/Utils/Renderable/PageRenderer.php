@@ -133,13 +133,15 @@ class PageRenderer
 
         $modelPath = Path::Combine($themePath, 'template', $page->model);
 
+        //print_r($modelPath);
+        //die();
         // we load body and footer before the header so every assets is listed
         // in the Html object and then we can do a render of CSS and JS in the header
-        if(!isset($page->model) || $page->model == 'default' || empty($page->model)) {
+        if(isset($page->model) && $page->model != 'default' && !empty($page->model)) {
             $pageBodyAndFooter = view('theme::index')->render();
         }
         else if (file_exists($modelPath)) {
-            $pageBodyAndFooter = view('theme::template.'.without_ext($page->model))->render();
+            $pageBodyAndFooter = view('theme::template.'.without_ext(without_ext($page->model)))->render();
         }
         else {
             $pageBodyAndFooter = view('theme::index')->render();
