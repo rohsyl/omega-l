@@ -24,7 +24,7 @@
                 <div class="form-group">
                     {{ Form::label('logo', __('Contact logo'), ['class' => 'control-label col-md-4']) }}
                     <div class="col-md-4">
-                        {{ Form::omMediaChooser('logo', __('Contact logo'), isset($paramData['logo']) ? $paramData['logo'] : null) }}
+                        {{ Form::omMediaChooser('logo', __('Contact logo'), isset($paramData['contactLogo']) ? $paramData['contactLogo'] : null) }}
                     </div>
                 </div>
 
@@ -94,7 +94,7 @@
                 <div class="form-group">
                     {{ Form::label('npa', __('NPA'), ['class' => 'control-label col-md-4']) }}
                     <div class="col-md-4">
-                        {{ Form::text('npa', isset($paramData['npa']) ? $paramData['mail_info'] : '', ['class' => 'form-control', 'placeholder' => __('NPA')]) }}
+                        {{ Form::text('npa', isset($paramData['npa']) ? $paramData['npa'] : '', ['class' => 'form-control', 'placeholder' => __('NPA')]) }}
                     </div>
                 </div>
 

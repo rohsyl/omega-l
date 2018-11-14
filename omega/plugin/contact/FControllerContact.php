@@ -3,6 +3,7 @@ namespace OmegaPlugin\Contact;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Omega\Utils\Entity\Media;
 use Omega\Utils\Plugin\FController;
 use Omega\Utils\Url;
 use OmegaPlugin\Contact\Mail\ContactMail;
@@ -45,8 +46,18 @@ class FControllerContact extends FController {
         switch($data['view']['value'])
         {
             case self::VIEW_INFO:
+
+                $image = function() use ($param){
+                    if(isset($param['contactLogo']))
+                    {
+                        return Media::Get($param['contactLogo']);
+                    }
+                    return null;
+                };
+
                 return $this->view('display_info')->with([
-                    'param' => $param
+                    'param' => $param,
+                    'image' => $image,
                 ]);
                 break;
 
