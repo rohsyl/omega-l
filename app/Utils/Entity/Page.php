@@ -245,13 +245,14 @@ class Page{
                 $style = $backgroundColor == 'transparent' ? null : 'style="background-color: ' . $backgroundColor . ';"';
 
                 $views[] = [
-                    'html' => $this->content .= view('public.section')->with([
+                    'title' => $title,
+                    'html' => view('public.section')->with([
                         'compId' => $compId,
                         'style' => $style,
+                        'plugin' => $component->plugin,
                         'isWrapped' => $isWrapped,
                         'content' => $content,
                     ])->render(),
-                    'title' => $title
                 ];
             }
         }
