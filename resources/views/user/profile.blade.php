@@ -8,7 +8,7 @@
                <div class="row">
                    <div class="col-sm-7">
                        <div class="userAvatarContainer">
-                           {!! \Omega\Utils\OmegaUtils::GetUserAvatar($user) !!}
+                           {!! OmegaUtils::GetUserAvatar($user) !!}
                        </div>
                    </div>
                    <div class="col-sm-5">

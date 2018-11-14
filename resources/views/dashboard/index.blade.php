@@ -80,7 +80,7 @@
                             <i class="fa fa-picture-o fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <a href="{{ route('media.uploader') }}" style="color : #fff;" class="link-home">
+                            <a href="{{ route('media.library') }}" style="color : #fff;" class="link-home">
                                 <div class="huge"><i class="fa fa-upload"></i></div>
                                 <div>Upload files</div>
                             </a>
@@ -100,20 +100,27 @@
     <div class="row">
         <div class="col-sm-6">
             <div class="panel panel-default">
-                <div class="panel-heading"><i class="fa fa-file"></i> {{ __('Pages') }}</div>
+                <div class="panel-heading"><i class="fa fa-file"></i> {{ __('Last updated pages') }}</div>
                 <div class="panel-body">
                     <table class="table table-condensed table-hover">
                         <tr>
                             <th>{{ __('Name') }}</th>
+                            <th><small>{{ __('Updated at') }}</small></th>
                             <th></th>
                         </tr>
-
+                        @foreach($pages as $page)
                         <tr>
-                            <td></td>
+                            <td>
+                                {{ $page->name }}
+                            </td>
+                            <td>
+                                <em><small> {{ $page->updated_at }}</small></em>
+                            </td>
                             <td class="text-right">
-                                <a href=""><i class="fa fa-edit"></i></a>
+                                <a href="{{ route('admin.pages.edit', ['id' => $page->id]) }}"><i class="fa fa-edit"></i></a>
                             </td>
                         </tr>
+                        @endforeach
                     </table>
                 </div>
             </div>
@@ -127,21 +134,22 @@
                             <th>{{ __('Username') }}</th>
                             <th></th>
                         </tr>
-
+                        @foreach($users as $user)
                         <tr>
-                            <td></td>
+                            <td>{{ $user->displayName() }}</td>
                             <td class="text-right">
-                                <a href=""><i class="fa fa-search"></i></a>&nbsp;
-                                <a href=""><i class="fa fa-edit"></i></a>
+                                <a href="{{ route('profile', ['id' => $user->id]) }}"><i class="fa fa-search"></i></a>&nbsp;
+                                <a href="{{ route('user.edit', ['id' => $user->id]) }}"><i class="fa fa-edit"></i></a>
                             </td>
                         </tr>
+                        @endforeach
                     </table>
                 </div>
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading"><i class="fa fa-hand-spock-o"></i> {{ __('Template') }}</div>
                 <div class="panel-body">
-                    Current theme : <a href="">{{ $stats['theme'] }}</a>
+                    Current theme : <a href="{{ route('theme.detail', ['theme' => $stats['theme']]) }}">{{ $stats['theme'] }}</a>
                 </div>
             </div>
             <div class="panel panel-default">

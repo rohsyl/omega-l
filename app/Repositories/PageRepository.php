@@ -62,6 +62,10 @@ class PageRepository
         }
     }
 
+    public function getLastUpdatedPages($limit){
+        return $this->page->orderBy('updated_at', 'DESC')->limit($limit)->get();
+    }
+
     /**
      * Get all page where the parent is given
      * @param int|null $idPageParent
