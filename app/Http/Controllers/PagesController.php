@@ -89,6 +89,10 @@ class PagesController extends AdminController
         $currentLang = null;
         if($enabledLang){
             $currentLang = isset($lang) ? $lang : null;
+
+            if(!isset($currentLang) && session()->has('backoffice_lang_pages')){
+                $currentLang = session('backoffice_lang_pages');
+            }
         }
 
         $viewBag = [
@@ -106,6 +110,7 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function chooseLang(Request $request){
+        session(['backoffice_lang_pages' => $request->input('lang')]);
         return redirect()->route('admin.pages', ['lang' => $request->input('lang')]);
     }
 

@@ -70,13 +70,13 @@
                         |
                         <a  href="{{ route('admin.pages.delete', ['id' => $child->id]) }}"
                             title="{{ __('Delete') }}"
-                            data-url="{{ route('admin.pages.delete', ['id' => $child->id, 'confirmed' => true]) }}"
+                            data-url="{{ route('admin.pages.delete', ['id' => $child->id, 'confirmed' => 1]) }}"
                             class="delete text-danger">{{ __('Delete') }}</a>
                         |
                         @if($child->isEnabled)
-                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => false]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
+                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => 0]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
                         @else
-                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => true]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
+                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => 1]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
                         @endif
 
                     </span>

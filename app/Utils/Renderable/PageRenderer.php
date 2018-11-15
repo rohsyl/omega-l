@@ -107,11 +107,11 @@ class PageRenderer
                 return $this->renderPage($themePath, Entity::Page());
             }
             else {
-                return abord(404);
+                return abort(404);
             }
         }
         else {
-            return abord(404);
+            return abort(404);
         }
     }
 
