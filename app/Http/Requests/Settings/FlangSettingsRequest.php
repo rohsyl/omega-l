@@ -25,7 +25,7 @@ class FlangSettingsRequest extends FormRequest
     {
         return [
             'flang_enable' => 'required|boolean',
-            'flang_default' => 'required|exists:langs,slug'
+            'flang_default' => 'nullable|exists:langs,slug'
         ];
     }
 }

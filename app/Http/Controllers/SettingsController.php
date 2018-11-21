@@ -12,20 +12,24 @@ use Omega\Http\Requests\Settings\MemberSettingsRequest;
 use Omega\Http\Requests\Settings\SeoSettingsRequest;
 use Omega\Http\Requests\Settings\SmtpSettingsRequest;
 use Omega\Repositories\LangRepository;
+use Omega\Repositories\PageRepository;
 use Omega\Utils\Crypto;
 use Omega\Utils\Language\BackLangManager;
 
 class SettingsController extends AdminController
 {
     private $langRepository;
+    private $pageRepository;
 
-    public function __construct(LangRepository $langRepository) {
+    public function __construct(LangRepository $langRepository, PageRepository $pageRepository) {
         parent::__construct();
         $this->langRepository = $langRepository;
+        $this->pageRepository = $pageRepository;
     }
 
     #region general
     public function index(){
+        $pages = $this->pageRepository->getPagesWithParent();
 
         return view('settings.index')
             ->with('generalConfig', [
@@ -36,7 +40,8 @@ class SettingsController extends AdminController
                 'om_web_adress' => om_config('om_web_adress'),
             ])
             ->with('backLanguages', BackLangManager::getAllLang())
-            ->with('currentBackLanguage', BackLangManager::getCurrentLang());
+            ->with('currentBackLanguage', BackLangManager::getCurrentLang())
+            ->with('pages', to_select($pages, 'name', 'id'));
     }
 
     public function saveGeneral(GeneralSettingsRequest $request) {

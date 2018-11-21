@@ -375,7 +375,7 @@ class Page{
         }
 
 
-        if(om_config('om_enable_front_langauge')) {
+        if(om_config('om_enable_front_langauge') && $page->lang !== null) {
             if(!isset($lang)){
                 $lang = om_config('om_default_front_langauge');
                 session(['front_lang' => $lang]);

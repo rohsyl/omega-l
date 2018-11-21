@@ -54,10 +54,7 @@
         <div class="form-group">
             {{ Form::label('home', __('Home page'), ['class' => 'control-label col-sm-3']) }}
             <div class="col-sm-5">
-                <select class="form-control" name="home" id="home">
-                    <option selected disabled value="0">{{ __('Select a page') }}</option>
-
-                </select>
+                {{ Form::select('home', $pages, $generalConfig['om_home_page_id'], ['class' => 'form-control']) }}
                 @if ($errors->has('home'))
                     <span class="text-danger" role="alert">
                         <strong>{{ $errors->first('home') }}</strong>

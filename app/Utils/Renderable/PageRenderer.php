@@ -46,6 +46,9 @@ class PageRenderer
         // if lang not enabled, force lang to null.
         if(!$this->langRepository->isEnabled()) $this->lang = null;
 
+        if(isset($this->lang)){
+            session(['front_lang' => $this->lang]);
+        }
 
         // if no id and no slug are set, then we will get the id of the homepage
         if($this->id == null && $this->slug == null){

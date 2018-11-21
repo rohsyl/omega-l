@@ -90,7 +90,7 @@ class PageRepository
             $query = $query->where('fkPageParent', $idPageParent);
         }
         else
-            $query = $query->where('fkPageParent', $idPageParent);
+            $query = $query->whereNull('fkPageParent');
 
         return $query->get();
     }

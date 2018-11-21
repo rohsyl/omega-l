@@ -8,9 +8,6 @@ use Omega\Utils\Entity\Page;
 
 class LanguageController extends Controller
 {
-
-
-
     public function change($target, $referer = null){
         if($referer) {
             $targetPageId = Page::GetCorrespondingInLang($referer, $target);

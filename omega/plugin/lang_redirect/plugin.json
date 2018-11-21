@@ -1,0 +1,9 @@
+{
+	"pluginName" : "lang_redirect",
+	"pluginTitle" : "Language redirect",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "This plugin allow you to insert a component in a page and automatically redirect to a specific page and change the language according to the browser language"
+}
