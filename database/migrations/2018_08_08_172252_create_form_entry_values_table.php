@@ -15,7 +15,7 @@ class CreateFormentryvaluesTable extends Migration
     {
         Schema::create('form_entry_values', function (Blueprint $table) {
             $table->increments('id');
-            $table->longText('value');
+            $table->longText('value')->nullable();
 
             $table->integer('fkFormEntry')->unsigned();
             $table->integer('fkModule')->unsigned();

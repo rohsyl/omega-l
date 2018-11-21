@@ -52,7 +52,10 @@ class MediaChooser extends ATypeEntry {
         $param = $this->getParamSpecial();
         $uid = $this->getUniqId();
         if(!$param['multiple']){
-            return $this->getPost($uid.'-media-id');
+            if($this->existsPost($uid.'-media-id')) {
+                return $this->getPost($uid . '-media-id');
+            }
+            return null;
         }
         else{
 
