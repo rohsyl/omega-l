@@ -57,17 +57,18 @@ class MediaChooser extends ATypeEntry {
         else{
 
             $medias = array();
-            foreach ($this->getPost($uid.'-media-id') as $i => $type) {
-                $item = array(
-                    'id' => $this->getPost($uid.'-media-id')[$i],
-                    'order' => $this->getPost($uid.'-media-order')[$i]
-                );
-                if($this->getPost($uid.'-media-delete')[$i] == false && isset($item)) {
-                    $medias[] = $item;
+            if($this->existsPost($uid.'-media-id') && $this->existsPost($uid.'-media-order')){
+                foreach ($this->getPost($uid.'-media-id') as $i => $type) {
+                    $item = array(
+                        'id' => $this->getPost($uid.'-media-id')[$i],
+                        'order' => $this->getPost($uid.'-media-order')[$i]
+                    );
+                    if($this->getPost($uid.'-media-delete')[$i] == false && isset($item)) {
+                        $medias[] = $item;
+                    }
                 }
+                $medias = array_orderby($medias, 'order', SORT_ASC);
             }
-
-            $medias = array_orderby($medias, 'order', SORT_ASC);
 
             return json_encode($medias);
         }

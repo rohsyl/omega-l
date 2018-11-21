@@ -93,7 +93,7 @@ abstract class ATypeEntry
      * @return bool True if exists
      */
     protected function existsPost($key){
-        return isset($_POST[$key]);
+        return request()->has($key);
     }
 
     /**
@@ -102,7 +102,9 @@ abstract class ATypeEntry
      * @return mixed
      */
     protected function getPost($key){
-        return $_POST[$key];
+        if($this->existsPost($key))
+            return request()->input($key);
+        return null;
     }
 
     /**
