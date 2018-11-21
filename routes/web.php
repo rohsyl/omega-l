@@ -87,13 +87,13 @@ Route::middleware('om_not_installed')->group(function() {
             Route::get('group/delete/{id}/{confirm?}', 'GroupController@delete')->name('group.delete');
             Route::get('group/enable/{id}/{enable}', 'GroupController@enable')->name('group.enable');
 
+            Route::get('pages/getPagesLevelZeroBylang/{lang?}', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
             Route::get('pages/getTable/{lang?}', 'PagesController@getTable')->name('admin.pages.index.table');
             Route::get('pages/getAllPageByParentAndLang/{pid}/{lang}/{idParent?}', 'PagesController@getAllPageByParentAndLang')->name('admin.pages.getbyparentandlang');
             Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');
             Route::post('pages/sort', 'PagesController@sort')->name('admin.pages.sort');
             Route::get('pages/delete/{id}/{confirm?}', 'PagesController@delete')->name('admin.pages.delete');
             Route::get('pages/enable/{id}/{enable}', 'PagesController@enable')->name('admin.pages.enable');
-            Route::get('pages/getPagesLevelZeroBylang', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
             Route::get('pages/moduleareaList/{pageId}', 'PagesController@moduleareaList')->name('admin.pages.moduleareaList');
             Route::get('pages/moduleList/{pageId}', 'PagesController@moduleList')->name('admin.pages.moduleList');
             Route::get('pages/ma/plugins/{pageId?}', 'ModuleareaController@listplugin')->name('admin.pages.ma.plugins');

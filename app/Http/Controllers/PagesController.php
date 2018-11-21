@@ -126,7 +126,7 @@ class PagesController extends AdminController
         $langs = $this->langRepository->allEnabled();
 
         $pages = !$enabledLang
-            ? $this->pageRepository->getPagesWithParent(null)
+            ? $this->pageRepository->getPageWithParentAndLang(null, null)
             : $this->pageRepository->getPageWithParentAndLang($lang, null);
 
         return view('pages.add')->with([
@@ -134,6 +134,17 @@ class PagesController extends AdminController
             'selectedLang' => $lang,
             'langs' => to_select($langs, 'name', 'slug', [null => __('None')]),
             'pages' => to_select($pages, 'name', 'id', [null => __('No parent')]),
+        ]);
+    }
+
+    public function getPagesLevelZeroBylang($lang = null){
+
+        $pages = !isset($lang)
+            ? $this->pageRepository->getPageWithParentAndLang(null, null)
+            : $this->pageRepository->getPageWithParentAndLang($lang, null);
+
+        return view('pages.pages_select_options')->with([
+            'pages' => $pages
         ]);
     }
 
