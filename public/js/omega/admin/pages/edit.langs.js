@@ -20,7 +20,7 @@ $(function () {
         var url = route('admin.pages.getbyparentandlang', args);
         omega.ajax.query(url, {}, omega.ajax.GET, function(json){
             $select.empty();
-            addOption($select, null, 'Any');
+            addOption($select, null, 'None');
             json.pages.forEach(function(page){
                 addOption($select, page.id, page.name, json.selected == page.id);
             })

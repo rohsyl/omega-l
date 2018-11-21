@@ -100,7 +100,7 @@ class PagesController extends AdminController
             'enabledLang' => $enabledLang,
             'defaultLang' => $defaultLang,
             'currentLang' => $currentLang,
-            'langs' => to_select($this->langRepository->allEnabled(), 'name', 'slug', [null => __('Any')]),
+            'langs' => to_select($this->langRepository->allEnabled(), 'name', 'slug', [null => __('None')]),
         ];
         return view('pages.index')->with($viewBag);
     }
@@ -132,7 +132,7 @@ class PagesController extends AdminController
         return view('pages.add')->with([
             'enableLang' => $enabledLang,
             'selectedLang' => $lang,
-            'langs' => to_select($langs, 'name', 'slug', [null => __('Any')]),
+            'langs' => to_select($langs, 'name', 'slug', [null => __('None')]),
             'pages' => to_select($pages, 'name', 'id', [null => __('No parent')]),
         ]);
     }
@@ -188,7 +188,7 @@ class PagesController extends AdminController
             'menus' => to_select($this->menuRepository->getWithLang($enabledLang ? $page->lang : null), 'name','id', [null => __('Default menu')]),
             'cssThemes' => array_to_select($this->themeRepository->getThemeCssThemes($currentTheme), ['none' => __('None')]),
 
-            'langs_select' => to_select($langs, 'name', 'slug', [null => __('Any')]),
+            'langs_select' => to_select($langs, 'name', 'slug', [null => __('None')]),
             'langs' => $langs,
             'correspondingParents' => $this->pageRepository->getCorrespondingParents($langs, $page),
 
