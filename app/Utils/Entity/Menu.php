@@ -295,9 +295,14 @@ class Menu{
         else return array(1);
     }
 
+    /**
+     * Format an URL
+     * @param $url string The URL
+     * @param null $lang The lang
+     * @return string The new URL
+     */
     private function PrepareUrl($url, $lang = null)
     {
-
         // if url start with '#', 'http://' or 'https://', then leave it like that
         if(strpos($url, '#') === 0 || strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0){
             return $url;

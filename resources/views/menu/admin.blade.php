@@ -78,7 +78,7 @@
                     add_action(route('group.index'), 'fa fa-list-alt', __('Manage groups'))
                 ]) !!}
                 {!! add_action('#', 'glyphicon glyphicon-text-width',  __('Apparences'), [
-                    add_action(route('theme.index'), 'fa fa-paint-brush', __('Theme')),
+                    add_action(route('theme.index'), 'fa fa-paint-brush', __('Themes')),
                     //add_action(route('editor.index'), 'fa fa-code', __('File editor')),
                     add_action(route('menu.index'), 'glyphicon glyphicon-list-alt', __('Menus'))
                 ]) !!}

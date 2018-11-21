@@ -1,1 +1,1 @@
-<div class="text-center" style="column-count: 2">{!! $text !!}</div>
+<div style="column-count: 3">{!! $text !!}</div>
