@@ -4,6 +4,7 @@ namespace Omega\Http\Controllers;
 
 use Omega\Repositories\PluginRepository;
 use Omega\Utils\Plugin\Plugin as PluginUtils;
+use Omega\Utils\Plugin\PluginMeta;
 
 class PluginController extends AdminController
 {
@@ -40,7 +41,17 @@ class PluginController extends AdminController
                 return redirect()->route('admin.plugins');
             }
 
-            toast()->success(__('Plugin installed succesfully.') . ' ' . camelize_plugin($name));
+            // publish plugin assets
+            $publishResult = PluginUtils::Publish($name);
+
+            if($publishResult['code'] === 0){
+                toast()->success(__('Plugin installed succesfully.') . ' ' . camelize_plugin($name));
+                toast()->success(__('Plugin publised!'));
+            }
+            else {
+                toast()->error(__('Error') . '<br />' . $publishResult['output']);
+            }
+
             return redirect()->route('admin.plugins'); }
         else {
             return view('plugin.confirm')->with([
@@ -85,5 +96,23 @@ class PluginController extends AdminController
         }
 
         return $response;
+    }
+
+    public function settings($name){
+        return view('plugin.meta')->with([
+            'meta' => new PluginMeta($name),
+        ]);
+    }
+
+    public function publish($name){
+        $publishResult = PluginUtils::Publish($name);
+
+        if($publishResult['code'] === 0){
+            toast()->success(__('Plugin publised!'));
+        }
+        else {
+            toast()->error(__('Error') . '<br />' . $publishResult['output']);
+        }
+        return redirect()->route('admin.plugins.settings', ['name' => $name]);
     }
 }

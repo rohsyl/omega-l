@@ -20,6 +20,7 @@
             <td>{{ $meta->getDescription() }}</td>
             <td>
                 <span class="actions">
+                    <a href="{{ route('admin.plugins.settings', ['name' => $meta->getName() ]) }}">{{ __('Settings') }}</a> |
                     <a href="{{  route('admin.plugins.uninstall', ['name' => $meta->getName() ]) }}" class="text-danger">{{ __('Uninstall') }}</a>
                 </span>
             </td>

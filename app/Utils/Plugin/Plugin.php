@@ -9,6 +9,8 @@
 namespace Omega\Utils\Plugin;
 
 
+use Illuminate\Support\Facades\Artisan;
+
 class Plugin
 {
     /**
@@ -49,4 +51,15 @@ class Plugin
         return $pluginController;
     }
 
+
+    public static function Publish($name){
+
+        $code = Artisan::call('omega:plugin:publish', ['plugin' => $name]);
+        $output = Artisan::output();
+
+        return [
+            'code' => $code,
+            'output' => $output
+        ];
+    }
 }
