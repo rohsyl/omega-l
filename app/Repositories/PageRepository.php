@@ -73,9 +73,9 @@ class PageRepository
      */
     public function getPagesWithParent($idPageParent = null){
         if(!isset($idPageParent))
-            return $this->page->whereNull('fkPageParent')->get();
+            return $this->page->whereNull('fkPageParent')->orderBy('order')->get();
         else
-            return $this->page->where('fkPageParent', $idPageParent)->get();
+            return $this->page->where('fkPageParent', $idPageParent)->orderBy('order')->get();
     }
 
     /**
@@ -92,7 +92,7 @@ class PageRepository
         else
             $query = $query->whereNull('fkPageParent');
 
-        return $query->get();
+        return $query->orderBy('order')->get();
     }
 
     /**

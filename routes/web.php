@@ -90,6 +90,7 @@ Route::middleware('om_not_installed')->group(function() {
             Route::get('pages/getTable/{lang?}', 'PagesController@getTable')->name('admin.pages.index.table');
             Route::get('pages/getAllPageByParentAndLang/{pid}/{lang}/{idParent?}', 'PagesController@getAllPageByParentAndLang')->name('admin.pages.getbyparentandlang');
             Route::get('pages/add/{lang?}', 'PagesController@add')->name('admin.pages.add');
+            Route::post('pages/sort', 'PagesController@sort')->name('admin.pages.sort');
             Route::get('pages/delete/{id}/{confirm?}', 'PagesController@delete')->name('admin.pages.delete');
             Route::get('pages/enable/{id}/{enable}', 'PagesController@enable')->name('admin.pages.enable');
             Route::get('pages/getPagesLevelZeroBylang', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');

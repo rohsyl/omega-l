@@ -5,6 +5,7 @@ namespace Omega\Http\Controllers;
 use Illuminate\Validation\Rule;
 use Omega\Http\Requests\Page\Component\SaveSettingsRequest;
 use Omega\Http\Requests\Page\Module\CreateModuleRequest;
+use Omega\Http\Requests\Page\SortRequest;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
@@ -375,6 +376,21 @@ class PagesController extends AdminController
         $this->pageRepository->enable($page, $enable);
         toast()->success($enable ? __('Page enabled') : __('Page disabled'));
         return redirect()->back();
+    }
+
+    public function sort(SortRequest $request){
+        $orders = $request->input('order');
+        foreach($orders as $p)
+        {
+            $page = $this->pageRepository->get($p['id']);
+            $page->order = $p['order'];
+            $result = $page->save();
+            if(!$result)
+                break;
+        }
+        return response()->json([
+            'result' => $result,
+        ]);
     }
 
     /**
