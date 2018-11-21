@@ -17,10 +17,9 @@
 
         @if($enabledLang)
             {{ Form::open(['route' => ['admin.pages.chooselang'], 'method' => 'POST', 'class' => 'form-inline']) }}
-            <div class="form-group">
-                {{ Form::select('lang', $langs, $currentLang, ['id' => 'choose-lang', 'class' => 'form-control']) }}
+            <div class="form-group" >
+                {{ Form::select('lang', $langs, $currentLang, ['id' => 'choose-lang', 'class' => 'form-control', 'onchange' => 'this.form.submit()']) }}
             </div>
-            <button type="submit" class="btn btn-default" name="formChooseLang">Choose language</button>
             {{ Form::close() }}
         @endif
     </p>
