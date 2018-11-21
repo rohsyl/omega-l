@@ -19,7 +19,7 @@
     <link href="{{ theme_asset('css/main.css') }}" rel="stylesheet"/>
 
     <!-- Scripts -->
-    <script src="{{ theme_asset('js/jquery.min.js') }}"></script>
+
     <script src="{{ theme_asset('js/jquery.scrollex.min.js') }}"></script>
     <script src="{{ theme_asset('js/skel.min.js') }}"></script>
     <script src="{{ theme_asset('js/util.js') }}"></script>
