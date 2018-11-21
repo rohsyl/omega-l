@@ -8,10 +8,12 @@ OmegaCMS is a content management system created by Sylvain Roh. It is based on L
 
 - An Apache webserver
     - with mod_rewrite enabled
-- PHP 5.6 or newer
+- PHP 7.2
 - MySQL
 
 ### Installing
+
+TODO: i will soon provide a installation guide...
 
 ## Versioning
 
@@ -19,4 +21,5 @@ We use [Git](https://git-scm.com/) for versioning on [GitHub](https://github.com
 
 ## Authors
 
-* **Sylvain Roh** - [GitLab Profile](http://gitlab.rohs.ch/rohsyl)
+* **Sylvain Roh** - [Profile](https://github.com/rohsyl)
+* **Gaetan Huser** - [Profile](https://github.com/R-Men)
