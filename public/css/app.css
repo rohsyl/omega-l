@@ -663,7 +663,7 @@ th.date{
 
 .toolbar{
 	padding: 5px;
-    z-index : 2000;
+    z-index : 1010;
     text-align: right;
     float : right;
 }

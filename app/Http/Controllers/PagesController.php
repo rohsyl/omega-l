@@ -509,7 +509,7 @@ class PagesController extends AdminController
                 $pluginTemplatesWithTitle['null'] = __('Default');
             }
             else{
-                $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(prettify_text($template));
+                $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(without_ext(prettify_text($template)));
             }
         }
 

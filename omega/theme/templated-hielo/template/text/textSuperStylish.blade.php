@@ -1,0 +1,1 @@
+<div class="text-center" style="column-count: 2">{!! $text !!}</div>
