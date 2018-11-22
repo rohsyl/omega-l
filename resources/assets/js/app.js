@@ -46,6 +46,8 @@ require('codemirror');
 require('summernote');
 require('sortablejs');
 require('ace-builds');
+require('codemirror');
+require('codemirror/mode/htmlembedded/htmlembedded');
 
 // make toastr gobally available
 import toastr from 'toastr';
@@ -54,6 +56,7 @@ window.toastr = toastr;
 // make Sortable gobally available
 import Sortable from 'sortablejs';
 window.Sortable = Sortable;
+
 
 require('./assets/metisMenu.min');
 require('./assets/sb-admin-2.min');

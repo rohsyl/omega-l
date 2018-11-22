@@ -97,7 +97,8 @@ let OmegaNotice = require('./omegaNotice');
                             $dom.find('*').removeAttr('class').removeAttr('style');
                             $this.summernote('insertNode', $dom[0]);
                             return false;
-                        }
+                        },
+                        prettifyHtml: true
                     };
 
                     var editor = $this.summernote(param);
