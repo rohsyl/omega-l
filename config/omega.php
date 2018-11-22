@@ -56,7 +56,7 @@ return [
     ],
 
     /**
-     * Define the icon to be used in the
+     * Define the icon to be used in the media library
      */
     'media' => [
         'icons' => [
@@ -67,6 +67,15 @@ return [
             'music_icon_class' => 'glyphicon glyphicon-headphones',
             'videoext_icon_class' => 'glyphicon glyphicon-play',
         ],
+    ],
+
+    'page' => [
+
+        /**
+         * This entry allow you to define the number
+         * of item per pages in the pages list.
+         */
+        'paginate' => 20,
     ],
 
 

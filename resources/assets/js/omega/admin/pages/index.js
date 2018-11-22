@@ -43,10 +43,25 @@ $(function(){
 
     });
 
+
     function updateTable()
     {
-        var url = !$tableContainer.data('lang-enabled') ? route('admin.pages.index.table') : route('admin.pages.index.table', {lang: $tableContainer.data('lang-current')});
+        var currentPage = omega.getQueryStringParams('page');
+
+        var args = {};
+        if($tableContainer.data('lang-enabled')){
+            args.lang = $tableContainer.data('lang-current');
+        }
+
+        if(typeof currentPage !== 'undefined'){
+            args.page = currentPage;
+        }
+
+        var url = route('admin.pages.index.table', args);
         omega.ajax.loadHtml($tableContainer, url.url());
     }
     updateTable();
+
+
+
 });

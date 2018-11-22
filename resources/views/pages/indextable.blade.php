@@ -89,5 +89,9 @@
 
         @endforeach
 
+
     @endif
 </table>
+<div class="text-center">
+    {{ $pages->links() }}
+</div>

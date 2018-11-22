@@ -15,10 +15,13 @@ use Omega\Utils\Entity\Page as PageHelper;
 class PageRepository
 {
 
+    private $paginateNb;
+
     private $page;
 
     public function __construct(Page $page) {
         $this->page = $page;
+        $this->paginateNb = config('omega.page.paginate');
     }
 
     /**
@@ -72,10 +75,31 @@ class PageRepository
      * @return mixed
      */
     public function getPagesWithParent($idPageParent = null){
+        return $this->pagesWithParent($idPageParent)->get();
+    }
+
+    /**
+     * Get all page where the parent is given paginate
+     * @param int|null $idPageParent
+     * @return mixed
+     */
+    public function paginatePagesWithParent($idPageParent = null){
+        return $this->pagesWithParent($idPageParent)->paginate($this->paginateNb);
+    }
+
+
+    /**
+     * Get all page where the parent is given
+     * @param null $idPageParent
+     * @return mixed
+     */
+    private function pagesWithParent($idPageParent = null){
+        $query = null;
         if(!isset($idPageParent))
-            return $this->page->whereNull('fkPageParent')->orderBy('order')->get();
+            $query = $this->page->whereNull('fkPageParent');
         else
-            return $this->page->where('fkPageParent', $idPageParent)->orderBy('order')->get();
+            $query = $this->page->where('fkPageParent', $idPageParent);
+        return $query->orderBy('order');
     }
 
     /**
@@ -85,6 +109,21 @@ class PageRepository
      * @return mixed
      */
     public function getPageWithParentAndLang($langSlug, $idPageParent = null){
+        return $this->pageWithParentAndLang($langSlug, $idPageParent)->get();
+    }
+
+    /**
+     * Get all page with the given parent and the given lang
+     * @param $langSlug string The slug of the lang
+     * @param int|null $idPageParent The id of the parent or null
+     * @return mixed
+     */
+    public function paginatePageWithParentAndLang($langSlug, $idPageParent = null){
+        return $this->pageWithParentAndLang($langSlug, $idPageParent)->paginate($this->paginateNb);
+    }
+
+
+    private function pageWithParentAndLang($langSlug, $idPageParent = null){
         $query = $this->page->where('lang', $langSlug);
         if(isset($idPageParent)){
             $query = $query->where('fkPageParent', $idPageParent);
@@ -92,9 +131,8 @@ class PageRepository
         else
             $query = $query->whereNull('fkPageParent');
 
-        return $query->orderBy('order')->get();
+        return $query->orderBy('order');
     }
-
     /**
      * Get the parent of the page in the corresponding lang for each lang
      * @param $langs

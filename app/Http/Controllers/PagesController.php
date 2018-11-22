@@ -413,8 +413,10 @@ class PagesController extends AdminController
         $enabledLang = om_config('om_enable_front_langauge');
 
         $pages = !$enabledLang ?
-            $this->pageRepository->getPagesWithParent(null) :
-            $this->pageRepository->getPageWithParentAndLang($lang, null);
+            $this->pageRepository->paginatePagesWithParent(null) :
+            $this->pageRepository->paginatePageWithParentAndLang($lang, null);
+
+        $pages->withPath(route('admin.pages'));
 
         return view('pages.indextable')->with([
             'enabledLang' => $enabledLang,

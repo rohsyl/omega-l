@@ -23762,6 +23762,17 @@ var OmegaNotice = __webpack_require__(25);
                 $(selector).datepicker({
                     format: 'yyyy-mm-dd'
                 });
+            },
+
+            getQueryStringParams: function getQueryStringParams(sParam) {
+                var sPageURL = window.location.search.substring(1);
+                var sURLVariables = sPageURL.split('&');
+                for (var i = 0; i < sURLVariables.length; i++) {
+                    var sParameterName = sURLVariables[i].split('=');
+                    if (sParameterName[0] === sParam) {
+                        return sParameterName[1];
+                    }
+                }
             }
             //---- Private method ----//
         };
