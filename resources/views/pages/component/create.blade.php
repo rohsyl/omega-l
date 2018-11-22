@@ -1,7 +1,7 @@
 
 <div class="row">
     @if(count($plugins) == 0)
-    <p class="text-center">There is any components installed...</p>
+    <p class="text-center">{{ __('No components available...') }}</p>
     @else
     <div style="max-height: 450px; overflow-y:auto;">
         @foreach($plugins as $plugin)
