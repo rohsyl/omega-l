@@ -58,7 +58,7 @@ class PluginRepository
     }
 
     public function getInstalledPlugin(){
-        return $this->plugin->all();
+        return $this->plugin->orderBy('name')->get();
     }
 
     public function getPluginInMenu(){
