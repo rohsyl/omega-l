@@ -52,13 +52,18 @@ class DropDown extends ATypeEntry {
 
     public function getPostedValue()
     {
-        return $this->getPost($this->getUniqId());
+        return real_null($this->getPost($this->getUniqId()));
     }
 
     public  function getObjectValue() {
         $param = $this->getParam();
         $v = $this->getValue();
-        $selectedValue = isset($v) ? $v : $param['default'];
+
+        $default = null;
+        if(!isset($param['model'])){
+            $default = $param['default'];
+        }
+        $selectedValue = isset($v) ? $v : $default;
         $ret = array(
             'title' => isset($param['options'][$selectedValue]) ? $param['options'][$selectedValue] : '',
             'value' => $selectedValue
