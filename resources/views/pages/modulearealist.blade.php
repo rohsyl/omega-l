@@ -14,7 +14,7 @@
 
                         <li class="list-group-item sortable-item" data-positionid="{{ $position->id }}">
 
-                            {{ $position->module->name }}
+                            {{ $position->module->name }} @if(isset($position->lang))({{ $position->lang }})@endif
 
                             <span class="sortPosition badge" data-positionid="{{ $position->id }}"><span class="fa fa-sort-amount-desc glyphicon-move"></span></span>
 
@@ -24,7 +24,9 @@
                                data-is="{{ is_null($position->fkPage) ? 1 : 0 }}"
                                data-positionid="{{ $position->id }}"><i class="{{ is_null($position->fkPage) ? 'fa fa-star' : 'fa fa-star-o' }}"></i></a>
 
+                            @if(om_config('om_enable_front_langauge'))
                             <a href="#" class="setLang badge" data-positionid="{{ $position->id }}"><i class="fa fa-language"></i></a>
+                            @endif
                         </li>
 
                     @endforeach

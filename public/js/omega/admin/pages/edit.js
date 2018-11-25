@@ -326,7 +326,23 @@ $(function(){
 
 
     $body.delegate('.setLang', 'click', function(e){
+        e.stopPropagation();
+        var $this = $(this);
+        var positionid = $this.data('positionid');
 
+        var url = route('admin.pages.ma.lang', {positionid: positionid});
+        omega.ajax.query(url, {}, omega.ajax.GET, function(data){
+            var mid = omega.modal.open(__("Edit Language"), '<form id="formEditPositionLang">'+data+'</form>', __('Save'), function(){
+                var $form = $('#formEditPositionLang');
+                url = route('admin.pages.ma.langsave');
+                args = omega.ajax._serializeForm($form);
+                omega.ajax.query(url, args, 'POST', function(jResponse){
+                    omega.notice.success('Language saved');
+                    omega.modal.hide(mid);
+                    loadModuleareas();
+                }, undefined, {dataType: 'json'});
+            });
+        })
     });
 
 
@@ -393,8 +409,6 @@ $(function(){
                         omega.notice.success(__('Order updated'));
                     });
                 },
-
-
             });
         });
     }

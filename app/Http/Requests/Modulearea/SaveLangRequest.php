@@ -23,7 +23,8 @@ class SaveLangRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'posId' => 'required|integer|exists:positions,id',
+            'posLang' => 'nullable|exists:langs,slug'
         ];
     }
 }

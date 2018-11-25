@@ -82,13 +82,15 @@ Route::middleware('om_not_installed')->group(function() {
             });
 
 
-            Route::get('group', 'GroupController@index')->name('group.index');
-            Route::get('group/add', 'GroupController@add')->name('group.add');
-            Route::post('group/create', 'GroupController@create')->name('group.create');
-            Route::get('group/edit/{id}', 'GroupController@edit')->name('group.edit');
-            Route::post('group/edit/{id}', 'GroupController@update')->name('group.update');
-            Route::get('group/delete/{id}/{confirm?}', 'GroupController@delete')->name('group.delete');
-            Route::get('group/enable/{id}/{enable}', 'GroupController@enable')->name('group.enable');
+            Route::prefix('group')->group(function(){
+                Route::get('/', 'GroupController@index')->name('group.index');
+                Route::get('add', 'GroupController@add')->name('group.add');
+                Route::post('create', 'GroupController@create')->name('group.create');
+                Route::get('edit/{id}', 'GroupController@edit')->name('group.edit');
+                Route::post('edit/{id}', 'GroupController@update')->name('group.update');
+                Route::get('delete/{id}/{confirm?}', 'GroupController@delete')->name('group.delete');
+                Route::get('enable/{id}/{enable}', 'GroupController@enable')->name('group.enable');
+            });
 
             Route::get('pages/getPagesLevelZeroBylang/{lang?}', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
             Route::get('pages/getTable/{lang?}', 'PagesController@getTable')->name('admin.pages.index.table');
@@ -105,6 +107,8 @@ Route::middleware('om_not_installed')->group(function() {
             Route::post('pages/ma/delete/{id}', 'ModuleareaController@deletePosition')->name('admin.pages.ma.delete');
             Route::post('pages/ma/setonallpages/{id}/{set}/{pageId?}', 'ModuleareaController@setOnAllPages')->name('admin.pages.ma.setonallpages');
             Route::post('pages/ma/setorder', 'ModuleareaController@setOrder')->name('admin.pages.ma.setorder');
+            Route::get('pages/ma/lang/{positionid}', 'ModuleareaController@getLangForm')->name('admin.pages.ma.lang');
+            Route::post('pages/ma/langsave', 'ModuleareaController@saveLang')->name('admin.pages.ma.langsave');
 
             Route::get('pages/componentList/{pageId}', 'PagesController@componentList')->name('admin.pages.componentList');
 

@@ -52,6 +52,13 @@ class PositionRepository
         return $pos;
     }
 
+    public function setlang($positionId, $lang){
+        $pos = $this->get($positionId);
+        $pos->lang = $lang;
+        $pos->save();
+        return $pos;
+    }
+
     public function updateOrder($positionId, $order, $moduleareaId){
         $pos = $this->get($positionId);
         $pos->order = $order;

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Omega\Http\Requests\Modulearea\AddPositionRequest;
 use Omega\Http\Requests\Modulearea\SaveLangRequest;
 use Omega\Http\Requests\Modulearea\SetOrderRequest;
+use Omega\Repositories\LangRepository;
 use Omega\Repositories\ModuleAreaRepository;
 use Omega\Repositories\PositionRepository;
 use Omega\Repositories\ThemeRepository;
@@ -15,14 +16,17 @@ class ModuleareaController extends AdminController
     private $moduleAreaRepository;
     private $themeRepository;
     private $positionRepository;
+    private $langRepository;
 
     public function __construct(ModuleAreaRepository $moduleAreaRepository,
                                 ThemeRepository $themeRepository,
-                                PositionRepository $positionRepository) {
+                                PositionRepository $positionRepository,
+                                LangRepository $langRepository) {
         parent::__construct();
         $this->moduleAreaRepository = $moduleAreaRepository;
         $this->themeRepository = $themeRepository;
         $this->positionRepository = $positionRepository;
+        $this->langRepository = $langRepository;
     }
 
 
@@ -85,11 +89,22 @@ class ModuleareaController extends AdminController
         ]);
     }
 
-    public function getLangForm($idPosition){
+    public function getLangForm($positionid){
 
+        $position = $this->positionRepository->get($positionid);
+
+        return view('pages.module.langsettings')->with([
+            'position' => $position,
+            'langs' => to_select($this->langRepository->allEnabled(), 'name', 'slug', [null => __('Any')])
+        ]);
     }
 
     public function saveLang(SaveLangRequest $request){
 
+        $this->positionRepository->setlang($request->input('posId'), $request->input('posLang'));
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 }

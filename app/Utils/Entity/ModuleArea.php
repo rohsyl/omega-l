@@ -74,32 +74,33 @@ class ModuleArea{
             {
                 if(!isset($position->fkPage) || $position->fkPage == $page->id)
                 {
-
-                    $data = Type::GetValues($position->module->plugin->id, $position->module->id, $page->id);
-                    $plugin_param = json_decode($position->module->param, true);
-
-                    $plugin_param['placement'] = 'modulearea';
-
-                    $plugin = Plugin::FInstance($position->module->plugin->name);
-
-
-                    if(method_exists($plugin, 'display'))
+                    if(!om_config('om_enable_front_langauge') || $position->lang == null || $position->lang == $page->lang)
                     {
-                        $content = $plugin->display($plugin_param, $data);
+                        $data = Type::GetValues($position->module->plugin->id, $position->module->id, $page->id);
+                        $plugin_param = json_decode($position->module->param, true);
 
-                        $html .= view('public.module')->with([
-                            'content' => $content,
-                            'plugin' => $plugin,
-                        ])->render();
+                        $plugin_param['placement'] = 'modulearea';
+
+                        $plugin = Plugin::FInstance($position->module->plugin->name);
 
 
-                        if(method_exists($plugin, 'registerDependencies'))
+                        if(method_exists($plugin, 'display'))
                         {
-                            OmegaUtils::addDependencies($plugin->registerDependencies());
+                            $content = $plugin->display($plugin_param, $data);
+
+                            $html .= view('public.module')->with([
+                                'content' => $content,
+                                'plugin' => $plugin,
+                            ])->render();
+
+
+                            if(method_exists($plugin, 'registerDependencies'))
+                            {
+                                OmegaUtils::addDependencies($plugin->registerDependencies());
+                            }
                         }
                     }
                 }
-
             }
         }
 		return $html;
