@@ -142,7 +142,7 @@ class Menu{
         $menu = null;
 
         if(isset($id)){
-            $menu = $this->menuRepository->get($this->currentPage->idMenu);
+            $menu = $this->menuRepository->get($id);
         }
 
         if (!isset($menu) && isset($this->currentPage) && isset($this->currentPage->idMenu)) {
