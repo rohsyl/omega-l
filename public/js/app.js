@@ -25645,10 +25645,12 @@ module.exports = __webpack_require__(83);
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__omega_app_omega__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__omega_app_omega___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__omega_app_omega__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toastr__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toastr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toastr__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_sortablejs__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_sortablejs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_sortablejs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_codemirror__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_codemirror___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_codemirror__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_toastr__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_toastr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_toastr__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_sortablejs__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_sortablejs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_sortablejs__);
 
 
 /**
@@ -25698,13 +25700,16 @@ __webpack_require__(64);
 __webpack_require__(3);
 __webpack_require__(65);
 
+
+window.CodeMirror = __WEBPACK_IMPORTED_MODULE_1_codemirror___default.a;
+
 // make toastr gobally available
 
-window.toastr = __WEBPACK_IMPORTED_MODULE_1_toastr___default.a;
+window.toastr = __WEBPACK_IMPORTED_MODULE_2_toastr___default.a;
 
 // make Sortable gobally available
 
-window.Sortable = __WEBPACK_IMPORTED_MODULE_2_sortablejs___default.a;
+window.Sortable = __WEBPACK_IMPORTED_MODULE_3_sortablejs___default.a;
 
 __webpack_require__(71);
 __webpack_require__(72);

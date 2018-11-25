@@ -213,10 +213,15 @@ Route::middleware('om_not_installed')->group(function() {
                 ->name('public.byslug');
         } else {
 
+            // Page by slug
+            Route::any('/{slug}', 'PublicController@slug')
+                ->name('public.byslug');
+
             // Homepage with lang
             Route::any('/{lang}', 'PublicController@home_with_lang')
                 ->where(['lang' => '[a-z]{2}'])
                 ->name('public.homelang');
+
 
             // Page by slug and lang
             Route::any('/{lang}/{slug}', 'PublicController@slug_and_lang')

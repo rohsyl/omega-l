@@ -428,7 +428,7 @@ class Page{
 
     public static function GetUrl($id){
         $page = self::GetPageRepository()->get($id);
-        if(om_config('om_enable_front_langauge')) {
+        if(om_config('om_enable_front_langauge') && isset($page->lang)) {
             if(!session()->has('front_lang')){
                 session(['front_lang' => $page->lang]);
             }

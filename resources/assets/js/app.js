@@ -49,6 +49,9 @@ require('ace-builds');
 require('codemirror');
 require('codemirror/mode/htmlembedded/htmlembedded');
 
+import CodeMirror from 'codemirror';
+window.CodeMirror = CodeMirror;
+
 // make toastr gobally available
 import toastr from 'toastr';
 window.toastr = toastr;
