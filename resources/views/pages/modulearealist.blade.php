@@ -16,14 +16,15 @@
 
                             {{ $position->module->name }}
 
-                            <span class="sortPosition badge" data-positionid="{{ $position->id }}"><span class="glyphicon glyphicon-sort-by-attributes glyphicon-move"></span></span>
+                            <span class="sortPosition badge" data-positionid="{{ $position->id }}"><span class="fa fa-sort-amount-desc glyphicon-move"></span></span>
 
-                            <a href="#" class="deletePosition badge" data-positionid="{{ $position->id }}"><span class="glyphicon glyphicon-remove"></span></a>
+                            <a href="#" class="deletePosition badge" data-positionid="{{ $position->id }}"><i class="fa fa-times"></i></a>
 
                             <a href="#" class="setOnAllPages badge"
                                data-is="{{ is_null($position->fkPage) ? 1 : 0 }}"
-                               data-positionid="{{ $position->id }}"><span class="{{ is_null($position->fkPage) ? 'glyphicon glyphicon-star' : 'glyphicon glyphicon-star-empty' }}"></span></a>
+                               data-positionid="{{ $position->id }}"><i class="{{ is_null($position->fkPage) ? 'fa fa-star' : 'fa fa-star-o' }}"></i></a>
 
+                            <a href="#" class="setLang badge" data-positionid="{{ $position->id }}"><i class="fa fa-language"></i></a>
                         </li>
 
                     @endforeach

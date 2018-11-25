@@ -325,6 +325,11 @@ $(function(){
     });
 
 
+    $body.delegate('.setLang', 'click', function(e){
+
+    });
+
+
     /**
      * Load all the moduleareas
      */

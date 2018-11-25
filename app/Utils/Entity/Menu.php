@@ -131,11 +131,21 @@ class Menu{
         return $menuHtml;
     }
 
-    public function getBySecurity_AsArray(){
+    /**
+     * Get the main menu by security or by id if the id is given as paramenter
+     * @param null $id The id of the menu to retrive
+     * @return array
+     */
+    public function getAsArray($id = null){
         $langEnabled = $this->langRepository->isEnabled();
 
         $menu = null;
-        if (isset($this->currentPage) && isset($this->currentPage->idMenu)) {
+
+        if(isset($id)){
+            $menu = $this->menuRepository->get($this->currentPage->idMenu);
+        }
+
+        if (!isset($menu) && isset($this->currentPage) && isset($this->currentPage->idMenu)) {
             $menu = $this->menuRepository->get($this->currentPage->idMenu);
         }
 

@@ -4,6 +4,7 @@ namespace Omega\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Omega\Http\Requests\Modulearea\AddPositionRequest;
+use Omega\Http\Requests\Modulearea\SaveLangRequest;
 use Omega\Http\Requests\Modulearea\SetOrderRequest;
 use Omega\Repositories\ModuleAreaRepository;
 use Omega\Repositories\PositionRepository;
@@ -82,5 +83,13 @@ class ModuleareaController extends AdminController
         return response()->json([
             'result'  => true
         ]);
+    }
+
+    public function getLangForm($idPosition){
+
+    }
+
+    public function saveLang(SaveLangRequest $request){
+
     }
 }

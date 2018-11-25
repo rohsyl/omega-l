@@ -389,6 +389,7 @@ class PagesController extends AdminController
         return redirect()->back();
     }
 
+
     public function sort(SortRequest $request){
         $orders = $request->input('order');
         foreach($orders as $p)

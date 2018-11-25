@@ -68,16 +68,19 @@ Route::middleware('om_not_installed')->group(function() {
 
             Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
-            Route::get('user/profile/{id?}', 'UserController@profile')->name('profile');
-            Route::get('user', 'UserController@index')->name('user.index');
-            Route::get('user/add', 'UserController@add')->name('user.add');
-            Route::post('user/create', 'UserController@create')->name('user.create');
-            Route::get('user/edit/{id}', 'UserController@edit')->name('user.edit');
-            Route::post('user/edit/{id}', 'UserController@update')->name('user.update');
-            Route::get('user/edit/{id}/password', 'UserController@editPassword')->name('user.edit.passwd');
-            Route::post('user/edit/{id}/password', 'UserController@updatePassword')->name('user.update.passwd');
-            Route::get('user/delete/{id}/{confirm?}', 'UserController@delete')->name('user.delete');
-            Route::get('user/enable/{id}/{enable}', 'UserController@enable')->name('user.enable');
+            Route::prefix('user')->group(function(){
+                Route::get('/', 'UserController@index')->name('user.index');
+                Route::get('profile/{id?}', 'UserController@profile')->name('profile');
+                Route::get('add', 'UserController@add')->name('user.add');
+                Route::post('create', 'UserController@create')->name('user.create');
+                Route::get('edit/{id}', 'UserController@edit')->name('user.edit');
+                Route::post('edit/{id}', 'UserController@update')->name('user.update');
+                Route::get('edit/{id}/password', 'UserController@editPassword')->name('user.edit.passwd');
+                Route::post('edit/{id}/password', 'UserController@updatePassword')->name('user.update.passwd');
+                Route::get('delete/{id}/{confirm?}', 'UserController@delete')->name('user.delete');
+                Route::get('enable/{id}/{enable}', 'UserController@enable')->name('user.enable');
+            });
+
 
             Route::get('group', 'GroupController@index')->name('group.index');
             Route::get('group/add', 'GroupController@add')->name('group.add');
@@ -212,10 +215,6 @@ Route::middleware('om_not_installed')->group(function() {
             Route::any('/{slug}', 'PublicController@slug')
                 ->name('public.byslug');
         } else {
-
-            // Page by slug
-            Route::any('/{slug}', 'PublicController@slug')
-                ->name('public.byslug');
 
             // Homepage with lang
             Route::any('/{lang}', 'PublicController@home_with_lang')
