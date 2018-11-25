@@ -23,8 +23,6 @@
     {!! Entity::Menu()->getBySecurity() !!}
 </nav>
 
-
-
 <!-- Heading -->
 <section id="One" class="wrapper style3">
     <div class="inner">

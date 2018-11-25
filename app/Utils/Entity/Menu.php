@@ -130,6 +130,40 @@ class Menu{
 
         return $menuHtml;
     }
+
+    public function getBySecurity_AsArray(){
+        $langEnabled = $this->langRepository->isEnabled();
+
+        $menu = null;
+        if (isset($this->currentPage) && isset($this->currentPage->idMenu)) {
+            $menu = $this->menuRepository->get($this->currentPage->idMenu);
+        }
+
+        // else find menu by member group
+        if (!isset($menu)) {
+            $ids = $this->getMemberGroupOrPublic();
+            foreach ($ids as $id) {
+
+                $menu = $langEnabled
+                    ? $this->menuRepository->getMenuMainByMemberGroupAndLang($id, session('front_lang'))
+                    : $this->menuRepository->getMenuMainByMemberGroup($id);
+
+                if (isset($menu)) {
+                    break;
+                }
+            }
+        }
+
+        // if no menu found
+        if (!isset($menu)) {
+            return [];
+        }
+
+        return [
+            'lang' => $langEnabled ? $menu->lang : null,
+            'menu' => json_decode($menu->json)
+        ];
+    }
 	
 	private function getHtmlFromJson($json, $html, $lang = null, $level = -1, &$containesActive = false) {
 		$level++;
@@ -301,7 +335,7 @@ class Menu{
      * @param null $lang The lang
      * @return string The new URL
      */
-    private function PrepareUrl($url, $lang = null)
+    public function PrepareUrl($url, $lang = null)
     {
         // if url start with '#', 'http://' or 'https://', then leave it like that
         if(strpos($url, '#') === 0 || strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0){

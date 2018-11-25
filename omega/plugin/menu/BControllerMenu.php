@@ -1,11 +1,7 @@
 <?php
-namespace Omega\Plugin\Menu;
+namespace OmegaPlugin\Menu;
 
-use Omega\Library\Plugin\BController;
-use Omega\Plugin\Menu\Model\ModelMenu;
-use Omega\Admin\Model\ModelModule;
-use Omega\Library\Util\Redirect;
-use Omega\Library\Util\Form;
+use Omega\Utils\Plugin\BController;
 
 class BControllerMenu extends  BController {
 
@@ -15,17 +11,8 @@ class BControllerMenu extends  BController {
     }
 
     public function install() {
-        if(!$this->isInstalled()){
-            parent::install();
-            parent::runSql($this->root.'/sql/install.sql');
-        }
-    }
-
-    public function uninstall() {
-        if($this->isInstalled()) {
-            parent::uninstall();
-            parent::runSql($this->root . '/sql/uninstall.sql');
-        }
+        parent::runSql($this->root.'/sql/install.sql');
+        return true;
     }
 
     public function index() {
