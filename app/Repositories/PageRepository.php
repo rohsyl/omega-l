@@ -48,6 +48,9 @@ class PageRepository
      * @return int
      */
     public function delete($id){
+        $page = $this->get($id);
+        $page->slug = str_random(10);
+        $page->save();
         return $this->page->destroy($id);
     }
 

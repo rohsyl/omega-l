@@ -82,13 +82,7 @@ class FControllerContact extends FController {
 
                 if($request->isMethod('post')){
 
-
-
                     $validator = Validator::make($request->all(), $this->rules);
-
-
-
-
 
                     $validator->after(function ($validator) use ($isAntispam, $request, $param) {
                         if($isAntispam){
