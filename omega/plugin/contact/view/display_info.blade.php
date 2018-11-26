@@ -16,10 +16,12 @@
 
 
 <address class="contact-contactinfo">
+    @if(!empty($param['mail_info']))
     <div class="center-icon mail">
         <i class="fa fa-envelope"></i>
     </div>
     <a href="mailto:{{ $param['mail_info'] }}">{{ $param['mail_info'] }}</a><br />
+    @endif
     @if(!empty($param['phone']))
         <div class="center-icon phone">
             <i class="fa fa-phone"></i>

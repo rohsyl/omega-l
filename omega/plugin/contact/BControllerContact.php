@@ -21,6 +21,8 @@ class BControllerContact extends  BController {
         'locality' => 'nullable|string',
         'conf_message' => 'nullable|string',
         'is_antispam' => 'required|boolean',
+        'key_site' => 'nullable|string',
+        'key_secret' => 'nullable|string',
     ];
 
     public function __construct(){
@@ -70,6 +72,8 @@ class BControllerContact extends  BController {
             'locality' => $request->input('locality'),
             'conf_message' => $request->input('conf_message'),
             'is_antispam' => $request->input('is_antispam'),
+            'key_site' => $request->input('key_site'),
+            'key_secret' => $request->input('key_secret'),
         );
 
         om_config(['contact_param' => json_encode($param)]);

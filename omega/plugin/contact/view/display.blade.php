@@ -48,14 +48,17 @@
             </div>
         </div>
         @if($isAntispam)
-        <div class="row">
-            <div class="col-md-6">
-                <div>Captcha: <br /><img src="{{ session('captcha')['image_src'] }}" /></div>
-                <div class="form-group">
-                    <input  type="text" name="result" class="form-control">
-                </div>
-            </div>
-        </div>
+            @if($errors->has('recaptcha'))
+                <span class="text-danger">{{ $errors->first('recaptcha') }}</span>
+            @endif
+            <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response"/>
+            <script>
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('{{ $key_site }}', {action: 'contactpage'}).then(function (token) {
+                        document.getElementById('g-recaptcha-response').value = token;
+                    });
+                });
+            </script>
         @endif
         <p class="text-right">
             <input type="submit" name="contactForm" class="btn btn-primary" value="Envoyer"/>

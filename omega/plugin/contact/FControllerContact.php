@@ -1,8 +1,10 @@
 <?php
 namespace OmegaPlugin\Contact;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Omega\Facades\OmegaUtils;
 use Omega\Utils\Entity\Media;
 use Omega\Utils\Plugin\FController;
 use Omega\Utils\Url;
@@ -13,6 +15,10 @@ class FControllerContact extends FController {
 
     const VIEW_FORM = 1;
     const VIEW_INFO = 2;
+
+    const RE_CAPCHAT_URL = 'https://www.google.com/recaptcha/api/siteverify';
+    const RE_CAPCHAT_JS = 'https://www.google.com/recaptcha/api.js?render=';
+    const RE_CAPCHAT_THRESHOLD = 0.5;
 
     private $rules = [
         'name' => 'required|string',
@@ -69,18 +75,46 @@ class FControllerContact extends FController {
 
                 $request = request();
 
-                $isAntispam = $param['is_antispam'];
+
+                $isAntispam = isset($param['is_antispam'])
+                            && isset($param['key_site'])
+                            && isset($param['key_secret']) ? $param['is_antispam'] : false;
+
                 if($request->isMethod('post')){
+
+
 
                     $validator = Validator::make($request->all(), $this->rules);
 
-                    $validator->after(function ($validator) use ($isAntispam, $request) {
-                        if ($isAntispam && !$request->has('result')) {
-                            $validator->errors()->add('result', __('The captcha must be resolved!'));
-                        }
-                        else if(session('captcha')['code'] != $request->input('result')){
-                            $validator->errors()->add('result', __('Invalid captcha!'));
 
+
+
+
+                    $validator->after(function ($validator) use ($isAntispam, $request, $param) {
+                        if($isAntispam){
+                            if($request->has('g-recaptcha-response')){
+                                $client = new Client();
+                                $response = $client->request('POST', self::RE_CAPCHAT_URL, [
+                                    'form_params' => [
+                                        'secret' => $param['key_secret'],
+                                        'response' => $request->input('g-recaptcha-response'),
+                                    ],
+                                ]);
+
+                                if($response->getStatusCode() == 200){
+                                    $content = $response->getBody()->getContents();
+
+                                    $data = json_decode($content);
+
+                                    if($data->success) {
+                                        if($data->score > self::RE_CAPCHAT_THRESHOLD){
+                                            // all good, it's not a bot !
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            $validator->errors()->add('recaptcha', __('Error while validating captcha'));
                         }
                     });
 
@@ -90,6 +124,8 @@ class FControllerContact extends FController {
                             ->withErrors($validator)
                             ->withInput();
                     }
+
+
 
                     $mail = $param['mail'];
 
@@ -101,10 +137,13 @@ class FControllerContact extends FController {
 
 
                 if ($isAntispam) {
-                    session(['captcha' => simple_php_captcha()]);
+                    OmegaUtils::addDependencies([
+                        'js' => [self::RE_CAPCHAT_JS . $param['key_site']]
+                    ]);
                 }
 
                 $m['isAntispam'] = $isAntispam;
+                $m['key_site'] = isset($param['key_site']) ? $param['key_site'] : '';
                 return $this->view('display')->with($m);
                 break;
         }

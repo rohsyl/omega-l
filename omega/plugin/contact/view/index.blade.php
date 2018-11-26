@@ -133,8 +133,19 @@
                     </div>
                 </div>
 
+
                 <div class="form-group">
-                    {{ Form::label('is_antispam', __('Enable Antispam'), ['class' => 'control-label col-md-4']) }}
+                    <div class="col-sm-offset-4 col-sm-4">
+                        <hr />
+                        <h4>{{ __('reCAPTCHA') }}</h4>
+                        <div class="alert alert-info">
+                            https://www.google.com/recaptcha/admin#list
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ Form::label('is_antispam', __('Enable reCAPTCHA'), ['class' => 'control-label col-md-4']) }}
                     <div class="col-sm-4">
                         <div class="checkbox">
                             <label>
@@ -144,6 +155,27 @@
                             </label>
                         </div>
 
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    {{ Form::label('key_site', __('Site key'), ['class' => 'control-label col-md-4']) }}
+                    <div class="col-md-4">
+                        {{ Form::text('key_site', isset($paramData['key_site']) ? $paramData['key_site'] : '', ['class' => 'form-control', 'placeholder' => __('Site key')]) }}
+                        <div class="help-block">
+                            {{ __('This key is used to invoke reCAPTCHA service on your site') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ Form::label('key_secret', __('Secret key'), ['class' => 'control-label col-md-4']) }}
+                    <div class="col-md-4">
+                        {{ Form::text('key_secret', isset($paramData['key_secret']) ? $paramData['key_secret'] : '', ['class' => 'form-control', 'placeholder' => __('Secret key')]) }}
+                        <div class="help-block">
+                            {{ __('This key authorizes communication between your application backend and the reCAPTCHA server to verify the user\'s response. Keep this key secret.') }}
+                        </div>
                     </div>
                 </div>
 
