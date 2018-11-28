@@ -21,12 +21,13 @@
 
                 var marker = new google.maps.Marker({
                     map: map,
-                    position: map.getCenter(),;
-                    @if(isset($markerPicture)) :
-                    '{{ $markerPicture->path }}',;
+                    position: map.getCenter(),
+                    @if(isset($markerPicture))
+                    icon: '{{ $markerPicture->path }}',
                     @endif
-            })
-                        @if(isset($markerText) && !empty($markerText))
+                });
+
+                @if(isset($markerText) && !empty($markerText))
                 var contentString = "{{ $markerText }}";
                 var infowindow = new google.maps.InfoWindow({ content: contentString });
 
