@@ -22,8 +22,8 @@
         </div>
         <table class="table" id="table-plangs">
             <tr>
-                <th>Languages</th>
-                <th>Page</th>
+                <th>{{ __('Languages') }}</th>
+                <th>{{ __('Page') }}</th>
                 <th></th>
             </tr>
             @foreach($langs as $l)
@@ -32,7 +32,7 @@
                         <td>{{ $l->name }}</td>
                         <td>
                             <select class="form-control" id="select-plangs-{{ $l->slug }}" name="plangs_rel[{{ $l->slug }}]">
-                                <option>{{ __('Loading...') }}</option>
+                                <option>{{ __('Loading') }}</option>
                             </select>
 
                             @if ($errors->has('plangs_rel.'.$l->slug))

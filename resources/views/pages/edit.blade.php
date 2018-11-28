@@ -23,7 +23,7 @@
                         <button type="submit" class="btn btn-primary btn-tooltip" title="{{ __('Save') }}" name="getEditPageForm">
                             <span class="glyphicon glyphicon-floppy-disk"></span> <span class="hidden-xs">{{ __('Save') }}</span>
                         </button>
-                        <a href="{{ \Omega\Utils\Entity\Page::GetUrl($page->id) }}" class="btn btn-info btn-tooltip" target="_blank" title="{{ __('View the page') }}">
+                        <a href="{{ \Omega\Utils\Entity\Page::GetUrl($page->id) }}" class="btn btn-info btn-tooltip" target="_blank" title="{{ __('View page') }}">
                             <span class="glyphicon glyphicon-eye-open"></span> <span class="hidden-xs hidden-sm">{{ __('View page') }}</span>
                         </a>
                         @if(!$page->isEnabled)

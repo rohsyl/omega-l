@@ -1,6 +1,6 @@
 <table class="table table-condensed">
     @if(sizeof($modules) == 0)
-        {{ __('Any modules...') }}
+        {{ __('Any modules') }}...
     @else
     @foreach($modules as $module)
     <tr>

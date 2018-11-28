@@ -14,7 +14,7 @@
         {{ Form::label('name', __('Name'), ['class' => 'col-md-3 control-label']) }}
         <div class="col-md-7">
             {{ Form::text('name', $lang->name, ['class' => 'form-control input-md', 'placeholder' => 'Name']) }}
-            <span class="help-block">The langauge name like "Francais"</span>
+            <span class="help-block">{{ __('The langauge name like "Francais"') }}</span>
         </div>
     </div>
 
