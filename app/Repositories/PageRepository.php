@@ -178,6 +178,7 @@ class PageRepository
         $page->slug = unique_slug($page, str_slug($page->name));
         if(isset($inputs['lang']))
             $page->lang = $inputs['lang'];
+        $page->model = 'default';
         $page->fkPageParent = $inputs['parent'];
         $page->fkUser = Auth::id();
         return $page->save();

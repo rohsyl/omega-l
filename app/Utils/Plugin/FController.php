@@ -101,8 +101,8 @@ abstract class FController extends AbstractController {
      * @param $key string A key
      * @return string The unique id
      */
-	public function unique($key){
-	    return $this->name . '_' . $this->idComponent . '_' . $key;
+	public function unique($key = null){
+	    return $this->name . '_' . $this->idComponent . (isset($key) ? '_' . $key : '');
     }
 
     /**

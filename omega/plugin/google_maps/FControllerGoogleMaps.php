@@ -1,7 +1,6 @@
 <?php
 namespace OmegaPlugin\GoogleMaps;
 
-
 use Omega\Utils\Plugin\FController;
 
 class FControllerGoogleMaps extends  FController {
@@ -30,8 +29,8 @@ class FControllerGoogleMaps extends  FController {
         $m['mapstyleEnabled'] = isset($data['mapstyleEnabled']) ? $data['mapstyleEnabled']['mapstyle'] : false;
         $m['lat'] = $data['lat'];
         $m['long'] = $data['long'];
-        $m['markerPicture'] = $data['markerPicture']->id == null ? null : $data['markerPicture'];
+        $m['markerPicture'] = isset($data['markerPicture']) && $data['markerPicture']->id == null ? null : $data['markerPicture'];
         $m['markerText'] = $data['markerText'];
-        return $this->view( $m );
+        return $this->view('display')->with($m);
     }
 }

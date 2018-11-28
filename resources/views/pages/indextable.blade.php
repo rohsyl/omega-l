@@ -23,7 +23,7 @@
                 <td><a href="{{ route('admin.pages.edit', ['id' => $page->id]) }}">{{ $page->name }}</a></td>
                 <td>{{ $page->owner->username }}</td>
                 <td>{{ $page->updated_at }}</td>
-                <td>{{ isset($page->model) ? $page->model : __('Default') }}</td>
+                <td>{{ prettify_text(isset($page->model) ? without_ext(without_ext($page->model)) : __('default')) }}</td>
 
                 @if($enabledLang)
                     <td>{{ isset($page->lang) ? $page->lang : __('Any')}}</td>
@@ -57,7 +57,7 @@
                         <td><i class="fa fa-minus"></i> <a href="{{ route('admin.pages.edit', ['id' => $child->id]) }}">{{ $child->name }}</a></td>
                         <td>{{ $child->owner->username }}</td>
                         <td>{{ $child->updated_at }}</td>
-                        <td>{{ isset($child->model) ? $child->model : __('Default') }}</td>
+                        <td>{{ prettify_text(isset($child->model) ? without_ext(without_ext($child->model)) : __('default')) }}</td>
 
                         @if($enabledLang)
                             <td>{{ isset($child->lang) ? $child->lang : __('Any')}}</td>
