@@ -37,11 +37,11 @@ class Menu{
 
         $this->menuHtmlStruct = array(
             'ul_main' => '<ul>%1$s</ul>',
-            'li_nochildren' => '<li class="nav-item-%3$s"><a href="%1$s">%2$s</a></li>',
-            'li_nochildrenactiv' => '<li class="active nav-item-%3$s"><a href="%1$s" class="active">%2$s</a></li>',
-            'li_children' => '<li class="nav-item-%3$s"><a href="%1$s">%2$s</a>%4$s</li>',
+            'li_nochildren' => '<li class="nav-item-%3$s"><a href="%1$s" %4$s>%2$s</a></li>',
+            'li_nochildrenactiv' => '<li class="active nav-item-%3$s"><a href="%1$s" class="active" %4$s>%2$s</a></li>',
+            'li_children' => '<li class="nav-item-%3$s"><a href="%1$s" %5$s>%2$s</a>%4$s</li>',
             'ul_children' => '<ul>%1$s</ul>',
-            'li_childrenactiv' => '<li class="active nav-item-%3$s"><a href="%1$s">%2$s</a>%4$s</li>'
+            'li_childrenactiv' => '<li class="active nav-item-%3$s"><a href="%1$s" %5$s>%2$s</a>%4$s</li>'
         );
     }
 
@@ -195,6 +195,9 @@ class Menu{
 		
             $url = $row['url'];
 			$title = $row['title'];
+			$isNewTab = isset($row['isnewtab']) ? $row['isnewtab'] : false;
+
+			$target = $isNewTab ? 'target="_blank"' : '';
 
 			if(array_key_exists('children', $row)) {
 
@@ -207,12 +210,12 @@ class Menu{
 
 				if($url == $current_page || $containesActive){
 
-					$z .= sprintf($html['li_childrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $sub);
+					$z .= sprintf($html['li_childrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $sub, $target);
 					$containesActive = true;
 					
 				} else {
 				
-					$z .= sprintf($html['li_children'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $sub);
+					$z .= sprintf($html['li_children'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $sub, $target);
 					
 				}
 				
@@ -223,12 +226,12 @@ class Menu{
 
 				    self::$currentPageUrl = $url;
 
-					$z .= sprintf($html['li_nochildrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)));
+					$z .= sprintf($html['li_nochildrenactiv'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $target);
 					$containesActive = true;
 					
 				} else {
 				
-					$z .= sprintf($html['li_nochildren'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)));
+					$z .= sprintf($html['li_nochildren'], $this->PrepareUrl($url, $lang), $title, strtolower(str_slug($title)), $target);
 					
 				}
 				
@@ -261,17 +264,17 @@ class Menu{
 
 			if(isset($_SESSION['member_connected']) && $_SESSION['member_connected'] == true)
 			{
-				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/profil'), __('Profil'), 'profil');
-				$subItems .= sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/logout'), __('Logout'), 'logout');
+				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/profil'), __('Profil'), 'profil', '');
+				$subItems .= sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/logout'), __('Logout'), 'logout', '');
 				$sub = sprintf($html['ul_children'], $subItems);
-				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub);
+				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub, '');
 
 			}
 			else
 			{
-				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/login'), __('Log in'), 'login');
+				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/login'), __('Log in'), 'login', '');
 				$sub = sprintf($html['ul_children'], $subItems);
-				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub);
+				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub, '');
 			}
 			return $z;
 		}
@@ -310,12 +313,12 @@ class Menu{
                     ]);
                 }
 				$htmlType = session('front_lang') == $lang->slug ? 'li_nochildrenactiv' : 'li_nochildren';
-				$subItems .= sprintf($html[$htmlType], $urlLang, $lang->name, $lang->slug);
+				$subItems .= sprintf($html[$htmlType], $urlLang, $lang->name, $lang->slug, '');
 			}
 
 
 			$sub = sprintf($html['ul_children'], $subItems);
-			$z .= sprintf($html['li_children'], $url, $title, 'language', $sub);
+			$z .= sprintf($html['li_children'], $url, $title, 'language', $sub, '');
 
 			return $z;
 		}

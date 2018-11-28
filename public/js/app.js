@@ -79246,6 +79246,8 @@ $(function () {
 /* 73 */
 /***/ (function(module, exports) {
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /*!
  * Nestable jQuery Plugin - Copyright (c) 2012 David Bushell - http://dbushell.com/
  * Dual-licensed under the BSD or MIT licenses
@@ -79338,24 +79340,33 @@ $(function () {
                     return;
                 }
                 if ($(e.currentTarget).hasClass('edit')) {
-                    var onUpdate = "" + "$(this).parent().parent().parent().find('.dd-handle').first().html($(this).parent().find('div input.title').first().val());" + "$(this).parent().parent().parent().find('a.edit').first().data('url', $(this).parent().find('div input.url').first().val());" + "$(this).parent().parent().parent().find('a.edit').first().data('title',  $(this).parent().find('div input.title').first().val());" + "$.growl.notice({ title : 'Success', message: 'Link updated. <br /> You must click on the Save button for it to take effect.' });" + "return false;";
-                    var onCancel = "" + "$('.edit-form').remove(); " + "return false;";
+                    var getMenuEditForm = function getMenuEditForm(url, title, isNewTab) {
+                        var checked = (typeof isNewTab === 'undefined' ? 'undefined' : _typeof(isNewTab)) !== undefined ? isNewTab : false;
+                        return '<div id="formMenuEdit">' + '<div class="form-group">' + '   <label for="menuEntryUrl" class="control-label">URL / Slug</label>' + '   <input type="text" id="menuEntryUrl" value="' + url + '" class="form-control" />' + '</div>' + '<div class="form-group">' + '   <label for="menuEntryLabel" class="control-label">Label</label>' + '   <input type="text" id="menuEntryLabel" value="' + title + '" class="form-control" />' + '</div>' + '<div class="checkbox">\n' + '    <label>\n' + '      <input type="checkbox" id="menuEntryOpenInNewTab" ' + (checked ? 'checked' : '') + '> Open in a new tab\n' + '    </label>\n' + '  </div>' + '</div>';
+                    };
 
-                    $('.edit-form').remove();
-                    var div = $('<div class="edit-form"></div>');
-                    var form = $('<form class="form-inline" role="form"></form>');
-                    var inputUrl = $('<div class="form-group"></div>').append('<input type="text" class="form-control input-sm url" value="' + $(e.currentTarget).data('url') + '" placeholder="Url">');
-                    var inputTitle = $('<div class="form-group"></div>').append('<input type="text" class="form-control input-sm title" value="' + $(e.currentTarget).data('title') + '" placeholder="Title">');
-                    var buttonUpdate = $('<a href="#" style="margin-left:2px;" onclick="' + onUpdate + '" class="btn btn-primary btn-sm" class="update">Update</a>');
-                    var buttonCancel = $('<a href="#" style="margin-left:2px;" onclick="' + onCancel + '" class="btn btn-default btn-sm" class="cancel">Close</a>');
+                    var url = $(e.currentTarget).data('url');
+                    var title = $(e.currentTarget).data('title');
+                    var isNewTab = $(e.currentTarget).data('isnewtab');
 
-                    form.append(inputUrl);
-                    form.append(inputTitle);
-                    form.append(buttonUpdate);
-                    form.append(buttonCancel);
-                    div.append(form);
-                    $(e.currentTarget).next().after(div);
-                    return false;
+                    var html = getMenuEditForm(url, title, isNewTab);
+                    var mid = omega.modal.open(__('Edit menu entry'), html, __('Save'), function () {
+
+                        var url = $('#menuEntryUrl').val();
+                        var title = $('#menuEntryLabel').val();
+                        var isNewTab = $('#menuEntryOpenInNewTab').is(":checked");
+
+                        $(e.currentTarget).data('url', url);
+                        $(e.currentTarget).data('title', title);
+                        $(e.currentTarget).data('isnewtab', isNewTab);
+
+                        var label = title;
+                        if (isNewTab) label = title + ' ' + '<i class="fa fa-external-link"></i>';
+
+                        $(e.currentTarget).parent().find('.dd-handle').first().html(label);
+
+                        omega.modal.hide(mid);
+                    });
                 } else if ($(e.currentTarget).hasClass('remove')) {
                     $(e.currentTarget).parent().remove();
                     if ($('#nestable ol:first li').length == 0) {

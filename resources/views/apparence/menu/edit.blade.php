@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @push('scripts')
-    <script src="{{ asset('js/jquery.nestable.js') }}" language="JavaScript"></script>
-    <script src="{{ asset('js/custom.nestable.js') }}" language="JavaScript"></script>
     <script src="{{ asset('js/omega/admin/apparance/menu/edit.js') }}" language="JavaScript"></script>
 @endpush
 
@@ -42,10 +40,10 @@ $overflow = 150;
                                         <a class="remove" href="#">
                                             <span class="glyphicon glyphicon-trash" style="float:right; position:absolute; right:5px; top:7px; cursor:pointer;"></span>
                                         </a>
-                                        <a class="edit" data-url="'.$array[$i]['url'].'" data-title="'.$array[$i]['title'].'" href="#">
+                                        <a class="edit" data-url="'.$array[$i]['url'].'" data-title="'.$array[$i]['title'].'" data-isnewtab="' . (isset($array[$i]['isnewtab']) ? $array[$i]['isnewtab'] : 'false') . '" href="#">
                                             <span class="glyphicon glyphicon-cog" style="float:right; position:absolute; right:25px; top:7px; cursor:pointer;"></span>
                                         </a>
-                                        <div class="dd-handle">'.$array[$i]['title'].'</div>';
+                                        <div class="dd-handle">'.$array[$i]['title'].' ' .(isset($array[$i]['isnewtab']) && $array[$i]['isnewtab'] ? '<i class="fa fa-external-link"></i>' : ''). '</div>';
                                 if(array_key_exists('children', $array[$i]))
                                 {
                                     $html .= genHtmlAdmin($array[$i]['children']);
