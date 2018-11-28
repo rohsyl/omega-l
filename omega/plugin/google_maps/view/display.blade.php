@@ -2,7 +2,7 @@
     @if(isset($lat) && !empty($lat) && isset($long) && !empty($long))
     <div class="plugin plugin-googlemaps">
         <div id="{{ $uid }}_map" class="map" style="height: 400px;"></div>
-        <script async="" defer="" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPN2x0Oe5Nu19nToBOUaAhph2sBZLHYxo&callback=initMap" type="text/javascript"></script>
+        <script async="" defer="" src="https://maps.googleapis.com/maps/api/js?key={{ $apikey }}&callback=initMap" type="text/javascript"></script>
         <script type="text/javascript">
             function initMap() {
                 var latlng = new google.maps.LatLng({{ $lat }}, {{ $long }});
@@ -20,11 +20,11 @@
                 var map = new google.maps.Map(document.getElementById("{{ $uid }}_map"),myOptions);
 
                 var marker = new google.maps.Marker({
-                    map: map,;
+                    map: map,
+                    position: map.getCenter(),;
                     @if(isset($markerPicture)) :
-                    '{{ $markerPicture->path }}',
+                    '{{ $markerPicture->path }}',;
                     @endif
-                    position;: map.getCenter()
             })
                         @if(isset($markerText) && !empty($markerText))
                 var contentString = "{{ $markerText }}";
