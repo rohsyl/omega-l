@@ -24,9 +24,9 @@
 <div class="form-group">
     {{ Form::label('is_hidden', __('Hide'), ['class' => 'control-label']) }}
     <div class="checkbox">
-        <label class="radio-inline" for="is_hidden">
+        <label class="radio-inline" for="is_hidden_chk">
             {{ Form::hidden('is_hidden', 0) }}
-            {{ Form::checkbox('is_hidden', 1, $isHidden) }}
+            {{ Form::checkbox('is_hidden', 1, $isHidden, ['id' => 'is_hidden_chk']) }}
             {{ __('Hide the component') }}
         </label>
     </div>
@@ -37,11 +37,11 @@
     {{ Form::label('comp_width', __('Component width'), ['class' => 'control-label']) }}
     <div>
         <label class="radio-inline" for="comp_width-0">
-            {{ Form::radio('comp_width', 'wrapped', $isWrapped) }}
+            {{ Form::radio('comp_width', 'wrapped', $isWrapped, ['id' => 'comp_width-0']) }}
             {{ __('Wrapped') }}
         </label>
         <label class="radio-inline" for="comp_width-1">
-            {{ Form::radio('comp_width', 'full-width', !$isWrapped) }}
+            {{ Form::radio('comp_width', 'full-width', !$isWrapped, ['id' => 'comp_width-1']) }}
             {{ __('Full Width') }}
         </label>
     </div>
@@ -55,7 +55,7 @@
         <div class="col-sm-3">
             <div class="radio">
                 <label for="bgcolor-0">
-                    {{ Form::radio('bgcolor', 'transparent', $bgColorType == 'transparent') }}
+                    {{ Form::radio('bgcolor', 'transparent', $bgColorType == 'transparent', ['id' => 'bgcolor-0']) }}
                     {{ __('Transparent') }}
                 </label>
             </div>
@@ -66,7 +66,7 @@
         <div class="col-sm-3">
             <div class="radio">
                 <label for="bgcolor-1">
-                    {{ Form::radio('bgcolor', 'custom', $bgColorType == 'custom') }}
+                    {{ Form::radio('bgcolor', 'custom', $bgColorType == 'custom', ['id' => 'bgcolor-1']) }}
                     {{ __('Custom') }}
                 </label>
             </div>
@@ -80,7 +80,7 @@
         <div class="col-sm-3">
             <div class="radio">
                 <label for="bgcolor-2">
-                    {{ Form::radio('bgcolor', 'theme', $bgColorType == 'theme') }}
+                    {{ Form::radio('bgcolor', 'theme', $bgColorType == 'theme', ['id' => 'bgcolor-2']) }}
                     {{ __('Theme') }}
                 </label>
             </div>
