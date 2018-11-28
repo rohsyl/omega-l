@@ -23,7 +23,7 @@
                 <ul class="dropdown-menu lang">
                     @foreach(\Omega\Utils\Language\BackLangManager::getAllLang() as $l)
                     <li>
-                        <a href="#">
+                        <a href="{{ route('admin.settings.setblang', [$l->getTwoLetterId()]) }}">
                             <img src="{{ $l->getFlag() }}" title="{{ $l->getName() }}" />&nbsp;&nbsp;{{ $l->getName() }}
                         </a>
                     </li>

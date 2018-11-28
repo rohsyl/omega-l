@@ -41,11 +41,11 @@
     </div>
     @else
         <div class="plugin plugin-googlemaps">
-            Lat and/or lng undefined...
+            {{ __('Lat and/or lng undefined...') }}
         </div>
     @endif
 @else
     <div class="plugin plugin-googlemaps">
-    API Key is undefined...
+        {{ __('API Key is undefined...') }}
     </div>
 @endif

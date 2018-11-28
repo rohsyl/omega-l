@@ -227,4 +227,9 @@ class SettingsController extends AdminController
         ]);
     }
 
+    public function setBackOfficeLang($slug){
+        session(['admin.lang' => $slug]);
+        return redirect()->back();
+    }
+
 }

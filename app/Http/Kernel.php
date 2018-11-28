@@ -62,5 +62,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'om_not_installed' => \Omega\Http\Middleware\OmegaNotInstalled::class,
         'om_is_installed' => \Omega\Http\Middleware\OmegaIsInstalled::class,
+        'om_backoffice_lang' => \Omega\Http\Middleware\AdminLocale::class,
     ];
 }
