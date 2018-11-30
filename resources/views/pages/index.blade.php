@@ -8,24 +8,30 @@
 @section('content')
     <h1 class="page-header">{{ __('Pages') }}</h1>
 
-    <p>
-        @php $args = $enabledLang ? ['lang' => $currentLang] : []; @endphp
-        <a href="{{ route('admin.pages.add', $args) }}" class="btn btn-primary btn-tooltip" title="{{ __('Add new') }}">
-            <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
-        </a>
-        <a href="#" id="sortPages" class="btn btn-default btn-tooltip" title="{{ __('Sort') }}"><span class="glyphicon glyphicon-sort"></span> {{ __('Sort') }}</a>
+    <div class="row">
+        <div class="col-sm-6">
+            @if($enabledLang)
+                {{ Form::open(['route' => ['admin.pages.chooselang'], 'method' => 'POST', 'class' => 'form-inline']) }}
+                <div class="form-group" >
+                    {{ Form::label('lang', __('Filter by language') . ' :') }}
+                    {{ Form::select('lang', $langs, $currentLang, ['id' => 'choose-lang', 'class' => 'form-control', 'onchange' => 'this.form.submit()']) }}
+                </div>
+                {{ Form::close() }}
+            @endif
+        </div>
+        <div class="col-sm-6 pull">
+            <p class="text-right">
+                @php $args = $enabledLang ? ['lang' => $currentLang] : []; @endphp
+                <a href="#" id="sortPages" class="btn btn-default btn-tooltip" title="{{ __('Sort') }}"><span class="glyphicon glyphicon-sort"></span> {{ __('Sort') }}</a>
+                <a href="{{ route('admin.pages.add', $args) }}" class="btn btn-primary btn-tooltip" title="{{ __('Add new') }}">
+                    <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
+                </a>
+            </p>
+        </div>
 
-        @if($enabledLang)
-            {{ Form::open(['route' => ['admin.pages.chooselang'], 'method' => 'POST', 'class' => 'form-inline']) }}
-            <div class="form-group" >
-                {{ Form::label('lang', __('Filter by language') . ' :') }}
-                {{ Form::select('lang', $langs, $currentLang, ['id' => 'choose-lang', 'class' => 'form-control', 'onchange' => 'this.form.submit()']) }}
-            </div>
-            {{ Form::close() }}
-        @endif
-    </p>
+    </div>
 
-
+    <br />
     <div id="tableContainer" data-lang-current="{{ $currentLang }}" data-lang-enabled="{{ $enabledLang }}">
 
     </div>

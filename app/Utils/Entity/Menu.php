@@ -328,6 +328,44 @@ class Menu{
 		return '';
 	}
 
+    /**
+     * Get langs menu as an array
+     * @return array
+     */
+    public function getLangaugeMenuAsArray()
+    {
+        $langEnabled = $this->langRepository->isEnabled();
+        // TODO use Front/Lang
+        if($langEnabled) {
+
+            $current_page = Entity::Page()->id;
+            $current_page = $current_page != 0 ? $current_page : url()->previous();
+            $languages = $this->langRepository->allEnabled();
+
+            $navItems = [];
+            foreach($languages as $lang)
+            {
+                if(session('front_lang') == $lang->slug){
+                    $urlLang = Page::GetUrl($current_page);
+                }
+                else{
+                    $urlLang = route('public.language.change', [
+                        'target' => $lang->slug,
+                        'referer' => $current_page
+                    ]);
+                }
+                $navItems[] = [
+                    'url' => $urlLang,
+                    'title' => $lang->name
+                ];
+            }
+
+            return $navItems;
+        }
+
+        return [];
+    }
+
 
     private function getMemberGroupOrPublic()
     {

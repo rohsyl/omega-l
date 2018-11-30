@@ -22,7 +22,7 @@
 
                 <td><a href="{{ route('admin.pages.edit', ['id' => $page->id]) }}">{{ $page->name }}</a></td>
                 <td>{{ $page->owner->username }}</td>
-                <td>{{ $page->updated_at }}</td>
+                <td><em><small> {{ $page->updated_at }}</small></em></td>
                 <td>{{ prettify_text(isset($page->model) ? without_ext(without_ext($page->model)) : __('default')) }}</td>
 
                 @if($enabledLang)
@@ -38,12 +38,6 @@
                             title="{{ __('Delete') }}"
                             data-url="{{ route('admin.pages.delete', ['id' => $page->id, 'confirmed' => true]) }}"
                             class="delete text-danger">{{ __('Delete') }}</a>
-                        |
-                        @if($page->isEnabled)
-                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => 0]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
-                        @else
-                            <a href="{{ route('admin.pages.enable', ['id' => $page->id, 'enable' => 1]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
-                        @endif
 
                     </span>
                 </td>
@@ -56,7 +50,7 @@
 
                         <td><i class="fa fa-minus"></i> <a href="{{ route('admin.pages.edit', ['id' => $child->id]) }}">{{ $child->name }}</a></td>
                         <td>{{ $child->owner->username }}</td>
-                        <td>{{ $child->updated_at }}</td>
+                        <td><em><small> {{ $child->updated_at }}</small></em></td>
                         <td>{{ prettify_text(isset($child->model) ? without_ext(without_ext($child->model)) : __('default')) }}</td>
 
                         @if($enabledLang)
@@ -72,12 +66,6 @@
                             title="{{ __('Delete') }}"
                             data-url="{{ route('admin.pages.delete', ['id' => $child->id, 'confirmed' => 1]) }}"
                             class="delete text-danger">{{ __('Delete') }}</a>
-                        |
-                        @if($child->isEnabled)
-                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => 0]) }}" title="{{ __('Disable') }}">{{ __('Disable') }}</a>
-                        @else
-                            <a href="{{ route('admin.pages.enable', ['id' => $child->id, 'enable' => 1]) }}" title="{{ __('Enable') }}">{{ __('Enable') }}</a>
-                        @endif
 
                     </span>
                         </td>
