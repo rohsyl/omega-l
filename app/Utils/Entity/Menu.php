@@ -356,11 +356,15 @@ class Menu{
                 }
                 $navItems[] = [
                     'url' => $urlLang,
-                    'title' => $lang->name
+                    'title' => $lang->name,
+                    'lang' => $lang
                 ];
             }
 
-            return $navItems;
+            return [
+                'selected_lang' => $this->langRepository->getBySlug(session('front_lang')),
+                'menu' => $navItems
+            ];
         }
 
         return [];
