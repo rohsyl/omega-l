@@ -16,6 +16,7 @@ use Omega\Http\Requests\Medias\UploaderRequest;
 use Omega\Models\Media;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MediaRepository;
+use Omega\Utils\Directory;
 use Omega\Utils\Entity\VideoExternal;
 use Omega\Utils\Path;
 use Omega\Utils\Url;
@@ -55,9 +56,11 @@ class MediasController extends AdminController
     public function uploader(UploaderRequest $request){
         $parent = $request->input('parent');
         $maxUploadFileSize = humanReadableBytes(getMaximumFileUploadSize());
+        $isWritable = Directory::isWritable(media_path());
         return view(Request::ajax() ? 'media.uploader' : 'media.framed.uploader')->with([
             'isModal' => Request::ajax(),
             'parent' => $parent,
+            'isWritable' => $isWritable,
             'maxUploadFileSize' => $maxUploadFileSize
         ]);
     }
