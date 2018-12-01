@@ -24,5 +24,6 @@ mix.scripts([
 
 // copy all page-specific js files to the public folder
 mix.copyDirectory('resources/assets/js/omega/admin', 'public/js/omega/admin');
+mix.copyDirectory('resources/assets/img', 'public/images');
 
 

@@ -13,6 +13,7 @@ use Omega\Utils\Url;
 
 class Media extends Model implements InterfaceMediaConstant
 {
+    const IMG_404 = 'images/image-not-found.png';
 
     protected $table = 'medias';
 
@@ -52,6 +53,15 @@ class Media extends Model implements InterfaceMediaConstant
 
     private $metas = array();
 
+    /*
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        if(!file_exists($this->getRealpath())){
+            $this->path = self::Get404Placeholder();
+        }
+    }*/
 
     public function getTitle($lang = null){
         return $this->getMeta($lang, 'title');
@@ -119,15 +129,28 @@ class Media extends Model implements InterfaceMediaConstant
 
     public function getThumbnail($w, $h, $returnUrl = true)
     {
-
         $fn = basename($this->path);
 
         $p = Path::Combine(media_path(), $this->id);
         $fp = Path::Combine($p, $fn);
 
+        $showError = false;
+
+        if(!file_exists($p) || !file_exists($fp)){
+            $fp = self::Get404PlaceholderRealPath();
+            $p = dirname($fp);
+            $showError = true;
+            //return self::Get404Placeholder();
+        }
+
+
         $newFilename = PictureHelper::GetImageName($fp, $w, $h);
         $newFilePath = Path::Combine( $p, $newFilename);
         $newFileUrl = Url::Absolute(Url::Combine( url('media'), $this->id, $newFilename));
+
+        if($showError){
+            $newFileUrl = asset('images/' . $newFilename);
+        }
 
         if(!file_exists($newFilePath))
             PictureHelper::Crop($fp, $newFilePath, $w, $h, 100);
@@ -144,7 +167,14 @@ class Media extends Model implements InterfaceMediaConstant
         if($this->getType() != self::T_PICTURE){
             return 0;
         }
-        list($width) = getimagesize($this->getRealpath());
+
+        $path = $this->getRealpath();
+
+        if(!file_exists($this->getRealpath())){
+            $path = self::Get404PlaceholderRealPath();
+        }
+
+        list($width) = getimagesize($path);
         return $width;
     }
 
@@ -153,7 +183,14 @@ class Media extends Model implements InterfaceMediaConstant
         if($this->getType() != self::T_PICTURE){
             return 0;
         }
-        list($width, $height) = getimagesize($this->getRealpath());
+
+        $path = $this->getRealpath();
+
+        if(!file_exists($this->getRealpath())){
+            $path = self::Get404PlaceholderRealPath();
+        }
+
+        list($width, $height) = getimagesize($path);
         return $height;
     }
 
@@ -197,5 +234,13 @@ class Media extends Model implements InterfaceMediaConstant
 
     public function getMediaSize(){
         return self::GetMediaRepository()->GetMediaSize($this);
+    }
+
+    public static function Get404Placeholder(){
+        return asset(self::IMG_404);
+    }
+
+    public static function Get404PlaceholderRealPath(){
+        return public_path(self::IMG_404);
     }
 }

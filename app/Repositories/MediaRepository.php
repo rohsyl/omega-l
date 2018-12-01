@@ -187,6 +187,9 @@ class MediaRepository implements InterfaceMediaConstant {
         $t = self::GetType($media);
         if($t == self::T_VIDEO_EXT  )
             return null;
+        if(!file_exists(self::GetRealpath($media))){
+            return null;
+        }
         return filesize(self::GetRealpath($media));
     }
     #endregion
