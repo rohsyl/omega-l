@@ -59,11 +59,6 @@
                     </span>
                 @endif
             </div>
-            <div class="col-sm-4">
-                <div class="text-muted">
-                    {{ __('Username can only include alphanumeric characters, underscores and at sign.') }}
-                </div>
-            </div>
         </div>
         <div class="form-group">
             {{ Form::label('password', __('Password :'), ['class' => 'control-label col-sm-3']) }}
@@ -84,11 +79,6 @@
                         <strong>{{ $errors->first('password2') }}</strong>
                     </span>
                 @endif
-            </div>
-            <div class="col-sm-4">
-                <div class="text-muted">
-                    {{ __('Please use the strongest password as possible. (7 characters).') }}
-                </div>
             </div>
         </div>
 

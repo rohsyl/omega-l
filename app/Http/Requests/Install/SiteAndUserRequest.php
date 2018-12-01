@@ -28,7 +28,7 @@ class SiteAndUserRequest extends FormRequest
             'slogan' => 'required',
             'email' => 'required|email',
             'username' => 'required',
-            'password' => 'required|min:7|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\X])(?=.*[!$#%]).*$/',
+            'password' => 'required|string',
             'password2' => 'required|same:password',
         ];
     }
