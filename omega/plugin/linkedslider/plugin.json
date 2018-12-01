@@ -1,9 +1,0 @@
-{
-	"pluginName" : "linkedslider",
-	"pluginTitle" : "Linked Slider",
-	"pluginVersion" : "1.0.0",
-	"author" : "OmegaCMS",
-	"authorMail" : "support@omega-cms.org",
-	"authorWebsite" : "http://omega-cms.org",
-	"description" : "Create a slider that redirect to an url on click"
-}
