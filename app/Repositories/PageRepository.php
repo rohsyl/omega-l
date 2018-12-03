@@ -16,12 +16,14 @@ class PageRepository
 {
 
     private $paginateNb;
+    private $trashPaginateNb;
 
     private $page;
 
     public function __construct(Page $page) {
         $this->page = $page;
         $this->paginateNb = config('omega.page.paginate');
+        $this->trashPaginateNb = config('omega.page.trash.paginate');
     }
 
     /**
@@ -66,6 +68,27 @@ class PageRepository
         else{
             return $this->page->get();
         }
+    }
+
+    private function getDeletedPages(){
+        return Page::onlyTrashed()->orderBy('deleted_at', 'DESC');
+    }
+
+    public function deleted(){
+        return $this->getDeletedPages()->get();
+    }
+
+
+    public function deleted_paginate(){
+        return $this->getDeletedPages()->paginate($this->trashPaginateNb);
+    }
+
+    public function restore($id){
+        return $this->getTrashed($id)->restore();
+    }
+
+    public function getTrashed($id){
+        return Page::onlyTrashed()->find($id);
     }
 
     public function getLastUpdatedPages($limit){

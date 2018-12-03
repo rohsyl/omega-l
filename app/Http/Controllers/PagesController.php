@@ -704,4 +704,19 @@ class PagesController extends AdminController
         ]);
     }
     #endregion
+
+
+
+
+    public function trash(){
+        return view('pages.trash')->with([
+            'pages' => $this->pageRepository->deleted_paginate(),
+        ]);
+    }
+
+    public function restore($id){
+        $this->pageRepository->restore($id);
+
+        return redirect()->route('admin.pages.edit', ['id' => $id]);
+    }
 }

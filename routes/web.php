@@ -138,8 +138,16 @@ Route::middleware('om_not_installed')->group(function() {
                 Route::post('update/{id}', 'PagesController@update')->name('admin.pages.update');
                 Route::get('delete/{id}/{confirm?}', 'PagesController@delete')->name('admin.pages.delete');
                 Route::get('enable/{id}/{enable}', 'PagesController@enable')->name('admin.pages.enable');
+
+
+                Route::get('trash', 'PagesController@trash')->name('admin.pages.trash');
+                Route::get('restore/{id}', 'PagesController@restore')->name('admin.pages.restore');
+
                 Route::get('{lang?}', 'PagesController@index')->name('admin.pages');
                 Route::post('chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
+
+
+
             });
 
             Route::get('media/library', 'MediasController@library')->name('media.library');

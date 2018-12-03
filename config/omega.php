@@ -76,6 +76,10 @@ return [
          * of item per pages in the pages list.
          */
         'paginate' => 20,
+
+        'trash' => [
+            'paginate' => 20,
+        ]
     ],
 
 
