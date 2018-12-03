@@ -4,6 +4,6 @@
     margin-bottom : 15px;
 }
 .plugin-image .parallax-window {
-    background: transparent;
+    background: transparent !important;
     width: 100%;
 }
