@@ -717,6 +717,14 @@ class PagesController extends AdminController
     public function restore($id){
         $this->pageRepository->restore($id);
 
+        toast()->success(__('Page restored succesfully!'));
         return redirect()->route('admin.pages.edit', ['id' => $id]);
+    }
+
+    public function forcedelete($id){
+        $this->pageRepository->forcedelete($id);
+
+        toast()->success(__('Page deleted permanently!'));
+        return redirect()->route('admin.pages.trash');
     }
 }

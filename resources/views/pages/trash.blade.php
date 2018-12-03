@@ -17,7 +17,7 @@
 
     <div class="alert alert-info">
         <strong><i class="fa fa-info"></i> {{ __('Information') }}</strong>
-        {{ __('Here you can restore or permanently delete deleted pages') }}
+        {{ __('Here you can restore or permanently delete  deleted pages') }}
     </div>
 
     <table class="table table-condensed">
@@ -34,7 +34,11 @@
                 <td>
                     <span class="action-img-page-list">
                         <a  href="{{ route('admin.pages.restore', ['id' => $page->id]) }}" class="text-warning"
-                            title="{{ __('Restore') }}">{{ __('Restore') }}</a>
+                            title="{{ __('Restore') }}">{{ __('Restore') }}</a> |
+                        <a  href="javascript:void()"
+                            data-url="{{ route('admin.pages.forcedelete', ['id' => $page->id]) }}"
+                            class="text-danger delete"
+                            title="{{ __('Delete permanently the page') }}">{{ __('Delete permanently') }}</a>
                     </span>
                 </td>
             </tr>

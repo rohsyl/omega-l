@@ -87,6 +87,12 @@ class PageRepository
         return $this->getTrashed($id)->restore();
     }
 
+    public function forcedelete($id){
+        $page = $this->getTrashed($id);
+        $page->modules()->forceDelete();
+        return $page->forceDelete();
+    }
+
     public function getTrashed($id){
         return Page::onlyTrashed()->find($id);
     }

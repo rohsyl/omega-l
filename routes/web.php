@@ -142,6 +142,7 @@ Route::middleware('om_not_installed')->group(function() {
 
                 Route::get('trash', 'PagesController@trash')->name('admin.pages.trash');
                 Route::get('restore/{id}', 'PagesController@restore')->name('admin.pages.restore');
+                Route::get('forcedelete/{id}', 'PagesController@forcedelete')->name('admin.pages.forcedelete');
 
                 Route::get('{lang?}', 'PagesController@index')->name('admin.pages');
                 Route::post('chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
