@@ -80,20 +80,20 @@ class Page{
     public function __get($name){
         return $this->page->$name;
     }
-	
-	public function render()
-	{
-		if($this->secure && (isset($_SESSION['public']['connectedToPage_'.$this->id]) || isset($_SESSION['member_connected'])))
-		{
-			$this->renderComponent();	
-		}
-		else if($this->securityType == 'none')
-		{
-			$this->renderComponent();	
-		}
-		$this->doSecurityAction();
-	}
-	
+
+    public function render()
+    {
+        if($this->secure && (isset($_SESSION['public']['connectedToPage_'.$this->id]) || isset($_SESSION['member_connected'])))
+        {
+            $this->renderComponent();
+        }
+        else if($this->securityType == 'none')
+        {
+            $this->renderComponent();
+        }
+        $this->doSecurityAction();
+    }
+
     public function exists() {
         return isset($this->page) && $this->page->exists();
     }
@@ -172,7 +172,7 @@ class Page{
     public function reload() {
         return redirect(self::GetUrl($this->page->id));
     }
-		
+
     public static function RenderSpecialContent($content)
     {
         $p = new Page();
@@ -185,16 +185,16 @@ class Page{
             function($matches) {
 
                 ob_start();
-				include Path::Combine(macro_path(), $matches[1]);
-				$html = ob_get_clean();
-                
+                include Path::Combine(macro_path(), $matches[1]);
+                $html = ob_get_clean();
+
                 return $html;
             },
             $content
         );
         return $content;
     }
-	
+
     public function renderPhpFromContent($content) {
         ob_start();
         eval('?>' . $content);
@@ -223,9 +223,10 @@ class Page{
 
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
                 $t = explode('/',  $args['settings']['pluginTemplate']);
+                $theme = $t[0];
                 $plugin = $t[1];
                 $template = $t[2];
-                $path = 'theme::template.'.$plugin.'.'.$template;
+                $path = Path::Combine(theme_path($theme), 'template', $plugin, $template);
                 $instance->forceView($path);
             }
 
