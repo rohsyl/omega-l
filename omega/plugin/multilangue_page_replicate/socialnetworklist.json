@@ -1,0 +1,74 @@
+{
+	"facebook": {
+		"name": "Facebook",
+		"class": "fa fa-facebook",
+		"color": "#306199",
+		"colorHover": "#1a3553"
+	},
+	"twitter": {
+		"name": "Twitter",
+		"class": "fa fa-twitter",
+		"color": "#26c4f1",
+		"colorHover": "#0b8bb0"
+	},
+	"instagram": {
+		"name": "Instagram",
+		"class": "fa fa-instagram",
+		"color": "#3f729b",
+		"colorHover": "#144065"
+	},
+	"googleplus": {
+		"name": "Google+",
+		"class": "fa fa-google-plus",
+		"color": "#e93f2e",
+		"colorHover": "#a92012"
+	},
+	"youtube": {
+		"name": "YouTube",
+		"class": "fa fa-youtube",
+		"color": "#cc181e",
+		"colorHover": "#7a0e12"
+	},
+	"vimeo": {
+		"name": "Vimeo",
+		"class": "fa fa-vimeo-square",
+		"color": "#1bb6ec",
+		"colorHover": "#0d799e"
+	},
+	"android": {
+		"name": "Android",
+		"class": "fa fa-android",
+		"color": "#a4c639",
+		"colorHover": "#668113"
+	},
+	"dribbble": {
+		"name": "Dribbble",
+		"class": "fa fa-dribbble",
+		"color": "#444444",
+		"colorHover": "#333333"
+	},
+	"github": {
+		"name": "GitHub",
+		"class": "fa fa-github",
+		"color": "#4183c4",
+		"colorHover": "#154b7f"
+	},
+	"linkedin": {
+		"name": "Linkedin",
+		"class": "fa fa-linkedin",
+		"color": "#0976b4",
+		"colorHover": "#034b75"
+	},
+	"vine": {
+		"name": "Vine",
+		"class": "fa fa-vine",
+		"color": "#00b488",
+		"colorHover": "#007558"
+	},
+	"skype": {
+		"name": "Skype",
+		"class": "fa fa-skype",
+		"color": "#00aff0",
+		"colorHover": "#00719c"
+	}
+}

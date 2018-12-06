@@ -1,0 +1,12 @@
+{
+	"pluginName" : "multilangue_page_replicate",
+	"pluginTitle" : "Multilangue page replicator",
+	"pluginVersion" : "1.0.0",
+	"author" : "Roh Sylvain",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "This tools allow you to duplicate pages from a language to one or many target language",
+	"options" : {
+		"displayInMenu" : 1
+	}
+}
