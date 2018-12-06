@@ -1,0 +1,1 @@
+<div class="om-wrapper"><a href="?logout">{{ __('Logout') }}</a></div>
