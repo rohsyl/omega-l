@@ -6,6 +6,8 @@ use Omega\Utils\Plugin\FController;
 
 define('GALLERY_DISPLAY_WALL', 1);
 define('GALLERY_DISPLAY_SLIDER', 2);
+define('GALLERY_DISPLAY_BIGSLIDER', 3);
+define('GALLERY_DISPLAY_BS_SLIDER', 4);
 
 class FControllerGallery extends  FController {
 
@@ -43,8 +45,14 @@ class FControllerGallery extends  FController {
         if($display == GALLERY_DISPLAY_WALL) {
             return $this->view('display')->with($data);
         }
-        else {
+        else if($display == GALLERY_DISPLAY_SLIDER) {
             return $this->view('display_slider')->with($data);
+        }
+        else if($display == GALLERY_DISPLAY_BS_SLIDER){
+            return $this->view('display_bs_slider')->with($data);
+        }
+        else {
+            return $this->view('display_bigslider')->with($data);
         }
     }
 }
