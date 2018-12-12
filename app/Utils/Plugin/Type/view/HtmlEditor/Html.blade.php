@@ -1,4 +1,4 @@
-<textarea id="{{ $uid }}" name="{{ $uid }}">{{ isset($value) ? $value : '' }}</textarea>
+<textarea id="{{ $uid }}" name="{{ $uid }}" class="">{{ isset($value) ? $value : '' }}</textarea>
 <script>
     var textarea = document.getElementById('{{ $uid }}');
     var editor = CodeMirror.fromTextArea(textarea, {

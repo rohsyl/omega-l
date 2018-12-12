@@ -37,11 +37,21 @@ class PageRepository
 
     /**
      * Get a page by slug
-     * @param $slug strin
+     * @param $slug string
      * @return Page|null
      */
     public function getBySlug($slug){
         return $this->page->where('slug', $slug)->first();
+    }
+
+    /**
+     * Get a page by slug and lang
+     * @param $slug string
+     * @param $lang string Language slug
+     * @return Page|null
+     */
+    public function getBySlugAndLang($slug, $lang){
+        return $this->page->where('slug', $slug)->where('lang', $lang)->first();
     }
 
     /**
@@ -53,6 +63,13 @@ class PageRepository
         $page = $this->get($id);
         $page->slug = str_random(10);
         $page->save();
+
+        foreach($page->children as $child){
+            $child->slug = str_random(10);
+            $child->save();
+            $this->page->destroy($child->id);
+        }
+
         return $this->page->destroy($id);
     }
 
@@ -223,7 +240,9 @@ class PageRepository
     public function update($page, $inputs, $beforeSaveClosure = null){
 
         $name = $inputs['name'];
-        $slug = unique_slug($page, str_slug($inputs['slug']));
+        // TODO : unique slug
+        //$slug = unique_slug($page, str_slug($inputs['slug']));
+        $slug = $inputs['slug'];
 
         // callback to update name and slug in menus
         if(isset($beforeSaveClosure))

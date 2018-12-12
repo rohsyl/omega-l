@@ -122,6 +122,15 @@ class Type{
        return self::GetRepository()->getValueForEntry($entryId, $moduleId);
     }
 
+
+    public static function DuplicateValues($fromId, $toId){
+        $values = self::GetRepository()->getAllValuesForModule($fromId);
+        foreach($values as $value){
+            $newValue = $value->replicate();
+            $newValue->fkModule = $toId;
+            $newValue->save();
+        }
+    }
     /**
      *
      * @param $entry FormEntry

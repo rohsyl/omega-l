@@ -394,7 +394,12 @@ class Page{
 
     public static function GetId($slug, $lang = null){
 
-        $page = self::GetPageRepository()->getBySlug($slug);
+        if(isset($lang)){
+            $page = self::GetPageRepository()->getBySlugAndLang($slug, $lang);
+        }
+        else{
+            $page = self::GetPageRepository()->getBySlug($slug);
+        }
 
         if(isset($page)){
 

@@ -109,6 +109,17 @@ class FormRepository
     }
 
     /**
+     * Get all values for the given moduleId
+     * @param $moduleId int The id of the module/component
+     * @return mixed
+     */
+    public function getAllValuesForModule($moduleId){
+        return $this->formEntryValue
+            ->where('fkModule', $moduleId)
+            ->get();
+    }
+
+    /**
      * Save the value of the given entry
      * @param \Omega\Utils\Plugin\FormEntry $entry
      * @return boolean True if success

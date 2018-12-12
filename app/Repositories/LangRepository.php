@@ -27,6 +27,12 @@ class LangRepository{
     public function all(){
         return $this->lang->all();
     }
+    public function allEnabledExcept($slug){
+        return $this->lang
+            ->where('isEnabled', true)
+            ->where('slug', '<>', $slug)
+            ->get();
+    }
 
     public function allEnabled(){
         return $this->lang->where('isEnabled', true)->get();

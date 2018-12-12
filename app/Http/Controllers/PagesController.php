@@ -11,7 +11,7 @@ use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
 use Omega\Repositories\PageSecurityTypeRepository;
 use Omega\Repositories\PluginRepository;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\CreatePageRequest;
 use Omega\Http\Requests\Page\UpdateRequest;
@@ -268,13 +268,25 @@ class PagesController extends AdminController
 
         $enabledLang = om_config('om_enable_front_langauge');
 
+
+        $lang = null;
+        if(om_config('om_enable_front_langauge')){
+            $lang = real_null($request->input('lang'));
+
+        }
+
+        // TODO : unique slug
         // make sur the slug is unique
+        /*
         $validator = Validator::make($request->all(), [
             'slug' => [
-                Rule::unique('pages')->ignore($id),
+                Rule::unique('pages')->ignore($id)->where('lang', $lang)
+                Rule::unique('pages')->where(function ($query) use($page) {
+                    return $query->where('lang', $page->lang);
+                })->ignore($id),
+                //Rule::unique('pages')->ignore($id),
             ],
         ]);
-
         // send back with errors if the validation fails
         if ($validator->fails()) {
             toast()->error(__('Errors while saving the page'));
@@ -282,7 +294,8 @@ class PagesController extends AdminController
                 ->route('admin.pages.edit', ['id' => $id, 'tab' => $request->input('tab')])
                 ->withErrors($validator)
                 ->withInput();
-        }
+        }*/
+
 
         $page = $this->pageRepository->get($id);
 
@@ -293,6 +306,7 @@ class PagesController extends AdminController
         }
 
         $mr = $this->menuRepository;
+
         // update the page basic data
         // update the name and slug in all menus
         $this->pageRepository->update($page, $request->all(), function($name, $slug, $page) use ($mr) {
