@@ -7,7 +7,7 @@
                 function initMap() {
                     var latlng = new google.maps.LatLng({{ $lat }}, {{ $long }});
                     var myOptions = {
-                        zoom: 14,
+                        zoom: {{ $zoom }},
                         center: latlng,
                         scrollwheel: false,
                         scaleControl: false,
@@ -29,6 +29,11 @@
 
                             @if(isset($markerText) && !empty($markerText))
                     var contentString = "{!! $markerText !!}";
+
+                    @if($itineraryEnabled)
+                    contentString += '<a href="http://maps.google.com/maps?&z=10&mrt=all&t=m&q={{ $lat }}+{{ $long }}" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-map"></i> {{ __('Itinerary') }}</a>';
+                    @endif
+
                     var infowindow = new google.maps.InfoWindow({ content: contentString });
 
                     google.maps.event.addListener(marker, "click", function() {
