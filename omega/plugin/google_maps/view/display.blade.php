@@ -28,7 +28,7 @@
                     });
 
                             @if(isset($markerText) && !empty($markerText))
-                    var contentString = "{{ $markerText }}";
+                    var contentString = "{!! $markerText !!}";
                     var infowindow = new google.maps.InfoWindow({ content: contentString });
 
                     google.maps.event.addListener(marker, "click", function() {
