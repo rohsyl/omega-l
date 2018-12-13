@@ -76,7 +76,17 @@ $(function(){
             var mid = omega.modal.open('Edit module', '<form id="formEditModule">'+data+'</form>', 'Save', function(){
                 var $form = $('#formEditModule');
                 url = route('admin.pages.saveModule', {moduleId : id});
+
+                var $editor = $form.find('.codemirror-editor');
+
+                if($editor.length > 0){
+                    var editor = $editor.data('codemirror');
+                    var value = editor.getValue();
+                    $editor.val(value);
+                }
+
                 args = omega.ajax._serializeForm($form);
+
                 omega.ajax.query(url, args, 'POST', function(){
                     omega.modal.hide(mid);
                 });
