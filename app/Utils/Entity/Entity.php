@@ -27,6 +27,11 @@ class Entity{
     private $lang;
 
     /**
+     * @var string
+     */
+    private $langSlug = null;
+
+    /**
      * @param $page Page
      */
     public function setPage($page){
@@ -52,6 +57,10 @@ class Entity{
      */
     public function setLang($lang){
         $this->lang = $lang;
+    }
+
+    public function setLangSlug($langSlug){
+        $this->langSlug = $langSlug;
     }
 
     /**
@@ -87,9 +96,6 @@ class Entity{
      */
     public function LangSlug(){
 
-        if($this->Lang() !== null){
-            return $this->Lang()->slug;
-        }
-        return null;
+        return $this->langSlug;
     }
 }

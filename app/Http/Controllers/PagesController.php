@@ -309,9 +309,9 @@ class PagesController extends AdminController
 
         // update the page basic data
         // update the name and slug in all menus
-        $this->pageRepository->update($page, $request->all(), function($name, $slug, $page) use ($mr) {
-            $mr->updateNameInCustomMenu($name, $page);
-            $mr->updateSlugInCustomMenu($slug, $page);
+        $this->pageRepository->update($page, $request->all(), function($name, $slug, $lang, $page) use ($mr) {
+            $mr->updateNameInCustomMenu($name, $lang, $page);
+            $mr->updateSlugInCustomMenu($slug, $lang, $page);
         });
 
         // save the page relations

@@ -19,11 +19,12 @@ use Omega\Utils\Entity\Site;
  * @method static void setMenu(Menu $menu)
  * @method static void setSite(Site $site)
  * @method static void setLang(Lang $lang)
+ * @method static void setLangSlug(string $langSlug)
  * @method static Menu Menu()
  * @method static Page Page()
  * @method static Site Site()
  * @method static Lang Lang()
- * @method static null|string LangSlug()
+ * @method static string LangSlug()
  *
  * @see \Omega\Utils\Entity\Entity
  */
