@@ -5,6 +5,7 @@ $displayFilesize = $filesize['filesize'];
 if(!function_exists('document_get_item_content')){
     function document_get_item_content($media){
         global $displayFilesize;
+        $media->readInDbMeta();
 
         $html = '
         <div class="col-md-6 col-sm-12">
@@ -14,10 +15,10 @@ if(!function_exists('document_get_item_content')){
                         <i class="' . \OmegaPlugin\document\utils\DocumentUtils::getClassByExt($media->ext) . ' ' . \OmegaPlugin\document\utils\DocumentUtils::getIconByExt($media->ext) . '"></i>
                     </span>
                     <span class="text">';
-        if(isset($media->title) && !empty($media->title)){
-            $html .=  $media->title . '
+        if($media->getTitle() != null && !empty($media->getTitle())){
+            $html .=  $media->getTitle() . '
                             <span>
-                                ' . $media->description . '
+                                ' . $media->getDescription() . '
                                 ' . ( isset($displayFilesize) && $displayFilesize ? '('.\OmegaPlugin\document\utils\DocumentUtils::formatBytes($media->getFilesize()).')' : '' ) . '
                             </span>';
         }

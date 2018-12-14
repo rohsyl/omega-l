@@ -5,7 +5,7 @@ namespace Omega\Models;
 use Illuminate\Database\Eloquent\Model;
 use Omega\Repositories\MediaMetaRepository;
 use Omega\Repositories\MediaRepository;
-use Omega\Utils\Entity\Entity;
+use Omega\Facades\Entity;
 use Omega\Utils\Interfaces\InterfaceMediaConstant;
 use Omega\Utils\Path;
 use Omega\Utils\PictureHelper;
@@ -53,15 +53,15 @@ class Media extends Model implements InterfaceMediaConstant
 
     private $metas = array();
 
-    /*
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
+        /*
+        public function __construct(array $attributes = [])
+        {
+            parent::__construct($attributes);
 
-        if(!file_exists($this->getRealpath())){
-            $this->path = self::Get404Placeholder();
-        }
-    }*/
+            if(!file_exists($this->getRealpath())){
+                $this->path = self::Get404Placeholder();
+            }
+        }*/
 
     public function getTitle($lang = null){
         return $this->getMeta($lang, 'title');
