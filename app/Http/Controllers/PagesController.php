@@ -272,7 +272,6 @@ class PagesController extends AdminController
         $lang = null;
         if(om_config('om_enable_front_langauge')){
             $lang = real_null($request->input('lang'));
-
         }
 
         // TODO : unique slug
