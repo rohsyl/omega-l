@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/rohsyl/omega-l/tree/HEAD)
-
-[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.2...HEAD)
+## [v0.1.3](https://github.com/rohsyl/omega-l/tree/v0.1.3) (2019-02-12)
+[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.2...v0.1.3)
 
 **Implemented enhancements:**
 
@@ -11,6 +10,10 @@
 
 **Fixed bugs:**
 
+- Error while saving a page [\#49](https://github.com/rohsyl/omega-l/issues/49)
+- Documents: Media item get title and description for the current language [\#46](https://github.com/rohsyl/omega-l/issues/46)
+- Page slug change slug in menu of all language [\#45](https://github.com/rohsyl/omega-l/issues/45)
+- Module Area : "Show on all pages" symbol doesn't trigger visually [\#43](https://github.com/rohsyl/omega-l/issues/43)
 - Plugin Google Maps : "Go To" button  [\#42](https://github.com/rohsyl/omega-l/issues/42)
 - Plugin Google Maps : html not parsed [\#41](https://github.com/rohsyl/omega-l/issues/41)
 - Plugin Gallery [\#40](https://github.com/rohsyl/omega-l/issues/40)
