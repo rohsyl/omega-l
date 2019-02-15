@@ -31,7 +31,7 @@ class ContactMail extends MailablePlugin
      */
     public function build()
     {
-        $this->subject(__('Message of ' . $this->inputs['name']));
+        $this->subject(__('Message from ' . $this->inputs['name']));
         $this->from('noreply@' . request()->getHost(), 'Omega contact');
         $this->replyTo($this->inputs['mail']);
         return $this->plugin_view('mail', $this->inputs);
