@@ -244,7 +244,8 @@ class PageRepository
         //$slug = unique_slug($page, str_slug($inputs['slug']));
         $slug = $inputs['slug'];
 
-        $lang = real_null($inputs['lang']);
+
+        $lang = isset($inputs['lang']) ? real_null($inputs['lang']) : null;
 
         // callback to update name and slug in menus
         if(isset($beforeSaveClosure))
