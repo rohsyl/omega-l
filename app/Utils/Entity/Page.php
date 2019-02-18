@@ -222,12 +222,8 @@ class Page{
             $args = json_decode($component->param, true);
 
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
-                $t = explode('/',  $args['settings']['pluginTemplate']);
-                $theme = $t[0];
-                $plugin = $t[1];
-                $template = $t[2];
-                $path = Path::Combine(theme_path($theme), 'template', $plugin, $template);
-                $instance->forceView($path);
+                $ct = theme_decode_components_template($args['settings']['pluginTemplate']);
+                $instance->forceView($ct->getViewName(), $ct->buildPath());
             }
 
             $isHidden = isset($args['settings']['isHidden']) ? $args['settings']['isHidden'] : false;
@@ -280,17 +276,12 @@ class Page{
 
             // force using an other view defined in the settings of the component
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
-                $t = explode('/',  $args['settings']['pluginTemplate']);
-                $theme = $t[0];
-                $plugin = $t[1];
-                $template = $t[2];
-                $path = Path::Combine(theme_path($theme), 'template', $plugin, $template);
-                $instance->forceView($path);
+                $ct = theme_decode_components_template($args['settings']['pluginTemplate']);
+                $instance->forceView($ct->getViewName(), $ct->buildPath());
             }
 
             $isHidden = isset($args['settings']['isHidden']) ? $args['settings']['isHidden'] : false;
             if(!$isHidden) {
-
 
                 $content = $instance->display($args, $data);
 
