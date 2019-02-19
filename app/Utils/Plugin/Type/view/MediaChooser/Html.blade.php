@@ -5,21 +5,24 @@
     foreach($values as $val){
         $mediaId = $val['id'];
         $media = \Omega\Utils\Entity\Media::Get($mediaId);
-        $mediaItem = array(
-            'id' => $mediaId,
-            'name' => $media->name,
-            'title' => $media->title,
-            'description' => $media->description,
-            'type' => $media->getType(),
-        );
-        if($media->getType() == \Omega\Utils\Entity\Media::T_PICTURE){
-            $mediaItem['thumbnail'] = $media->getThumbnail(120, 68);
+        if(isset($media)){
+            $mediaItem = array(
+                'id' => $mediaId,
+                'name' => $media->name,
+                'title' => $media->title,
+                'description' => $media->description,
+                'type' => $media->getType(),
+            );
+            if($media->getType() == \Omega\Utils\Entity\Media::T_PICTURE){
+                $mediaItem['thumbnail'] = $media->getThumbnail(120, 68);
+            }
+            if($media->type == \Omega\Utils\Entity\Media::EXTERNAL_VIDEO){
+                $media = new \Omega\Utils\Entity\VideoExternal($media);
+                $mediaItem['thumbnail'] = $media->getVideoThumbnail();
+            }
+            $medias[] = $mediaItem;
         }
-        if($media->type == \Omega\Utils\Entity\Media::EXTERNAL_VIDEO){
-            $media = new \Omega\Utils\Entity\VideoExternal($media);
-            $mediaItem['thumbnail'] = $media->getVideoThumbnail();
-        }
-        $medias[] = $mediaItem;
+
     }
     $jsonMedia = json_encode($medias);
 @endphp

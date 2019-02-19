@@ -37,11 +37,21 @@ class PageRepository
 
     /**
      * Get a page by slug
-     * @param $slug strin
+     * @param $slug string
      * @return Page|null
      */
     public function getBySlug($slug){
         return $this->page->where('slug', $slug)->first();
+    }
+
+    /**
+     * Get a page by slug and lang
+     * @param $slug string
+     * @param $lang string Language slug
+     * @return Page|null
+     */
+    public function getBySlugAndLang($slug, $lang){
+        return $this->page->where('slug', $slug)->where('lang', $lang)->first();
     }
 
     /**
@@ -53,6 +63,13 @@ class PageRepository
         $page = $this->get($id);
         $page->slug = str_random(10);
         $page->save();
+
+        foreach($page->children as $child){
+            $child->slug = str_random(10);
+            $child->save();
+            $this->page->destroy($child->id);
+        }
+
         return $this->page->destroy($id);
     }
 
@@ -223,11 +240,16 @@ class PageRepository
     public function update($page, $inputs, $beforeSaveClosure = null){
 
         $name = $inputs['name'];
-        $slug = unique_slug($page, str_slug($inputs['slug']));
+        // TODO : unique slug
+        //$slug = unique_slug($page, str_slug($inputs['slug']));
+        $slug = $inputs['slug'];
+
+
+        $lang = isset($inputs['lang']) ? real_null($inputs['lang']) : null;
 
         // callback to update name and slug in menus
         if(isset($beforeSaveClosure))
-            $beforeSaveClosure($name, $slug, $page);
+            $beforeSaveClosure($name, $slug, $lang, $page);
 
         $page->showName = $inputs['showName'];
         $page->name = $name;
@@ -240,7 +262,7 @@ class PageRepository
         $page->fkMenu = $inputs['menu'];
         $page->fkPageParent = $inputs['parent'];
         if(om_config('om_enable_front_langauge')){
-            $page->lang = real_null($inputs['lang']);
+            $page->lang = $lang;
 
         }
 

@@ -11,7 +11,7 @@ use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
 use Omega\Repositories\PageSecurityTypeRepository;
 use Omega\Repositories\PluginRepository;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\CreatePageRequest;
 use Omega\Http\Requests\Page\UpdateRequest;
@@ -268,13 +268,24 @@ class PagesController extends AdminController
 
         $enabledLang = om_config('om_enable_front_langauge');
 
+
+        $lang = null;
+        if(om_config('om_enable_front_langauge')){
+            $lang = real_null($request->input('lang'));
+        }
+
+        // TODO : unique slug
         // make sur the slug is unique
+        /*
         $validator = Validator::make($request->all(), [
             'slug' => [
-                Rule::unique('pages')->ignore($id),
+                Rule::unique('pages')->ignore($id)->where('lang', $lang)
+                Rule::unique('pages')->where(function ($query) use($page) {
+                    return $query->where('lang', $page->lang);
+                })->ignore($id),
+                //Rule::unique('pages')->ignore($id),
             ],
         ]);
-
         // send back with errors if the validation fails
         if ($validator->fails()) {
             toast()->error(__('Errors while saving the page'));
@@ -282,7 +293,8 @@ class PagesController extends AdminController
                 ->route('admin.pages.edit', ['id' => $id, 'tab' => $request->input('tab')])
                 ->withErrors($validator)
                 ->withInput();
-        }
+        }*/
+
 
         $page = $this->pageRepository->get($id);
 
@@ -293,11 +305,12 @@ class PagesController extends AdminController
         }
 
         $mr = $this->menuRepository;
+
         // update the page basic data
         // update the name and slug in all menus
-        $this->pageRepository->update($page, $request->all(), function($name, $slug, $page) use ($mr) {
-            $mr->updateNameInCustomMenu($name, $page);
-            $mr->updateSlugInCustomMenu($slug, $page);
+        $this->pageRepository->update($page, $request->all(), function($name, $slug, $lang, $page) use ($mr) {
+            $mr->updateNameInCustomMenu($name, $lang, $page);
+            $mr->updateSlugInCustomMenu($slug, $lang, $page);
         });
 
         // save the page relations
@@ -514,16 +527,18 @@ class PagesController extends AdminController
         $themeName = $this->themeRepository->getCurrentThemeName();
         $pluginName = $module->plugin->name;
 
-        $pluginTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
-        array_unshift($pluginTemplates, null);
+        $componentsTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
 
         $pluginTemplatesWithTitle = array();
-        foreach($pluginTemplates as $template){
-            if($template == null){
-                $pluginTemplatesWithTitle['null'] = __('Default');
-            }
-            else{
-                $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(without_ext(prettify_text($template)));
+        $pluginTemplatesWithTitle['null'] = __('Default');
+        foreach($componentsTemplates as $views){
+            foreach($views as $newView){
+                $newViewName = $newView->getNewViewPath();
+                $label = $newView->getLabel();
+                if(!isset($label)){
+                    $label = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(without_ext(prettify_text($newViewName)));
+                }
+                $pluginTemplatesWithTitle[theme_encode_components_template($themeName, $newView)] = $label;
             }
         }
 
@@ -562,9 +577,11 @@ class PagesController extends AdminController
         }
         if(isset($args['settings']['pluginTemplate'])){
             $viewBag['pluginTemplate'] = $args['settings']['pluginTemplate'];
+            $viewBag['isPluginTemplateUpToDate'] = $this->pluginRepository->isPluginTemplateUpToDate($viewBag['pluginTemplate']);
         }
         else{
             $viewBag['pluginTemplate'] = 'null';
+            $viewBag['isPluginTemplateUpToDate'] = null;
         }
         if(isset($args['settings']['compTitle'])){
             $viewBag['compTitle'] = $args['settings']['compTitle'];
@@ -573,9 +590,18 @@ class PagesController extends AdminController
             $viewBag['compTitle'] = '';
         }
 
+
+
         $viewBag['pluginTemplates'] = $pluginTemplatesWithTitle;
         $viewBag['themeColors'] = $themeColors;
         return view('pages.component.settings')->with($viewBag);
+    }
+
+    public function isComponentsTemplateUpToDate(Request $request){
+        $bol = $this->pluginRepository->isPluginTemplateUpToDate($request->post('componentsTemplateString'));
+        return response()->json([
+            'upToDate' => $bol
+        ]);
     }
 
     /**
@@ -590,7 +616,7 @@ class PagesController extends AdminController
         if(!isset($args['settings'])) $args['settings'] = array();
         $args['settings']['compId'] = $request->input('compId');
         $args['settings']['compTitle'] = $request->input('compTitle');
-        $args['settings']['isHidden'] = $request->input('is_hidden');
+        $args['settings']['isHidden'] = intval($request->input('is_hidden'));
         $args['settings']['isWrapped'] = $request->input('comp_width') == 'wrapped';
         switch($_POST['bgcolor']) {
             case 'custom':

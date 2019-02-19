@@ -76,7 +76,17 @@ $(function(){
             var mid = omega.modal.open('Edit module', '<form id="formEditModule">'+data+'</form>', 'Save', function(){
                 var $form = $('#formEditModule');
                 url = route('admin.pages.saveModule', {moduleId : id});
+
+                var $editor = $form.find('.codemirror-editor');
+
+                if($editor.length > 0){
+                    var editor = $editor.data('codemirror');
+                    var value = editor.getValue();
+                    $editor.val(value);
+                }
+
                 args = omega.ajax._serializeForm($form);
+
                 omega.ajax.query(url, args, 'POST', function(){
                     omega.modal.hide(mid);
                 });
@@ -210,12 +220,12 @@ $(function(){
 
         if(is === 1)
         {
-            $this.find('span').addClass('fa-spin');
+            $this.find('i').addClass('fa-spin');
 
             url = route('admin.pages.ma.setonallpages', { id : posId, set : 0, pageId : pageId });
             omega.ajax.query(url.url(), {}, omega.ajax.POST, function(){
-                $this.find('span').removeClass('glyphicon-star fa-spin');
-                $this.find('span').addClass('glyphicon-star-empty');
+                $this.find('i').removeClass('fa-star fa-spin');
+                $this.find('i').addClass('fa-star-o');
                 $this.data('is', 0);
             }, function(){
                 alert(__('Ajax error while deleting module in area'));
@@ -223,12 +233,12 @@ $(function(){
         }
         else
         {
-            $this.find('span').addClass('fa-spin');
+            $this.find('i').addClass('fa-spin');
 
             url = route('admin.pages.ma.setonallpages', { id : posId, set : 1, pageId : 'null' });
             omega.ajax.query(url.url(), {}, omega.ajax.POST, function(){
-                $this.find('span').removeClass('glyphicon-star-empty fa-spin');
-                $this.find('span').addClass('glyphicon-star');
+                $this.find('i').removeClass('fa-star-o fa-spin');
+                $this.find('i').addClass('fa-star');
                 $this.data('is', 1);
             }, function(){
                 alert(__('Ajax error while deleting module in area'));

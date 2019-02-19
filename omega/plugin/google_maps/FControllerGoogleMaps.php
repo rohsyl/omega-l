@@ -27,8 +27,10 @@ class FControllerGoogleMaps extends  FController {
         $m['apikey'] = om_config('googlemaps_apikey');
         $m['mapstyle'] = om_config('googlemaps_mapstyle');
         $m['mapstyleEnabled'] = isset($data['mapstyleEnabled']) ? $data['mapstyleEnabled']['mapstyle'] : false;
+        $m['itineraryEnabled'] = isset($data['mapItineraryButtonEnabled']) ? $data['mapItineraryButtonEnabled']['itineraryButton'] : false;
         $m['lat'] = $data['lat'];
         $m['long'] = $data['long'];
+        $m['zoom'] = isset($data['zoom']) && !empty($data['zoom']) && is_numeric($data['zoom']) ? $data['zoom'] : 10;
         $m['markerPicture'] = isset($data['markerPicture']) && $data['markerPicture']->id == null ? null : $data['markerPicture'];
         $m['markerText'] = $data['markerText'];
         return $this->view('display')->with($m);
