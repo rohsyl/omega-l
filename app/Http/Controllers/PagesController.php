@@ -616,7 +616,7 @@ class PagesController extends AdminController
         if(!isset($args['settings'])) $args['settings'] = array();
         $args['settings']['compId'] = $request->input('compId');
         $args['settings']['compTitle'] = $request->input('compTitle');
-        $args['settings']['isHidden'] = $request->input('is_hidden');
+        $args['settings']['isHidden'] = intval($request->input('is_hidden'));
         $args['settings']['isWrapped'] = $request->input('comp_width') == 'wrapped';
         switch($_POST['bgcolor']) {
             case 'custom':

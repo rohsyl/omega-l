@@ -111,13 +111,14 @@
         $('#btn-check-compatibility').click(function(e){
             var $this = $(this);
             var url = route('admin.pages.isComponentsTemplateUpToDate');
+            $this.removeClass('btn-success').removeClass('btn-warning').addClass('btn-default').html('<i class="fa fa-spinner fa-spin"></i> Loading');
             omega.ajax.query(url, { componentsTemplateString : $('#compTemplate').val() }, 'POST', function(data){
                 console.log(data);
                 if(data.upToDate){
-                    $this.addClass('btn-success').removeClass('btn-warning').html('<i class="fa fa-check"></i> Up to date');
+                    $this.addClass('btn-success').removeClass('btn-default').html('<i class="fa fa-check"></i> Up to date');
                 }
                 else{
-                    $this.addClass('btn-warning').removeClass('btn-success').html('<i class="fa fa-times"></i> Is outdated and could cause errors');
+                    $this.addClass('btn-warning').removeClass('btn-default').html('<i class="fa fa-times"></i> Is outdated and could cause errors');
                 }
             }, undefined, {dataType: 'json'});
             return false;
