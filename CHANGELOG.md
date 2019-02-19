@@ -1,5 +1,17 @@
 # Change Log
 
+## [Unreleased](https://github.com/rohsyl/omega-l/tree/HEAD)
+
+[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.3...HEAD)
+
+**Implemented enhancements:**
+
+- Improve plugin component's template [\#50](https://github.com/rohsyl/omega-l/issues/50)
+
+**Fixed bugs:**
+
+- Improve plugin component's template [\#50](https://github.com/rohsyl/omega-l/issues/50)
+
 ## [v0.1.3](https://github.com/rohsyl/omega-l/tree/v0.1.3) (2019-02-12)
 [Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.2...v0.1.3)
 
