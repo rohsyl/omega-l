@@ -89,6 +89,10 @@ if(!function_exists('theme_decode_components_template')) {
      */
     function theme_decode_components_template($componentsTemplateString)
     {
+        if(!isset($componentsTemplateString) || $componentsTemplateString == 'null'){
+            return null;
+        }
+
         $t = explode('.',  $componentsTemplateString);
         $themeName = $t[0];
         $pluginName = $t[1];

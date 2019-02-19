@@ -20,12 +20,15 @@
     <span class="help-block">
         {{ __('Choose the template for this component') }}.
 
-        @if($isPluginTemplateUpToDate)
+        @if(!isset($isPluginTemplateUpToDate))
             <a href="#" class="btn btn-xs btn-success" id="btn-check-compatibility" data-toggle="tooltip" data-placement="bottom" title="{{ __('Click to check if it is up to date') }}"><i class="fa fa-check"></i> {{ __('Up to date') }}</a>
         @else
-            <a href="#" class="btn btn-xs btn-warning" id="btn-check-compatibility" data-toggle="tooltip" data-placement="bottom" title="{{ __('Click to check if it is up to date') }}"><i class="fa fa-times"></i> {{ __('Is outdated and could cause errors') }}</a>
+            @if($isPluginTemplateUpToDate)
+                <a href="#" class="btn btn-xs btn-success" id="btn-check-compatibility" data-toggle="tooltip" data-placement="bottom" title="{{ __('Click to check if it is up to date') }}"><i class="fa fa-check"></i> {{ __('Up to date') }}</a>
+            @else
+                <a href="#" class="btn btn-xs btn-warning" id="btn-check-compatibility" data-toggle="tooltip" data-placement="bottom" title="{{ __('Click to check if it is up to date') }}"><i class="fa fa-times"></i> {{ __('Is outdated and could cause errors') }}</a>
+            @endif
         @endif
-
     </span>
 </div>
 
@@ -114,11 +117,16 @@
             $this.removeClass('btn-success').removeClass('btn-warning').addClass('btn-default').html('<i class="fa fa-spinner fa-spin"></i> Loading');
             omega.ajax.query(url, { componentsTemplateString : $('#compTemplate').val() }, 'POST', function(data){
                 console.log(data);
-                if(data.upToDate){
+                if(data.upToDate == null){
                     $this.addClass('btn-success').removeClass('btn-default').html('<i class="fa fa-check"></i> Up to date');
                 }
                 else{
-                    $this.addClass('btn-warning').removeClass('btn-default').html('<i class="fa fa-times"></i> Is outdated and could cause errors');
+                    if(data.upToDate){
+                        $this.addClass('btn-success').removeClass('btn-default').html('<i class="fa fa-check"></i> Up to date');
+                    }
+                    else{
+                        $this.addClass('btn-warning').removeClass('btn-default').html('<i class="fa fa-times"></i> Is outdated and could cause errors');
+                    }
                 }
             }, undefined, {dataType: 'json'});
             return false;

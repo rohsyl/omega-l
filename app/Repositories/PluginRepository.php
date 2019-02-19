@@ -129,6 +129,9 @@ class PluginRepository
 
     public function isPluginTemplateUpToDate($pluginTemplateString){
         $cv = theme_decode_components_template($pluginTemplateString);
+
+        if(!isset($cv)) return null;
+
         $pm = new PluginMeta($cv->getPluginName());
         return version_compare($pm->getVersion(), $cv->getVersionString(), "<=");
     }

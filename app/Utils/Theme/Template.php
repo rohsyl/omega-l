@@ -47,7 +47,10 @@ class Template
      */
     public function getAllComponentsViewForPlugin($pluginName): array
     {
-        return $this->componentsView[$pluginName];
+        if(isset($this->componentsView[$pluginName]))
+            return $this->componentsView[$pluginName];
+        else
+            return [];
     }
 
     public function getComponentView($pluginName, $viewName, $newViewPath){
