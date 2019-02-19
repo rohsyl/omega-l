@@ -84,7 +84,7 @@ class Page{
 
     public function render()
     {
-        if($this->secure && (isset($_SESSION['public']['connectedToPage_'.$this->id]) || isset($_SESSION['member_connected'])))
+        if($this->secure && (session()->has('public.connectedToPage_'.$this->id) || isset($_SESSION['member_connected'])))
         {
             $this->renderComponent();
         }
@@ -175,7 +175,8 @@ class Page{
     }
 
     public function reload() {
-        return redirect(self::GetUrl($this->page->id));
+        $this->needRedirect = true;
+        $this->redirectTo = redirect(self::GetUrl($this->page->id));
     }
 
     public static function RenderSpecialContent($content)
