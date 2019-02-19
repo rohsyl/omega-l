@@ -527,16 +527,18 @@ class PagesController extends AdminController
         $themeName = $this->themeRepository->getCurrentThemeName();
         $pluginName = $module->plugin->name;
 
-        $pluginTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
-        array_unshift($pluginTemplates, null);
+        $componentsTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
 
         $pluginTemplatesWithTitle = array();
-        foreach($pluginTemplates as $template){
-            if($template == null){
-                $pluginTemplatesWithTitle['null'] = __('Default');
-            }
-            else{
-                $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(without_ext(prettify_text($template)));
+        $pluginTemplatesWithTitle['null'] = __('Default');
+        foreach($componentsTemplates as $views){
+            foreach($views as $newView){
+                $newViewName = $newView->getNewViewPath();
+                $label = $newView->getLabel();
+                if(!isset($label)){
+                    $label = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(without_ext(prettify_text($newViewName)));
+                }
+                $pluginTemplatesWithTitle[theme_encode_components_template($themeName, $newView)] = $label;
             }
         }
 
@@ -575,9 +577,11 @@ class PagesController extends AdminController
         }
         if(isset($args['settings']['pluginTemplate'])){
             $viewBag['pluginTemplate'] = $args['settings']['pluginTemplate'];
+            $viewBag['isPluginTemplateUpToDate'] = $this->pluginRepository->isPluginTemplateUpToDate($viewBag['pluginTemplate']);
         }
         else{
             $viewBag['pluginTemplate'] = 'null';
+            $viewBag['isPluginTemplateUpToDate'] = null;
         }
         if(isset($args['settings']['compTitle'])){
             $viewBag['compTitle'] = $args['settings']['compTitle'];
@@ -586,9 +590,18 @@ class PagesController extends AdminController
             $viewBag['compTitle'] = '';
         }
 
+
+
         $viewBag['pluginTemplates'] = $pluginTemplatesWithTitle;
         $viewBag['themeColors'] = $themeColors;
         return view('pages.component.settings')->with($viewBag);
+    }
+
+    public function isComponentsTemplateUpToDate(Request $request){
+        $bol = $this->pluginRepository->isPluginTemplateUpToDate($request->post('componentsTemplateString'));
+        return response()->json([
+            'upToDate' => $bol
+        ]);
     }
 
     /**
@@ -603,7 +616,7 @@ class PagesController extends AdminController
         if(!isset($args['settings'])) $args['settings'] = array();
         $args['settings']['compId'] = $request->input('compId');
         $args['settings']['compTitle'] = $request->input('compTitle');
-        $args['settings']['isHidden'] = $request->input('is_hidden');
+        $args['settings']['isHidden'] = intval($request->input('is_hidden'));
         $args['settings']['isWrapped'] = $request->input('comp_width') == 'wrapped';
         switch($_POST['bgcolor']) {
             case 'custom':
