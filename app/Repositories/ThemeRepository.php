@@ -105,7 +105,7 @@ class ThemeRepository
             $dir = opendir ($directory_path);
             while($element = readdir($dir))
             {
-                if($element != '.' && $element != '..')
+                if($element != '.' && $element != '..' && $element != 'register.php')
                 {
                     if (!is_dir(Path::Combine($directory_path, $element)))
                         $files[] = $element;

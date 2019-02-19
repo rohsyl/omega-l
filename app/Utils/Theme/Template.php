@@ -22,6 +22,7 @@ class Template
     }
 
     /**
+     * Register a component template view
      * @param $pluginName string The name of the plugin
      * @param $viewName string The name of the view in the plugin view directory (the name without the extentions)
      * @param $versionString string The version of the plugin when this components template was created. It's used to keep track of plugin update and then to alert the developper.
