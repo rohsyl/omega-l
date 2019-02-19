@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/rohsyl/omega-l/tree/HEAD)
-
-[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.3...HEAD)
+## [v0.1.4](https://github.com/rohsyl/omega-l/tree/v0.1.4) (2019-02-19)
+[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.3...v0.1.4)
 
 **Implemented enhancements:**
 
