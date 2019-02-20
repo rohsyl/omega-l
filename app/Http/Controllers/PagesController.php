@@ -1,20 +1,17 @@
 <?php
-
 namespace Omega\Http\Controllers;
 
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\Component\SaveSettingsRequest;
 use Omega\Http\Requests\Page\Module\CreateModuleRequest;
 use Omega\Http\Requests\Page\SortRequest;
+use Omega\Http\Requests\Page\CreatePageRequest;
+use Omega\Http\Requests\Page\UpdateRequest;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
 use Omega\Repositories\PageSecurityTypeRepository;
 use Omega\Repositories\PluginRepository;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
-use Omega\Http\Requests\Page\CreatePageRequest;
-use Omega\Http\Requests\Page\UpdateRequest;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MenuRepository;
 use Omega\Repositories\ModuleAreaRepository;
@@ -76,6 +73,7 @@ class PagesController extends AdminController
         $this->pluginRepository = $pluginRepository;
     }
 
+    #region index
     /**
      * The list of pages
      * @param null $lang If not null, filter by lang
@@ -83,14 +81,13 @@ class PagesController extends AdminController
      */
     public function index($lang = null){
 
-
         $enabledLang = om_config('om_enable_front_langauge');
         $defaultLang = om_config('om_default_front_langauge');
 
         $currentLang = null;
         if($enabledLang){
             $currentLang = isset($lang) ? $lang : null;
-
+            // if the lang is not given in the URL, then get the value from the session if it exists
             if(!isset($currentLang) && session()->has('backoffice_lang_pages')){
                 $currentLang = session('backoffice_lang_pages');
             }
@@ -111,10 +108,56 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function chooseLang(Request $request){
+        // set the chosen lang in a session variable
         session(['backoffice_lang_pages' => $request->input('lang')]);
+        // redirect back to the list of pages
         return redirect()->route('admin.pages', ['lang' => $request->input('lang')]);
     }
 
+    /**
+     * Sort the pages
+     * @param SortRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sort(SortRequest $request){
+        $orders = $request->input('order');
+        foreach($orders as $p)
+        {
+            $page = $this->pageRepository->get($p['id']);
+            $page->order = $p['order'];
+            $result = $page->save();
+            if(!$result)
+                break;
+        }
+        return response()->json([
+            'result' => $result,
+        ]);
+    }
+
+    /**
+     * Get the table with all the page filtered by lang
+     * @param null|string $lang
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getTable($lang = null){
+        $enabledLang = om_config('om_enable_front_langauge');
+
+        $pages = !$enabledLang ?
+            $this->pageRepository->paginatePagesWithParent(null) :
+            $this->pageRepository->paginatePageWithParentAndLang($lang, null);
+
+        $pages->withPath(route('admin.pages'));
+
+        return view('pages.indextable')->with([
+            'enabledLang' => $enabledLang,
+            'currentLang' => $lang,
+            'pages' => $pages,
+        ]);
+    }
+    #endregion
+
+
+    #region add
     /**
      * Display the form to add a new page
      * @param null $lang If not null, set by default the given lang
@@ -137,6 +180,11 @@ class PagesController extends AdminController
         ]);
     }
 
+    /**
+     * Get the list of page that can be a parent of a newly created page.
+     * @param null $lang
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getPagesLevelZeroBylang($lang = null){
 
         $pages = !isset($lang)
@@ -157,13 +205,17 @@ class PagesController extends AdminController
         $inputs = $request->all();
         $this->pageRepository->create($inputs);
 
+        // Redirect to the list of page in the right language (if given)
         $args = [];
         if(isset($inputs['lang']))
             $args['lang'] = $inputs['lang'];
 
         return redirect()->route('admin.pages', $args);
     }
+    #endregion
 
+
+    #region edit
     /**
      * Display the form to edit a page
      * @param $id int The id of the page
@@ -372,6 +424,24 @@ class PagesController extends AdminController
     }
 
     /**
+     * Get all pages filtered by parent and lang
+     * Used for the multi-lang
+     * @param $pid int The id of the current page
+     * @param $lang string The selected lang
+     * @param null $idParent The id of the page parent
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function getAllPageByParentAndLang($pid, $lang, $idParent = null){
+        return response()->json([
+            'selected' => PageHelper::GetCorrespondingInLang($pid, $lang),
+            'pages' => $this->pageRepository->getPageWithParentAndLang($lang, $idParent)
+        ]);
+    }
+    #endregion
+
+
+    #region delete
+    /**
      * Soft-Delete a page by id after confirmation
      * @param $id int The id of the page
      * @param bool $confirm
@@ -388,7 +458,10 @@ class PagesController extends AdminController
                 ->with(['id' => $id]);
         }
     }
+    #endregion
 
+
+    #region enable_disable
     /**
      * Enable or disable the given page
      * @param $id int The id of the page
@@ -401,58 +474,7 @@ class PagesController extends AdminController
         toast()->success($enable ? __('Page enabled') : __('Page disabled'));
         return redirect()->back();
     }
-
-
-    public function sort(SortRequest $request){
-        $orders = $request->input('order');
-        foreach($orders as $p)
-        {
-            $page = $this->pageRepository->get($p['id']);
-            $page->order = $p['order'];
-            $result = $page->save();
-            if(!$result)
-                break;
-        }
-        return response()->json([
-            'result' => $result,
-        ]);
-    }
-
-    /**
-     * Get the table with all the page filtered by lang
-     * @param null|string $lang
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function getTable($lang = null){
-        $enabledLang = om_config('om_enable_front_langauge');
-
-        $pages = !$enabledLang ?
-            $this->pageRepository->paginatePagesWithParent(null) :
-            $this->pageRepository->paginatePageWithParentAndLang($lang, null);
-
-        $pages->withPath(route('admin.pages'));
-
-        return view('pages.indextable')->with([
-            'enabledLang' => $enabledLang,
-            'currentLang' => $lang,
-            'pages' => $pages,
-        ]);
-    }
-
-    /**
-     * Get all pages filtered by parent and lang
-     * Used for the multi-lang
-     * @param $pid int The id of the current page
-     * @param $lang string The selected lang
-     * @param null $idParent The id of the page parent
-     * @return \Illuminate\Http\JsonResponse
-     */
-    function getAllPageByParentAndLang($pid, $lang, $idParent = null){
-        return response()->json([
-            'selected' => PageHelper::GetCorrespondingInLang($pid, $lang),
-            'pages' => $this->pageRepository->getPageWithParentAndLang($lang, $idParent)
-        ]);
-    }
+    #endregion
 
 
     #region component
@@ -524,6 +546,7 @@ class PagesController extends AdminController
         // TODO : improve the managment of the settings
         // using a Form ? (class:Type)
 
+
         $themeName = $this->themeRepository->getCurrentThemeName();
         $pluginName = $module->plugin->name;
 
@@ -590,13 +613,16 @@ class PagesController extends AdminController
             $viewBag['compTitle'] = '';
         }
 
-
-
         $viewBag['pluginTemplates'] = $pluginTemplatesWithTitle;
         $viewBag['themeColors'] = $themeColors;
         return view('pages.component.settings')->with($viewBag);
     }
 
+    /**
+     * Check if the component template is up to date
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function isComponentsTemplateUpToDate(Request $request){
         $bol = $this->pluginRepository->isPluginTemplateUpToDate($request->post('componentsTemplateString'));
         return response()->json([
@@ -655,15 +681,19 @@ class PagesController extends AdminController
 
         $this->moduleRepository->componentOrderInitForPage($pageId);
         switch($position){
+            // Move the component to the top
             case 'upper':
                 $this->moduleRepository->componentOrderSetOrderUpper($compId, $pageId);
                 break;
+            // Move the component up by one
             case 'up':
                 $this->moduleRepository->componentOrderSetOrderUp($compId, $pageId);
                 break;
+            // Move the component to the bottom
             case 'downer':
                 $this->moduleRepository->componentOrderSetOrderDowner($compId, $pageId);
                 break;
+            // Move the component down by one
             case 'down':
                 $this->moduleRepository->componentOrderSetOrderDown($compId, $pageId);
                 break;
@@ -719,7 +749,7 @@ class PagesController extends AdminController
 
     /**
      * Save the module
-     * @param $moduleId The id of the module
+     * @param $moduleId int The id of the module
      * @return \Illuminate\Http\JsonResponse
      */
     public function saveModule($moduleId) {
@@ -732,14 +762,22 @@ class PagesController extends AdminController
     #endregion
 
 
-
-
+    #region trash
+    /**
+     * Get the page that display the content of the trash
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function trash(){
         return view('pages.trash')->with([
             'pages' => $this->pageRepository->deleted_paginate(),
         ]);
     }
 
+    /**
+     * Restore a page by id
+     * @param $id int The id of the page
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function restore($id){
         $this->pageRepository->restore($id);
 
@@ -747,10 +785,16 @@ class PagesController extends AdminController
         return redirect()->route('admin.pages.edit', ['id' => $id]);
     }
 
+    /**
+     * Delete permanently a page by id
+     * @param $id int The id of the page
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function forcedelete($id){
         $this->pageRepository->forcedelete($id);
 
         toast()->success(__('Page deleted permanently!'));
         return redirect()->route('admin.pages.trash');
     }
+    #endregion
 }

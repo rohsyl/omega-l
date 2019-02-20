@@ -2,7 +2,6 @@
 
 namespace Omega\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Omega\Http\Requests\Apparence\Menu\CreateRequest;
 use Omega\Http\Requests\Apparence\Menu\UpdateRequest;
@@ -15,6 +14,10 @@ use Omega\Repositories\PageRepository;
 use Omega\Repositories\ThemeRepository;
 use Omega\Utils\Theme\Installer;
 
+/**
+ * Class ApparenceController
+ * @package Omega\Http\Controllers
+ */
 class ApparenceController extends AdminController
 {
     private $themeRepository;
@@ -40,6 +43,12 @@ class ApparenceController extends AdminController
         $this->langRepository = $langRepository;
     }
 
+    #region theme
+
+    /**
+     * Get the list of theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme(){
         return view('apparence.theme.index')->with([
             'current' => $this->themeRepository->getCurrentThemeName(),
@@ -48,7 +57,11 @@ class ApparenceController extends AdminController
         ]);
     }
 
-
+    /**
+     * Get the detail page of a theme
+     * @param $name string The name of the theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme_detail($name) {
         return view('apparence.theme.detail')->with([
             'isCurrent' => $this->themeRepository->getCurrentThemeName() == $name,
@@ -57,6 +70,11 @@ class ApparenceController extends AdminController
         ]);
     }
 
+    /**
+     * Publish the assets of the current theme
+     * @param $name
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_publish($name) {
 
         $code = Artisan::call('omega:theme:publish');
@@ -71,6 +89,11 @@ class ApparenceController extends AdminController
         return redirect()->back();
     }
 
+    /**
+     * Get the list of modulearea for the given theme name
+     * @param $name string The name of the theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme_ma_list($name){
         return view('apparence.theme.ma_list')->with([
             'theme' => $name,
@@ -78,10 +101,20 @@ class ApparenceController extends AdminController
         ]);
     }
 
+    /**
+     * Get the form to add a new modulearea to a theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme_ma_add(){
         return view('apparence.theme.ma_add');
     }
 
+    /**
+     * Create a new modulearea for the given theme
+     * @param CreateModuleAreaRequest $request
+     * @param $name string The name of the theme
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function theme_ma_create(CreateModuleAreaRequest $request, $name){
         $this->moduleAreaRepository->create(str_slug($request->input('modulearea'), '_'), $name);
         return response()->json([
@@ -89,6 +122,12 @@ class ApparenceController extends AdminController
         ]);
     }
 
+    /**
+     * Delete the given modulearea for the given theme
+     * @param $name string The name of the theme
+     * @param $area string The name of the modulearea
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function theme_ma_delete($name, $area){
         $this->moduleAreaRepository->deleteByName($area, $name);
         return response()->json([
@@ -96,12 +135,18 @@ class ApparenceController extends AdminController
         ]);
     }
 
+    /**
+     * Set the given theme as the one in use. Automatically publish the assets
+     * @param $name string The name of the theme
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_useit($name) {
 
+        // Set the current theme
         $this->themeRepository->setCurrentThemeName($name);
         toast()->success(__('Theme set'));
 
-
+        // Publish the assets
         $code = Artisan::call('omega:theme:publish');
         $output = Artisan::output();
         if($code === 0)
@@ -109,10 +154,15 @@ class ApparenceController extends AdminController
         else
             toast()->error(__('Error') . '<br />' . $output);
 
-        
+        // Redirect back to the list of theme
         return redirect()->route('theme.index');
     }
 
+    /**
+     * Install a theme
+     * @param $name string The name of the theme to install
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_install($name) {
         if(!$this->themeRepository->isInstalled($name)) {
 
@@ -136,6 +186,11 @@ class ApparenceController extends AdminController
         return redirect()->route('theme.index');
     }
 
+    /**
+     * Uninstall a theme
+     * @param $name string The name of the theme to uninstall
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_uninstall($name) {
         if($this->themeRepository->getCurrentThemeName() == $name){
             toast()->error(__('Can\'t delete the used theme...'));
@@ -150,13 +205,15 @@ class ApparenceController extends AdminController
     public function theme_delete($name) {
 
     }
-
+    #endregion
 
 
     public function editor(){
 
     }
 
+
+    #region menu
     public function menu(){
         return view('apparence.menu.index')->with([
             'menus' => $this->menuRepository->all(),
@@ -222,4 +279,5 @@ class ApparenceController extends AdminController
                 ->with(['id' => $id]);
         }
     }
+    #endregion
 }
