@@ -1,5 +1,20 @@
 # Change Log
 
+## [Unreleased](https://github.com/rohsyl/omega-l/tree/HEAD)
+
+[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.5...HEAD)
+
+**Implemented enhancements:**
+
+- Admin Page Content : Adding a component typo error [\#10](https://github.com/rohsyl/omega-l/issues/10)
+
+## [v0.1.5](https://github.com/rohsyl/omega-l/tree/v0.1.5) (2019-02-20)
+[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.4...v0.1.5)
+
+**Implemented enhancements:**
+
+- Create a new npm command to watch and publish automatically theme assets [\#48](https://github.com/rohsyl/omega-l/issues/48)
+
 ## [v0.1.4](https://github.com/rohsyl/omega-l/tree/v0.1.4) (2019-02-19)
 [Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.3...v0.1.4)
 
