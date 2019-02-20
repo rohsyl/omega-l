@@ -12,7 +12,13 @@
     "theme": "php artisan omega:theme:publish"
   },
   "watch": {
-    "theme": "omega/theme/*/assets/*"
+    "theme": {
+      "patterns": [
+        "omega/theme/*/assets/*"
+      ],
+      "extensions": "css,js",
+      "quiet": false
+    }
   },
   "devDependencies": {
     "axios": "^0.18",
