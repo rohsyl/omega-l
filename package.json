@@ -16,7 +16,7 @@
       "patterns": [
         "omega/theme/*/assets/*"
       ],
-      "extensions": "css,js",
+      "extensions": "*",
       "quiet": false
     }
   },
