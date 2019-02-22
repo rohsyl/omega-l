@@ -4,6 +4,7 @@ namespace Omega\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -45,5 +46,16 @@ class User extends Authenticatable
 
     public function displayName(){
         return isset($this->fullname) ? $this->fullname : $this->username;
+    }
+
+    public function hasRight($ability){
+        DB::statement('CALL om_UserHasRight(:ability, :id, @hasRight);',
+            array(
+                $ability,
+                $this->id
+            )
+        );
+        $results = DB::select('SELECT @hasRight as hasRight');
+        return boolval($results[0]->hasRight);
     }
 }

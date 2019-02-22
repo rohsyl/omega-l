@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 use Omega\Http\Requests\Apparence\Menu\CreateRequest;
 use Omega\Http\Requests\Apparence\Menu\UpdateRequest;
 use Omega\Http\Requests\Apparence\Theme\CreateModuleAreaRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\MenuRepository;
@@ -215,6 +216,8 @@ class ApparenceController extends AdminController
 
     #region menu
     public function menu(){
+        if(OmegaGate::denies('menu_read')) return OmegaGate::accessDeniedView();
+
         return view('apparence.menu.index')->with([
             'menus' => $this->menuRepository->all(),
             'langEnabled' => om_config('om_enable_front_langauge')
