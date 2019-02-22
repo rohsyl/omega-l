@@ -1,0 +1,28 @@
+os:
+  - linux
+
+language: php
+
+php:
+  - '7.1.3'
+
+services:
+  - mysql
+
+before_script:
+  - mysql -e 'CREATE DATABASE db_omega;'
+  - composer self-update
+  - composer install --no-interaction
+  - cp .env.travis .env
+  - phpenv rehash
+  - nvm install 7.7.1
+  - npm install npm@latest -g
+  - npm install -g jshint
+  - npm install
+
+script:
+  #  - vendor/bin/phpunit --coverage-text
+  - npm run production
+  #  - jshint resources/assets/js/modules/*
+  - php artisan key:generate
+  - php artisan migrate --seed

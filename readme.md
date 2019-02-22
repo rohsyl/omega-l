@@ -1,4 +1,8 @@
-# OmegaCMS (omega-l)
+# OmegaCMS (omega-l) [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
+
+[![Build Status](https://travis-ci.com/rohsyl/omega-l.svg?branch=master)](https://travis-ci.com/rohsyl/omega-l)
+
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/rohsyl/omega-l.svg)](http://isitmaintained.com/project/rohsyl/omega-l "Percentage of issues still open") [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/rohsyl/omega-l.svg)](http://isitmaintained.com/project/rohsyl/omega-l "Average time to resolve an issue")
 
 OmegaCMS is a content management system created by Sylvain Roh. It is based on Laravel 5
 
