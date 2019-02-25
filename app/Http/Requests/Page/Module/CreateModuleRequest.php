@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Page\Module;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class CreateModuleRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class CreateModuleRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('page_update');
     }
 
     /**

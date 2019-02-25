@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Page;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class CreatePageRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class CreatePageRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('page_add');
     }
 
     /**

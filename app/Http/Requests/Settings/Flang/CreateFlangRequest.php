@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Settings\Flang;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class CreateFlangRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class CreateFlangRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('setting_general');
     }
 
     /**

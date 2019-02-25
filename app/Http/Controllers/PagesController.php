@@ -7,6 +7,7 @@ use Omega\Http\Requests\Page\Module\CreateModuleRequest;
 use Omega\Http\Requests\Page\SortRequest;
 use Omega\Http\Requests\Page\CreatePageRequest;
 use Omega\Http\Requests\Page\UpdateRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
@@ -80,6 +81,8 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index($lang = null){
+        if(OmegaGate::denies('page_read'))
+            return OmegaGate::accessDeniedView();
 
         $enabledLang = om_config('om_enable_front_langauge');
         $defaultLang = om_config('om_default_front_langauge');
@@ -140,6 +143,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getTable($lang = null){
+        if(OmegaGate::denies('page_read'))
+            return OmegaGate::accessDeniedView();
+
         $enabledLang = om_config('om_enable_front_langauge');
 
         $pages = !$enabledLang ?
@@ -164,6 +170,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function add($lang = null){
+        if(OmegaGate::denies('page_add'))
+            return OmegaGate::accessDeniedView();
+
         $enabledLang = om_config('om_enable_front_langauge');
 
         $langs = $this->langRepository->allEnabled();
@@ -223,6 +232,8 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit($id, $tab = 'content'){
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
 
         $enabledLang = om_config('om_enable_front_langauge');
         $currentTheme = $this->themeRepository->getCurrentThemeName();
@@ -268,6 +279,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function moduleareaList($pageId) {
+        if(OmegaGate::denies('page_edit'))
+            return OmegaGate::accessDeniedView();
+
         $moduleAreas = $this->moduleAreaRepository->getAllModuleAreaByThemeName($this->themeRepository->getCurrentThemeName());
         return view('pages.modulearealist')->with([
             'moduleAreas' => $moduleAreas,
@@ -281,6 +295,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function componentList($pageId){
+        if(OmegaGate::denies('page_edit'))
+            return OmegaGate::accessDeniedView();
+
         $cs = $this->moduleRepository->getAllComponentsByPage($pageId);
         $components = array();
 
@@ -303,6 +320,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function moduleList($pageId){
+        if(OmegaGate::denies('page_edit'))
+            return OmegaGate::accessDeniedView();
+
         $modules = $this->moduleRepository->getAllModulesByPage($pageId);
 
         return view('pages.modulelist')->with([
@@ -448,6 +468,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
     public function delete($id, $confirm = false){
+        if(OmegaGate::denies('page_delete'))
+            return OmegaGate::accessDeniedView();
+
         if($confirm){
             $this->pageRepository->delete($id);
             toast()->success(__('Page deleted'));
@@ -469,6 +492,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function enable($id, $enable){
+        if(OmegaGate::denies('page_disable'))
+            return OmegaGate::redirectBack();
+
         $page = $this->pageRepository->get($id);
         $this->pageRepository->enable($page, $enable);
         toast()->success($enable ? __('Page enabled') : __('Page disabled'));
@@ -483,6 +509,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getCreateFormForComponent(){
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         return view('pages.component.create')->with([
             'plugins' => $this->pluginRepository->getPluginsWithComponentsSupport()
         ]);
@@ -494,6 +523,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getComponentForm($id){
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         $comp = $this->moduleRepository->get($id);
         $item = array(
             'id' => $comp->id,
@@ -515,6 +547,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\JsonResponse
      */
     function createComponent($pageId, $pluginId) {
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $plugin = $this->pluginRepository->get($pluginId);
         $comp = $this->moduleRepository->createComponent($pageId, $plugin);
         return response()->json([
@@ -528,6 +563,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\JsonResponse
      */
     function deleteComponent($id) {
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $result = $this->moduleRepository->delete($id);
         return response()->json([
             'result'  => $result
@@ -540,6 +578,8 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getFormComponentSettings($compId) {
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
 
         $module = $this->moduleRepository->get($compId);
 
@@ -624,6 +664,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\JsonResponse
      */
     public function isComponentsTemplateUpToDate(Request $request){
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $bol = $this->pluginRepository->isPluginTemplateUpToDate($request->post('componentsTemplateString'));
         return response()->json([
             'upToDate' => $bol
@@ -637,6 +680,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\JsonResponse
      */
     public function saveSettings(SaveSettingsRequest $request, $compId) {
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $module = $this->moduleRepository->get($compId);
         $args = json_decode($module->param, true);
         if(!isset($args['settings'])) $args['settings'] = array();
@@ -676,6 +722,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\JsonResponse
      */
     public function orderComponent($compId, $position){
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $module = $this->moduleRepository->get($compId);
         $pageId = $module->fkPage;
 
@@ -711,6 +760,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getCreateFormForModule(){
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         return view('pages.module.create')->with([
             'plugins' => to_select($this->pluginRepository->getPluginsWithModulesSupport(), 'name', 'id')
         ]);
@@ -742,6 +794,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
      */
     public function getEditFormForModule($moduleId, $pageId) {
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         $module = $this->moduleRepository->get($moduleId);
         $pluginId = $module->fkPlugin;
         return Type::FormRender($pluginId, $moduleId, $pageId);
@@ -753,6 +808,9 @@ class PagesController extends AdminController
      * @return \Illuminate\Http\JsonResponse
      */
     public function saveModule($moduleId) {
+        if(OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $module = $this->moduleRepository->get($moduleId);
         $res = Type::FormSave($module->fkPlugin, $moduleId, $module->fkPage);
         return response()->json([

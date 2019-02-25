@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Settings;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Utils\Language\BackLangManager;
 
 class GeneralSettingsRequest extends FormRequest
@@ -14,7 +15,7 @@ class GeneralSettingsRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('setting_general');
     }
 
     /**

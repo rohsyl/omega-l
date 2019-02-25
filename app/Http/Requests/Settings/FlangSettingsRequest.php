@@ -13,7 +13,7 @@ class FlangSettingsRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('setting_general');
     }
 
     /**

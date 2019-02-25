@@ -405,3 +405,15 @@ if(!function_exists('substr_if_longer')) {
         return $str;
     }
 }
+
+if(!function_exists('has_right')){
+    function has_right($ability){
+        return \Omega\Policies\OmegaGate::allows($ability);
+    }
+}
+
+if(!function_exists('has_right_for_user')){
+    function has_right_for_user($user, $ability){
+        return \Omega\Policies\OmegaGate::allowsForUser($user, $ability);
+    }
+}

@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Apparence\Menu;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class UpdateRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('menu_update');
     }
 
     /**

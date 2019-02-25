@@ -225,6 +225,8 @@ class ApparenceController extends AdminController
     }
 
     public function menu_add(){
+        if(OmegaGate::denies('menu_add')) return OmegaGate::accessDeniedView();
+
         return view('apparence.menu.add')->with([
             'membergroups' => to_select($this->membergroupRepository->all(), 'name', 'id'),
             'langs' => to_select($this->langRepository->allEnabled(), 'name', 'slug'),
@@ -241,6 +243,8 @@ class ApparenceController extends AdminController
 
 
     public function menu_edit($id){
+        if(OmegaGate::denies('menu_update')) return OmegaGate::accessDeniedView();
+
         return view('apparence.menu.edit')->with([
             'menu' => $this->menuRepository->get($id),
             'membergroups' => to_select($this->membergroupRepository->all(), 'name', 'id'),
@@ -250,6 +254,7 @@ class ApparenceController extends AdminController
     }
 
     public function menu_edit_pages($id, $lang = null){
+        if(OmegaGate::denies('menu_update')) return OmegaGate::accessDeniedView();
 
         if(om_config('om_enable_front_langauge')){
             $pages = $this->pageRepository->all($lang);
@@ -272,6 +277,8 @@ class ApparenceController extends AdminController
     }
 
     public function menu_delete($id, $confirm = null){
+        if(OmegaGate::denies('menu_delete')) return OmegaGate::accessDeniedView();
+
         if(isset($confirm) && $confirm){
             $this->menuRepository->delete($id);
             toast()->success(__('Menu deleted'));

@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Medias;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class MakeVideoRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class MakeVideoRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('can_access_media_library');
     }
 
     /**

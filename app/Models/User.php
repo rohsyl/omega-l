@@ -49,12 +49,10 @@ class User extends Authenticatable
     }
 
     public function hasRight($ability){
-        DB::statement('CALL om_UserHasRight(:ability, :id, @hasRight);',
-            array(
-                $ability,
-                $this->id
-            )
-        );
+        DB::statement('CALL om_UserHasRight(:ability, :id, @hasRight);', [
+            $ability,
+            $this->id
+        ]);
         $results = DB::select('SELECT @hasRight as hasRight');
         return boolval($results[0]->hasRight);
     }
