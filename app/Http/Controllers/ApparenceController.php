@@ -51,6 +51,8 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function theme(){
+        if(OmegaGate::denies('theme_read')) return OmegaGate::accessDeniedView();
+
         return view('apparence.theme.index')->with([
             'current' => $this->themeRepository->getCurrentThemeName(),
             'installed' => $this->themeRepository->getInstalledTheme(),
@@ -64,6 +66,8 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function theme_detail($name) {
+        if(OmegaGate::denies('theme_read')) return OmegaGate::accessDeniedView();
+
         return view('apparence.theme.detail')->with([
             'isCurrent' => $this->themeRepository->getCurrentThemeName() == $name,
             'theme' => $this->themeRepository->getByName($name),
@@ -77,6 +81,7 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function theme_publish($name) {
+        if(OmegaGate::denies('theme_publish')) return OmegaGate::redirectBack();
 
         $code = Artisan::call('omega:theme:publish');
 
@@ -96,6 +101,7 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function theme_ma_list($name){
+        if(OmegaGate::denies('theme_read')) return OmegaGate::jsonResponse();
         return view('apparence.theme.ma_list')->with([
             'theme' => $name,
             'moduleArea' => $this->moduleAreaRepository->getAllModuleAreaByThemeName($name)
@@ -107,6 +113,7 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function theme_ma_add(){
+        if(OmegaGate::denies('theme_modulearea')) return OmegaGate::accessDeniedView();
         return view('apparence.theme.ma_add');
     }
 
@@ -130,6 +137,7 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Http\JsonResponse
      */
     public function theme_ma_delete($name, $area){
+        if(OmegaGate::denies('theme_modulearea')) return OmegaGate::jsonResponse();
         $this->moduleAreaRepository->deleteByName($area, $name);
         return response()->json([
             'success' => true
@@ -142,6 +150,7 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function theme_useit($name) {
+        if(OmegaGate::denies('theme_use')) return OmegaGate::accessDeniedView();
 
         // Set the current theme
         $this->themeRepository->setCurrentThemeName($name);
@@ -165,6 +174,8 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function theme_install($name) {
+        if(OmegaGate::denies('theme_install')) return OmegaGate::accessDeniedView();
+
         if(!$this->themeRepository->isInstalled($name)) {
 
             $installer = $this->themeRepository->getInstaller($name);
@@ -193,6 +204,8 @@ class ApparenceController extends AdminController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function theme_uninstall($name) {
+        if(OmegaGate::denies('theme_install')) return OmegaGate::accessDeniedView();
+
         if($this->themeRepository->getCurrentThemeName() == $name){
             toast()->error(__('Can\'t delete the used theme...'));
             return redirect()->route('theme.index');
@@ -204,6 +217,7 @@ class ApparenceController extends AdminController
     }
 
     public function theme_delete($name) {
+        if(OmegaGate::denies('theme_delete')) return OmegaGate::accessDeniedView();
 
     }
     #endregion

@@ -2,14 +2,18 @@
 
 @section('content')
     <h1 class="page-header">{{ __('Members') }}</h1>
+
+    @if(has_right('membergroup_read'))
     <div class="panel panel-default">
         <div class="panel-heading">
             {{ __('Membergroups') }}
-            <div class="pull-right">
-                <a href="{{ route('member.addmembergroup') }}" class="btn btn-xs btn-primary">
-                    <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
-                </a>
-            </div>
+            @if(has_right('membergroup_add'))
+                <div class="pull-right">
+                    <a href="{{ route('member.addmembergroup') }}" class="btn btn-xs btn-primary">
+                        <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
+                    </a>
+                </div>
+            @endif
         </div>
         <table class="table table-hover table-page-list">
             @foreach($membergroups as $mgroup)
@@ -30,16 +34,20 @@
             @endforeach
         </table>
     </div>
+    @endif
 
 
+    @if(has_right('member_read'))
     <div class="panel panel-default">
         <div class="panel-heading">
             {{ __('Members') }}
-            <div class="pull-right">
-                <a href="{{ route('member.addmember') }}" class="btn btn-xs btn-primary">
-                    <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
-                </a>
-            </div>
+            @if(has_right('member_add'))
+                <div class="pull-right">
+                    <a href="{{ route('member.addmember') }}" class="btn btn-xs btn-primary">
+                        <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
+                    </a>
+                </div>
+            @endif
         </div>
         <table class="table table-hover table-page-list">
             @foreach($members as $member)
@@ -64,4 +72,6 @@
             @endforeach
         </table>
     </div>
+    @endif
+
 @endsection

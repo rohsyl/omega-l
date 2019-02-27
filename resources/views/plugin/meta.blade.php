@@ -15,6 +15,7 @@
         <dd>{{ $meta->getDescription() }}</dd>
     </dl>
 
+    @if(has_right('plugin_publish'))
     <h3 class="page-header">Publish</h3>
     <div class="alert alert-warning">
         <p>
@@ -29,4 +30,5 @@
         <br />
         <a href="{{ route('admin.plugins.publish', ['name' => $meta->getName()]) }}" class="btn btn-warning">Publish</a>
     </div>
+    @endif
 @endsection

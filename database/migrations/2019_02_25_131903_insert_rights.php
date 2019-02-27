@@ -58,6 +58,10 @@ class InsertRights extends Migration
         ['member_add','Can add new member'],
         ['member_update','Can update member'],
         ['member_delete','Can delete member'],
+        ['membergroup_read','Can see membergroups'],
+        ['membergroup_add','Can add new membergroup'],
+        ['membergroup_update','Can update membergroups'],
+        ['membergroup_delete','Can delete membergroups'],
 
         ['plugin_install','Can install and uninstall plugins'],
         ['plugin_read','Can see plugins'],

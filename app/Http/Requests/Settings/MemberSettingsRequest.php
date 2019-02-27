@@ -14,7 +14,7 @@ class MemberSettingsRequest extends FormRequest
      */
     public function authorize()
     {
-        return OmegaGate::allows('setting_general');
+        return OmegaGate::allows('setting_member');
     }
 
     /**

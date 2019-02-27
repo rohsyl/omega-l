@@ -14,7 +14,7 @@ class SeoSettingsRequest extends FormRequest
      */
     public function authorize()
     {
-        return OmegaGate::allows('setting_general');
+        return OmegaGate::allows('setting_seo');
     }
 
     /**

@@ -79,6 +79,7 @@ if (!function_exists('add_action')) {
                 'subaction' => $subaction,
             ]);
         }
+        return '';
     }
 }
 
@@ -415,5 +416,16 @@ if(!function_exists('has_right')){
 if(!function_exists('has_right_for_user')){
     function has_right_for_user($user, $ability){
         return \Omega\Policies\OmegaGate::allowsForUser($user, $ability);
+    }
+}
+
+
+if(!function_exists('has_any_rights')){
+    function has_any_rights(array $abilities){
+        foreach($abilities as $ability){
+            if(has_right($ability))
+                return true;
+        }
+        return false;
     }
 }

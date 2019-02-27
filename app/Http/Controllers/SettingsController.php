@@ -84,7 +84,7 @@ class SettingsController extends AdminController
 
     #region seo
     public function seo() {
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_seo'))
             return OmegaGate::accessDeniedView();
 
         return view('settings.seo')
@@ -162,7 +162,7 @@ class SettingsController extends AdminController
 
     #region member
     public function member() {
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_member'))
             return OmegaGate::accessDeniedView();
 
         return view('settings.member')
@@ -183,14 +183,14 @@ class SettingsController extends AdminController
 
     #region advanced
     public function advanced() {
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_advanced'))
             return OmegaGate::accessDeniedView();
 
         return view('settings.advanced');
     }
 
     public function clearCache(){
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_advanced'))
             return OmegaGate::accessDeniedView();
 
         Artisan::call('cache:clear');
@@ -204,7 +204,7 @@ class SettingsController extends AdminController
     #endregion
 
     public function langftable(){
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_flang'))
             return OmegaGate::accessDeniedView();
 
         return view('settings.flangtable')
@@ -212,7 +212,7 @@ class SettingsController extends AdminController
     }
 
     public function langfadd(){
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_flang'))
             return OmegaGate::accessDeniedView();
 
         return view('settings.flangadd');
@@ -227,7 +227,7 @@ class SettingsController extends AdminController
     }
 
     public function langfedit($slug){
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_flang'))
             return OmegaGate::accessDeniedView();
 
         $lang = $this->langRepository->getBySlug($slug);
@@ -247,7 +247,7 @@ class SettingsController extends AdminController
     }
 
     public function langfdelete($slug){
-        if(OmegaGate::denies('setting_general'))
+        if(OmegaGate::denies('setting_flang'))
             return response()->json([
                 'success' => false,
                 'message' => __('Access denied...')
@@ -261,9 +261,6 @@ class SettingsController extends AdminController
     }
 
     public function setBackOfficeLang($slug){
-        if(OmegaGate::denies('setting_general'))
-            return OmegaGate::accessDeniedView();
-
         session(['admin.lang' => $slug]);
         return redirect()->back();
     }

@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Member;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class UpdateMemberGroupRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class UpdateMemberGroupRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('membergroup_update');
     }
 
     /**

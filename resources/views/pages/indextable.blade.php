@@ -31,14 +31,18 @@
 
                 <td>
                     <span class="action-img-page-list">
+                        @if(has_right('page_update'))
                         <a  href="{{ route('admin.pages.edit', ['id' => $page->id]) }}"
                             title="{{ __('Edit') }}">{{ __('Edit') }}</a>
+                        @endif
                         |
+                        @if(has_right('page_delete'))
                         <a  href="{{ route('admin.pages.delete', ['id' => $page->id]) }}"
                             title="{{ __('Delete') }}"
                             data-url="{{ route('admin.pages.delete', ['id' => $page->id, 'confirmed' => true]) }}"
                             class="delete text-danger">{{ __('Delete') }}</a>
 
+                            @endif
                     </span>
                 </td>
 

@@ -8,6 +8,7 @@ use Omega\Http\Requests\Member\CreateMemberRequest;
 use Omega\Http\Requests\Member\UpdateMemberGroupRequest;
 use Omega\Http\Requests\Member\UpdateMemberRequest;
 use Omega\Http\Requests\Member\UpdatePasswordRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\MemberRepository;
 
@@ -24,6 +25,9 @@ class MemberController extends AdminController
     }
 
     public function index(){
+        if(OmegaGate::denies('member_read') && OmegaGate::denies('membergroup_read'))
+            return OmegaGate::accessDeniedView();
+
         return view('member.index')->with([
             'membergroups' => $this->membergroupRepository->all(),
             'members' => $this->memberRepository->all(),
@@ -33,6 +37,9 @@ class MemberController extends AdminController
 
     #region member
     public function member_add(){
+        if(OmegaGate::denies('member_add'))
+            return OmegaGate::accessDeniedView();
+
         return view('member.addmember');
     }
 
@@ -44,6 +51,9 @@ class MemberController extends AdminController
     }
 
     public function member_edit($id){
+        if(OmegaGate::denies('member_update'))
+            return OmegaGate::accessDeniedView();
+
         $member = $this->memberRepository->get($id);
 
         return view('member.editmember')->with([
@@ -62,6 +72,8 @@ class MemberController extends AdminController
     }
 
     public function member_edit_password($id) {
+        if(OmegaGate::denies('member_update'))
+            return OmegaGate::accessDeniedView();
         return view('member.editpassword')->with([
            'id' => $id
         ]);
@@ -76,6 +88,9 @@ class MemberController extends AdminController
     }
 
     public function member_delete($id, $confirm = null){
+        if(OmegaGate::denies('member_delete'))
+            return OmegaGate::accessDeniedView();
+
         if(isset($confirm) && $confirm){
             $this->memberRepository->delete($id);
             toast()->success(__('Member deleted'));
@@ -91,6 +106,9 @@ class MemberController extends AdminController
 
     #region membergroup
     public function membergroup_add() {
+        if(OmegaGate::denies('membergroup_add'))
+            return OmegaGate::accessDeniedView();
+
         return view('member.addmembergroup');
     }
 
@@ -102,6 +120,9 @@ class MemberController extends AdminController
     }
 
     public function membergroup_edit($id) {
+        if(OmegaGate::denies('membergroup_update'))
+            return OmegaGate::accessDeniedView();
+
         $membergroup = $this->membergroupRepository->get($id);
 
         return view('member.editmembergroup')->with([
@@ -121,6 +142,9 @@ class MemberController extends AdminController
     }
 
     public function membergroup_delete($id, $confirm = null) {
+        if(OmegaGate::denies('membergroup_delete'))
+            return OmegaGate::accessDeniedView();
+
         if(isset($confirm) && $confirm){
             $this->membergroupRepository->delete($id);
             toast()->success(__('Membergroup deleted'));

@@ -14,7 +14,7 @@ class CreateFlangRequest extends FormRequest
      */
     public function authorize()
     {
-        return OmegaGate::allows('setting_general');
+        return OmegaGate::allows('setting_flang');
     }
 
     /**

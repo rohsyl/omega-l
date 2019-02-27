@@ -2,6 +2,7 @@
 
 namespace Omega\Http\Controllers;
 
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\PluginRepository;
 use Omega\Utils\Plugin\Plugin as PluginUtils;
 use Omega\Utils\Plugin\PluginMeta;
@@ -11,7 +12,7 @@ class PluginController extends AdminController
     private $pluginRepository;
 
     /**
-     * Register here all action that can be called with the run method
+     * Register here all action that can't be called with the run method
      * @var array
      */
     private $protectedAction = ['install', 'uninstall'];
@@ -22,6 +23,9 @@ class PluginController extends AdminController
     }
 
     public function index(){
+        if(OmegaGate::denies('plugin_read'))
+            return OmegaGate::accessDeniedView();
+
         return view('plugin.index')->with([
             'installed' => to_meta($this->pluginRepository->getInstalledPlugin()),
             'uninstalled' => to_meta($this->pluginRepository->getUnstalledPlugins()),
@@ -29,6 +33,9 @@ class PluginController extends AdminController
     }
 
     public function install($name, $confirm = false){
+        if(OmegaGate::denies('plugin_install'))
+            return OmegaGate::accessDeniedView();
+
         if($confirm)
         {
             $this->pluginRepository->create($name);
@@ -64,6 +71,9 @@ class PluginController extends AdminController
 
     public function uninstall($name, $confirm = false){
 
+        if(OmegaGate::denies('plugin_install'))
+            return OmegaGate::accessDeniedView();
+
         if($confirm)
         {
             PluginUtils::Call($name, 'uninstall');
@@ -84,6 +94,9 @@ class PluginController extends AdminController
 
 
     public function run($name, $action){
+        if(OmegaGate::denies('plugin_read'))
+            return OmegaGate::accessDeniedView();
+
         if(in_array($action, $this->protectedAction)){
             toast()->error(__('This action can\'t be called directly...'));
             return redirect()->route('admin.plugins');
@@ -99,12 +112,18 @@ class PluginController extends AdminController
     }
 
     public function settings($name){
+        if(OmegaGate::denies('plugin_read'))
+            return OmegaGate::accessDeniedView();
+
         return view('plugin.meta')->with([
             'meta' => new PluginMeta($name),
         ]);
     }
 
     public function publish($name){
+        if(OmegaGate::denies('plugin_publish'))
+            return OmegaGate::accessDeniedView();
+
         $publishResult = PluginUtils::Publish($name);
 
         if($publishResult['code'] === 0){

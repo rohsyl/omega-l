@@ -20,13 +20,17 @@
             <td>{{ $meta->getDescription() }}</td>
             <td>
                 <span class="actions">
-                    <a href="{{ route('admin.plugins.settings', ['name' => $meta->getName() ]) }}">{{ __('Settings') }}</a> |
+                    <a href="{{ route('admin.plugins.settings', ['name' => $meta->getName() ]) }}">{{ __('Settings') }}</a>
+                    @if(has_right('plugin_install'))
+                    |
                     <a href="{{  route('admin.plugins.uninstall', ['name' => $meta->getName() ]) }}" class="text-danger">{{ __('Uninstall') }}</a>
+                    @endif
                 </span>
             </td>
         </tr>
         @endforeach
 
+        @if(has_right('plugin_install'))
         @foreach($uninstalled as $meta)
             <tr class="warning">
                 <td>{{ $meta->getTitle() }}</td>
@@ -40,5 +44,6 @@
                 </td>
             </tr>
         @endforeach
+        @endif
     </table>
 @endsection

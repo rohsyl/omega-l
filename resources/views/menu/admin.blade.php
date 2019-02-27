@@ -68,24 +68,31 @@
                 </li>
 
                 {!! add_action(route('admin.dashboard'), 'glyphicon glyphicon-th', __('Dashboard')) !!}
-                {!! add_action(route('admin.settings'), 'glyphicon glyphicon-cog',  __('Settings')) !!}
-                {!! add_action(route('admin.pages'), 'fa fa-file-text',  __('Pages')) !!}
-                {!! add_action(route('member.index'), 'fa fa-university', __('Members')) !!}
+
+                {!! add_action(route('admin.settings'), 'glyphicon glyphicon-cog',  __('Settings'), null, has_any_rights(['setting_general', 'setting_flang', 'setting_seo', 'setting_member', 'setting_advanced'])) !!}
+
+                {!! add_action(route('admin.pages'), 'fa fa-file-text',  __('Pages'), null, has_right('page_read')) !!}
+
+                {!! add_action(route('member.index'), 'fa fa-university', __('Members'), null, has_any_rights(['member_read', 'membergroup_read'])) !!}
+
                 {!! add_action('#', 'fa fa-users',  __('Users & Groups'), [
-                    add_action(route('user.add'), 'fa fa-user-plus', __('Add user')),
-                    add_action(route('user.index'), 'fa fa-list-alt', __('Manage users')),
-                    add_action(route('group.add'), 'fa fa-plus', __('Add group')),
-                    add_action(route('group.index'), 'fa fa-list-alt', __('Manage groups'))
-                ]) !!}
+
+                    add_action(route('user.add'), 'fa fa-user-plus', __('Add user'), null, has_right('user_add')),
+                    add_action(route('user.index'), 'fa fa-list-alt', __('Manage users'), null, has_right('user_read')),
+                    add_action(route('group.add'), 'fa fa-plus', __('Add group'), null, has_right('group_add')),
+                    add_action(route('group.index'), 'fa fa-list-alt', __('Manage groups'), null, has_right('group_read'))
+
+                ], has_any_rights(['user_read', 'group_read'])) !!}
+
                 {!! add_action('#', 'glyphicon glyphicon-text-width',  __('Apparences'), [
-                    add_action(route('theme.index'), 'fa fa-paint-brush', __('Themes')),
+                    add_action(route('theme.index'), 'fa fa-paint-brush', __('Themes'), null, has_right('theme_read')),
                     //add_action(route('editor.index'), 'fa fa-code', __('File editor')),
-                    add_action(route('menu.index'), 'glyphicon glyphicon-list-alt', __('Menus'))
-                ]) !!}
-                {!! add_action(route('admin.plugins'), 'fa fa-cubes',  __('Plugins'), add_sub_actions_plugin()) !!}
+                    add_action(route('menu.index'), 'glyphicon glyphicon-list-alt', __('Menus'), null, has_right('menu_read'))
+                ], has_any_rights(['menu_read', 'theme_read'])) !!}
 
+                {!! add_action(route('admin.plugins'), 'fa fa-cubes',  __('Plugins'), add_sub_actions_plugin(), has_right('plugin_read')) !!}
 
-                {!! add_action(route('media.library'), 'glyphicon glyphicon-picture',  __('Media Library')) !!}
+                {!! add_action(route('media.library'), 'glyphicon glyphicon-picture',  __('Media Library'), null, has_right('can_access_media_library')) !!}
             </ul>
         </div>
     </div>

@@ -9,7 +9,9 @@
     @if(isset($subaction) && sizeof($subaction) > 0)
     <ul class="nav nav-second-level">
         @foreach($subaction as $sub)
-            {!! $sub !!}
+            @if($sub != '')
+                {!! $sub !!}
+            @endif
         @endforeach
     </ul>
     @endif

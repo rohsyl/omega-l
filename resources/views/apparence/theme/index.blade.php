@@ -19,17 +19,23 @@
                     <div class="panel-body">
                         <p><a class="btn btn-primary btn-block btn-sm" href="{{ route('theme.detail', ['theme' => $it->name]) }}">{{ __('Detail') }}</a></p>
                         @if(!$used)
-                        <p><a class="btn btn-warning btn-block btn-sm" href="{{ route('theme.useit', ['theme' => $it->name]) }}">{{ __('Use it') }}</a></p>
+                            @if(has_right('theme_use'))
+                                <p><a class="btn btn-warning btn-block btn-sm" href="{{ route('theme.useit', ['theme' => $it->name]) }}">{{ __('Use it') }}</a></p>
+                            @endif
                         @else
                         <p><a class="btn btn-warning btn-block btn-sm disabled" href="#">{{ __('Used') }}</a></p>
                         @endif
+                        @if(has_right('theme_install'))
                         <p><a class="btn btn-default btn-block btn-sm" href="{{ route('theme.uninstall', ['theme' => $it->name]) }}">{{ __('Uninstall') }}</a></p>
+                        @endif
                     </div>
                 </div>
             </div>
             @endforeach
         @endif
     </div>
+
+    @if(has_right('theme_install'))
     <br />
     <div class="page-header">
         <h4>{{ __('Availables themes') }}</h4>
@@ -53,4 +59,5 @@
             @endforeach
         @endif
     </div>
+    @endif
 @endsection
