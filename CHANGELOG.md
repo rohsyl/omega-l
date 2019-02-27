@@ -1,11 +1,11 @@
 # Change Log
 
-## [Unreleased](https://github.com/rohsyl/omega-l/tree/HEAD)
-
-[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.5...HEAD)
+## [v1.0.0](https://github.com/rohsyl/omega-l/tree/v1.0.0) (2019-02-27)
+[Full Changelog](https://github.com/rohsyl/omega-l/compare/v0.1.5...v1.0.0)
 
 **Implemented enhancements:**
 
+- Implements User & Group Permissions [\#51](https://github.com/rohsyl/omega-l/issues/51)
 - Admin Page Content : Adding a component typo error [\#10](https://github.com/rohsyl/omega-l/issues/10)
 
 ## [v0.1.5](https://github.com/rohsyl/omega-l/tree/v0.1.5) (2019-02-20)
