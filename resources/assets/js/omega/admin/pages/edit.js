@@ -8,7 +8,7 @@ $(function(){
     var $inputTab = $('#tab');
     var componentItemClass = '.component-item';
     var $modulesContainer = $('#modules-container');
-    var loading = '<p class="text-center"><img src="'+omega.abspath+'../images/loading.gif" alt="Loading ..." /></p>';
+    var loading = omega.ajax.getSpinner();
 
     // When tab is switched save the selected tab in an input
     // So when the user click on the save button, he is redirected

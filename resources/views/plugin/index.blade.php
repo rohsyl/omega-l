@@ -22,7 +22,7 @@
                 <span class="actions">
                     <a href="{{ route('admin.plugins.settings', ['name' => $meta->getName() ]) }}">{{ __('Settings') }}</a>
                     @if(has_right('plugin_install'))
-                    |
+                    &nbsp;
                     <a href="{{  route('admin.plugins.uninstall', ['name' => $meta->getName() ]) }}" class="text-danger">{{ __('Uninstall') }}</a>
                     @endif
                 </span>

@@ -34,7 +34,9 @@
 
     <br />
     <div id="tableContainer" data-lang-current="{{ $currentLang }}" data-lang-enabled="{{ $enabledLang }}">
-
+        <script>
+            document.write(omega.ajax.getSpinner());
+        </script>
     </div>
 
 @endsection

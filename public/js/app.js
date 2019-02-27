@@ -25887,6 +25887,11 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;window.$ = windo
                     });
                 });
             },
+
+            getSpinner: function getSpinner() {
+                return '<p class="text-center text-muted"><i class="fa fa-spinner fa-2x fa-spin"></i></p>';
+            },
+
             //---- Private method ----//
             _serializeForm: function _serializeForm($form) {
                 return $form.serializeArray().reduce(function (obj, item) {

@@ -112,12 +112,18 @@
                         <tr>
                             <td>
                                 {{ $page->name }}
+
                             </td>
                             <td>
                                 <em><small> {{ $page->updated_at }}</small></em>
                             </td>
                             <td class="text-right">
-                                <a href="{{ route('admin.pages.edit', ['id' => $page->id]) }}"><i class="fa fa-edit"></i></a>
+                                <a href="{{ \Omega\Utils\Entity\Page::GetUrl($page->id) }}" target="_blank">
+                                    <i class="fa fa-search"></i>
+                                </a>
+                                @if(has_right('page_update'))&nbsp;
+                                    <a href="{{ route('admin.pages.edit', ['id' => $page->id]) }}"><i class="fa fa-edit"></i></a>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
