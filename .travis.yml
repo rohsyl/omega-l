@@ -11,9 +11,9 @@ services:
 
 before_script:
   - mysql -e 'CREATE DATABASE db_omega;'
+  - cp .env.travis .env
   - composer self-update
   - composer install --no-interaction
-  - cp .env.travis .env
   - phpenv rehash
   - nvm install 7.7.1
   - npm install npm@latest -g
