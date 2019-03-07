@@ -257,13 +257,6 @@ Route::middleware('om_not_installed')->group(function() {
 
         }
     }
-
-
-
-    // Modules
-    Route::prefix('/module')->group(function(){
-        Route::get('language/change/{target}/{referer?}', 'PublicControllers\LanguageController@change')->name('public.language.change');
-    });
 });
 
 

@@ -28,7 +28,7 @@ return [
         /**
          * Keep it disabled until it's implemented
          */
-        'enabled' => false,
+        'enabled' => true,
 
         'password' => [
             'salt' => 'Jb0=nuxa)2'

@@ -35,7 +35,7 @@ class Page{
 
     private $pageRepository;
     private $moduleRepository;
-    private $page;
+    private $page = null;
 
     public $secure;
     public $securityType;
@@ -43,23 +43,21 @@ class Page{
 
     public $content;
 
+    private $staticProperties = [];
+
+    private $needRender = true;
+
     private $needRedirect = false;
     private $redirectTo = null;
 
-    /**
-     * @param mixed $content
-     */
-    public function setContent($content): void
-    {
-        $this->content = $content;
-    }
 
-    public function __construct($id = 0) {
+    public function __construct($id = null) {
 
         $this->pageRepository = self::GetPageRepository();
         $this->moduleRepository = new ModuleRepository(new Module());
 
-        $this->page = $this->pageRepository->get($id);
+        if(isset($id))
+            $this->page = $this->pageRepository->get($id);
 
         if($this->exists())
         {
@@ -79,7 +77,22 @@ class Page{
 
 
     public function __get($name){
-        return $this->page->$name;
+
+        if(isset($this->staticProperties[$name])) {
+            return $this->staticProperties[$name];
+        }
+
+        if(isset($this->page)) {
+            if(isset($this->page->$name)) {
+                return $this->page->$name;
+            }
+        }
+
+        return null;
+    }
+
+    public function __set($name, $value){
+        $this->staticProperties[$name] = $value;
     }
 
     public function render()
@@ -96,6 +109,11 @@ class Page{
     }
 
     public function exists() {
+
+        if(isset($this->staticProperties['exists']))
+
+            return $this->staticProperties['exists'];
+
         return isset($this->page) && $this->page->exists();
     }
 
@@ -177,6 +195,32 @@ class Page{
     public function reload() {
         $this->needRedirect = true;
         $this->redirectTo = redirect(self::GetUrl($this->page->id));
+    }
+
+
+
+    /**
+     * @param mixed $content
+     */
+    public function setContent($content): void
+    {
+        $this->content = $content;
+    }
+
+    /**
+     * @param bool $needRender
+     */
+    public function setNeedRender(bool $needRender): void
+    {
+        $this->needRender = $needRender;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNeedRender(): bool
+    {
+        return $this->needRender;
     }
 
     public static function RenderSpecialContent($content)
@@ -334,15 +378,6 @@ class Page{
         }
         return [];
     }
-
-    public function isVisibleTitle(){
-        return $this->page->showTitle;
-    }
-
-    public function isVisibleSubTitle(){
-        return $this->page->showSubTitle;
-    }
-
 
     public function needRedirect() {
         return $this->needRedirect;

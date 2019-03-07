@@ -26,6 +26,8 @@ class PageRenderer
     private $lang = null;
     private $slug = null;
 
+    private $module = null;
+
 
     private $langRepository;
     private $themeRepository;
@@ -43,18 +45,28 @@ class PageRenderer
      */
     public function get()
     {
+
         // if lang not enabled, force lang to null.
         if(!$this->langRepository->isEnabled()) $this->lang = null;
+
 
         if(isset($this->lang)){
             session(['front_lang' => $this->lang]);
         }
 
-        // if no id and no slug are set, then we will get the id of the homepage
-        if($this->id == null && $this->slug == null){
+        // if no id, no slug and no module are set,
+        // then we will get the id of the homepage
+        if($this->id == null && $this->slug == null && $this->module == null){
             $this->id = Page::GetHome($this->lang);
         }
 
+
+        if(isset($this->module)){
+            if($this->module instanceof RedirectResponse)
+                return $this->module;
+            else if($this->module instanceof HttpException)
+                return $this->module;
+        }
 
         if(isset($this->slug)){
             $res = Page::GetId($this->slug, $this->lang);
@@ -87,6 +99,14 @@ class PageRenderer
         return $this;
     }
 
+    /**
+     * @param $module ModuleRenderer
+     * @return $this
+     */
+    public function withModule($module){
+        $this->module = $module;
+        return $this;
+    }
 
 
     /**
@@ -94,28 +114,34 @@ class PageRenderer
      * @return mixed The rendered content
      */
     private function renderById(){
-        if($this->id == '_404' || $this->id == null) {
-            return abort(404);
+
+        if($this->id == null && isset($this->module)){
+            $page = $this->module->page();
+        }
+        else{
+            $page = new Page($this->id);
         }
 
-        Entity::setPage(new Page($this->id));
+        Entity::setPage($page);
         Entity::setLangSlug(session('front_lang'));
         Entity::setMenu(new Menu());
         Entity::Menu()->setCurrentPage(Entity::Page());
 
         $themePath = $this->getThemePath(Entity::Site());
 
-        if( file_exists( $themePath )) {
+        if(file_exists($themePath)) {
+
+            if(isset($this->module)) {
+                return $this->renderPage($themePath);
+            }
+
             if(Entity::Page()->isEnabled) {
-                return $this->renderPage($themePath, Entity::Page());
+                return $this->renderPage($themePath);
             }
-            else {
-                return abort(404);
-            }
+
         }
-        else {
-            return abort(404);
-        }
+
+        return abort(404);
     }
 
 
@@ -123,28 +149,31 @@ class PageRenderer
      * @param $themePath string The path to the theme
      * @param $page Page The page to render
      */
-    function renderPage($themePath, $page)
+    function renderPage($themePath)
     {
-        if($page->exists())
-            $page->render();
-        else
-            $page->content = '404';
 
-        if($page->needRedirect()){
-            return $page->getRedirect();
+        if(Entity::Page()->exists()) {
+            if (Entity::Page()->isNeedRender()) {
+                Entity::Page()->render();
+            }
+        }
+        else
+            Entity::Page()->content = '404';
+
+
+        if(Entity::Page()->needRedirect()){
+            return Entity::Page()->getRedirect();
         }
 
-        $modelPath = Path::Combine($themePath, 'template', $page->model);
+        $modelPath = Path::Combine($themePath, 'template', Entity::Page()->model);
 
-        //print_r($modelPath);
-        //die();
         // we load body and footer before the header so every assets is listed
         // in the Html object and then we can do a render of CSS and JS in the header
-        if(isset($page->model) && $page->model != 'default' && !empty($page->model)) {
+        if(isset(Entity::Page()->model) && Entity::Page()->model != 'default' && !empty(Entity::Page()->model)) {
             $pageBodyAndFooter = view('theme::index')->render();
         }
-        else if (file_exists($modelPath)) {
-            $pageBodyAndFooter = view('theme::template.'.without_ext(without_ext($page->model)))->render();
+        else if (file_exists($modelPath) && !is_dir($modelPath)) {
+            $pageBodyAndFooter = view('theme::template.'.without_ext(without_ext(Entity::Page()->model)))->render();
         }
         else {
             $pageBodyAndFooter = view('theme::index')->render();
