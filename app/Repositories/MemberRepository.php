@@ -9,6 +9,7 @@
 namespace Omega\Repositories;
 
 
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use Omega\Models\Member;
 
@@ -22,6 +23,13 @@ class MemberRepository
 
     public function get($id){
         return $this->member->find($id);
+    }
+
+    public function getByRememberToken($id, $token){
+        return $this->member
+            ->where($this->member->getAuthIdentifierName(), $id)
+            ->where($this->member->getRememberTokenName(), $token)
+            ->first();
     }
 
     public function all(){
@@ -51,6 +59,16 @@ class MemberRepository
         return $member;
     }
 
+    /**
+     * @param $member Authenticatable
+     * @param $token
+     * @return mixed
+     */
+    public function updateRememberToken($member, $token){
+        $member->{$member->getRememberTokenName()} = $token;
+        $member->save();
+    }
+
     public function delete($id){
         return $this->member->destroy($id);
     }
@@ -64,5 +82,10 @@ class MemberRepository
             foreach($membergroups as $membergroupId){
                 $member->membergroups()->attach($membergroupId);
             }
+    }
+
+
+    public function findOrNull($username){
+        return $this->member->where('username', $username)->first();
     }
 }

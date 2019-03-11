@@ -362,8 +362,7 @@ class Page{
         }
     }
 
-    public function getCssTheme()
-    {
+    public function getCssTheme() {
         if($this->cssTheme != 'none') {
             $path = Path::Combine(
                 theme_css_path(om_config('om_theme_name')),

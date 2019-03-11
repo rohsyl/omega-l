@@ -41,6 +41,11 @@ return [
             'provider' => 'users',
         ],
 
+        'member' => [
+            'driver' => 'session',
+            'provider' => 'omega_member'
+        ],
+
         'api' => [
             'driver' => 'token',
             'provider' => 'users',
@@ -68,6 +73,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => Omega\Models\User::class,
+        ],
+
+        'omega_member' => [
+            'driver' => 'eloquent',
+            'model' => Omega\Models\Member::class,
         ],
 
         // 'users' => [

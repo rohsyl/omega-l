@@ -1,6 +1,7 @@
 <?php
 namespace Omega\Utils\Entity;
 
+use Illuminate\Support\Facades\Auth;
 use Omega\Utils\Url;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MemberRepository;
@@ -52,7 +53,11 @@ class Menu{
     public function setCurrentPage($page) {
         $this->currentPage = $page;
     }
-	
+
+    /**
+     * Define the html structure that will be used for generating the menu
+     * @param $menuHtmlStruct
+     */
 	public function setMenuHtmlStruct($menuHtmlStruct) {
 		$this->menuHtmlStruct = $menuHtmlStruct;
 	}
@@ -81,9 +86,7 @@ class Menu{
             $menuLang = $menu->lang;
         }
 
-		$menuHtml = $this->getHtmlFromJson($menu->json, $this->menuHtmlStruct, $menuLang);
-
-		return $menuHtml;
+		return $this->getHtmlFromJson($menu->json, $this->menuHtmlStruct, $menuLang);
 	}
 
     /**
@@ -95,16 +98,22 @@ class Menu{
         $langEnabled = $this->langRepository->isEnabled();
 
         $menu = null;
+
+        // find the menu that is define in the Page parameter under Parameters > Menu
         if (isset($this->currentPage) && isset($this->currentPage->idMenu)) {
             $menu = $this->menuRepository->get($this->currentPage->idMenu);
         }
 
         // else find menu by member group
         if (!isset($menu)) {
+            // get list of id of membergroup in which the connected member belongs to
+            // or public if the visitor is not a member
             $ids = $this->getMemberGroupOrPublic();
+
+            // find the first menu
             foreach ($ids as $id) {
 
-                $menu = $langEnabled
+                $menu = $langEnabled && session()->has('front_lang')
                     ? $this->menuRepository->getMenuMainByMemberGroupAndLang($id, session('front_lang'))
                     : $this->menuRepository->getMenuMainByMemberGroup($id);
 
@@ -119,16 +128,7 @@ class Menu{
             return 'No menu';
         }
 
-        $menuLang = null;
-        if ($langEnabled) {
-            $menuLang = $menu->lang;
-        }
-
-        $menuJson = $menu->json;
-
-        $menuHtml = $this->getHtmlFromJson($menuJson, $this->menuHtmlStruct, $menuLang);
-
-        return $menuHtml;
+        return $this->getHtmlFromJson($menu->json, $this->menuHtmlStruct, $langEnabled ? $menu->lang : null);
     }
 
     /**
@@ -177,15 +177,12 @@ class Menu{
 	
 	private function getHtmlFromJson($json, $html, $lang = null, $level = -1, &$containesActive = false) {
 		$level++;
-		
+
+		// decode json if not already done
 		if(!is_array($json)) {
-		
 			$menu = json_decode($json, true);
-		
 		} else {
-		
 			$menu = $json;
-			
 		}
 		
 		$z = '';
@@ -255,30 +252,32 @@ class Menu{
 	public function getMemberPart()
 	{
 		$html = $this->menuHtmlStruct;
+        $target = '';
 		$z = '';
+
 
 		if(config('omega.member.enabled')) {
 
 			$title = '<span class="glyphicon glyphicon-user"></span> <span class="hidden-md hidden-lg">'.__('Member') .'</span>';
 			$url = '#';
 
-			if(isset($_SESSION['member_connected']) && $_SESSION['member_connected'] == true)
+			if(Auth::guard('member')->check())
 			{
-				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/profil'), __('Profil'), 'profil', '');
-				$subItems .= sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/logout'), __('Logout'), 'logout', '');
+				$subItems  = sprintf($html['li_nochildren'], route('public.member.profile'), __('Profile'), 'profile', $target);
+				$subItems .= sprintf($html['li_nochildren'], route('public.member.logout'), __('Logout'), 'logout', $target);
 				$sub = sprintf($html['ul_children'], $subItems);
 				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub, '');
 
 			}
 			else
 			{
-				$subItems = sprintf($html['li_nochildren'], $this->PrepareUrl('/module/member/login'), __('Log in'), 'login', '');
+				$subItems = sprintf($html['li_nochildren'], route('public.member.login'), __('Log in'), 'login', $target);
 				$sub = sprintf($html['ul_children'], $subItems);
-				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub, '');
+				$z .= sprintf($html['li_children'], $url, $title, 'member', $sub, $target);
 			}
 			return $z;
 		}
-		return '';
+		return 'No';
 	}
 	
 	public function getLanguagePart()
@@ -297,13 +296,14 @@ class Menu{
 			$url = '#';
 
 			$current_page = Entity::Page()->id;
-			$current_page = $current_page != 0 ? $current_page : url()->previous();
+			$current_page = $current_page != null ? $current_page : url()->previous();
 			$languages = $this->langRepository->allEnabled();
 
 			$subItems = '';
 			foreach($languages as $lang)
 			{
-			    if(session('front_lang') == $lang->slug){
+
+			    if(Entity::Page()->id != null && session('front_lang') == $lang->slug){
                     $urlLang = Page::GetUrl($current_page);
                 }
                 else{
@@ -312,6 +312,7 @@ class Menu{
                         'referer' => $current_page
                     ]);
                 }
+
 				$htmlType = session('front_lang') == $lang->slug ? 'li_nochildrenactiv' : 'li_nochildren';
 				$subItems .= sprintf($html[$htmlType], $urlLang, $lang->name, $lang->slug, '');
 			}

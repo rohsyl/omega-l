@@ -11,9 +11,10 @@ namespace Omega\Http\Controllers\PublicControllers;
 
 use Omega\Facades\Entity;
 use Omega\Facades\OmegaUtils;
+use Omega\Http\Controllers\Controller;
 use Omega\Utils\Entity\Site;
 
-class PublicController
+class PublicController extends Controller
 {
     public function __construct() {
         if(OmegaUtils::isInstalled()){

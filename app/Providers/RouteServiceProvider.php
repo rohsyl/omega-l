@@ -81,8 +81,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapModuleRoutes()
     {
-        Route::prefix('module')
-            ->middleware('om_not_installed')
+        Route::middleware(['web', 'om_not_installed'])
+            ->prefix('module')
             ->namespace($this->namespace)
             ->group(base_path('routes/module.php'));
     }

@@ -3,7 +3,9 @@
 namespace Omega\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Omega\Policies\OmegaGate;
+use Omega\Utils\Member\MemberUserProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -27,5 +29,9 @@ class AuthServiceProvider extends ServiceProvider
 
         //
         OmegaGate::define();
+
+        Auth::provider('omega_member', function ($app, array $config){
+            return new MemberUserProvider();
+        });
     }
 }

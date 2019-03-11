@@ -8,6 +8,7 @@
 
 namespace Omega\Utils\Renderable;
 
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\View;
 use Omega\Utils\Entity\Page;
 
