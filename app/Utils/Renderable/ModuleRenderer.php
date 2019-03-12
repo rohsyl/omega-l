@@ -29,6 +29,7 @@ class ModuleRenderer
      * @var string
      */
     private $view;
+    private $viewBag;
 
     public function name($name) {
         $this->name = $name;
@@ -43,8 +44,9 @@ class ModuleRenderer
      * @param $view string
      * @return $this
      */
-    public function view($view) {
+    public function view($view, $viewBag = []) {
         $this->view = $view;
+        $this->viewBag = $viewBag;
         return $this;
     }
 
@@ -67,7 +69,7 @@ class ModuleRenderer
         $page->showSubtitle = true;
 
         $page->exists = true;
-        $page->setContent(view($this->view)->render());
+        $page->setContent(view($this->view)->with($this->viewBag)->render());
         $page->setNeedRender(false);
         return $page;
     }
