@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use Omega\Http\Requests\Install\LangRequest;
 use Omega\Http\Requests\Install\SiteAndUserRequest;
 use Omega\Models\User;
+use Omega\Models\Group;
 
 class InstallController extends Controller
 {
@@ -100,6 +101,10 @@ class InstallController extends Controller
         $admin->password = session('install.password');
         $admin->fullname = 'Administrator';
         $admin->save();
+
+        // put the admin user in the admin group
+        $group = Group::where('name', 'administrator')->first();
+        $group->users()->attach($admin);
 
         return redirect(route('admin.home'));
     }
