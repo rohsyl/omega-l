@@ -39,12 +39,16 @@ Route::middleware('om_not_installed')->group(function() {
     Route::group(['middleware' => ['auth', 'om_backoffice_lang']], function () {
         Route::prefix('admin')->group(function(){
             Route::get('/', config('omega.mvc.defaultcontroller').'@'.config('omega.mvc.defaultaction'))->name('admin.home');
+
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
 
 
             Route::prefix('settings')->group(function(){
+                // Settings > General Routes
                 Route::get('/', 'SettingsController@index')->name('admin.settings');
                 Route::post('general', 'SettingsController@saveGeneral')->name('admin.settings.general.save');
+
+                // Settings > Front-end language Routes
                 Route::get('flang', 'SettingsController@flang')->name('admin.settings.flang');
                 Route::post('flang', 'SettingsController@saveFlang')->name('admin.settings.flang.save');
                 Route::get('flangtable', 'SettingsController@langftable')->name('admin.settings.flang.table');
@@ -53,16 +57,20 @@ Route::middleware('om_not_installed')->group(function() {
                 Route::get('langfedit/{slug}', 'SettingsController@langfedit')->name('admin.settings.flang.langfedit');
                 Route::post('langfupdate/{slug}', 'SettingsController@langfupdate')->name('admin.settings.flang.langfupdate');
                 Route::get('delete/{slug}', 'SettingsController@langfdelete')->name('admin.settings.flang.langfdelete');
+
+                // Settings >  SEO
                 Route::get('seo', 'SettingsController@seo')->name('admin.settings.seo');
                 Route::post('seo', 'SettingsController@saveSeo')->name('admin.settings.seo.save');
-                //Route::get('smtp', 'SettingsController@smtp')->name('admin.settings.smtp');
-                //Route::post('smtp', 'SettingsController@saveSmtp')->name('admin.settings.smtp.save');
+
+                // Settings > Member
                 Route::get('member', 'SettingsController@member')->name('admin.settings.member');
                 Route::post('member', 'SettingsController@saveMember')->name('admin.settings.member.save');
+
+                // Settings > Advanced
                 Route::get('advanced', 'SettingsController@advanced')->name('admin.settings.advanced');
                 Route::get('clearcache', 'SettingsController@clearCache')->name('admin.settings.advanced.clearCache');
 
-
+                // Set the language of the back-office for the current session
                 Route::get('setblang/{slug}', 'SettingsController@setBackOfficeLang')->name('admin.settings.setblang');
             });
 
@@ -96,6 +104,7 @@ Route::middleware('om_not_installed')->group(function() {
             });
 
             Route::prefix('pages')->group(function(){
+
                 Route::get('getPagesLevelZeroBylang/{lang?}', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
                 Route::get('getTable/{lang?}', 'PagesController@getTable')->name('admin.pages.index.table');
                 Route::get('getAllPageByParentAndLang/{pid}/{lang}/{idParent?}', 'PagesController@getAllPageByParentAndLang')->name('admin.pages.getbyparentandlang');
@@ -107,14 +116,14 @@ Route::middleware('om_not_installed')->group(function() {
                 Route::get('moduleList/{pageId}', 'PagesController@moduleList')->name('admin.pages.moduleList');
 
                 Route::prefix('ma')->group(function(){
-                Route::get('plugins/{pageId?}', 'ModuleareaController@listplugin')->name('admin.pages.ma.plugins');
-                Route::get('plugins/{pluginId}/modules/{pageId?}', 'ModuleareaController@listmodulebyplugin')->name('admin.pages.ma.plugins.modules');
-                Route::post('add/{pageId?}', 'ModuleareaController@addPosition')->name('admin.pages.ma.add');
-                Route::post('delete/{id}', 'ModuleareaController@deletePosition')->name('admin.pages.ma.delete');
-                Route::post('setonallpages/{id}/{set}/{pageId?}', 'ModuleareaController@setOnAllPages')->name('admin.pages.ma.setonallpages');
-                Route::post('setorder', 'ModuleareaController@setOrder')->name('admin.pages.ma.setorder');
-                Route::get('lang/{positionid}', 'ModuleareaController@getLangForm')->name('admin.pages.ma.lang');
-                Route::post('langsave', 'ModuleareaController@saveLang')->name('admin.pages.ma.langsave');
+                    Route::get('plugins/{pageId?}', 'ModuleareaController@listplugin')->name('admin.pages.ma.plugins');
+                    Route::get('plugins/{pluginId}/modules/{pageId?}', 'ModuleareaController@listmodulebyplugin')->name('admin.pages.ma.plugins.modules');
+                    Route::post('add/{pageId?}', 'ModuleareaController@addPosition')->name('admin.pages.ma.add');
+                    Route::post('delete/{id}', 'ModuleareaController@deletePosition')->name('admin.pages.ma.delete');
+                    Route::post('setonallpages/{id}/{set}/{pageId?}', 'ModuleareaController@setOnAllPages')->name('admin.pages.ma.setonallpages');
+                    Route::post('setorder', 'ModuleareaController@setOrder')->name('admin.pages.ma.setorder');
+                    Route::get('lang/{positionid}', 'ModuleareaController@getLangForm')->name('admin.pages.ma.lang');
+                    Route::post('langsave', 'ModuleareaController@saveLang')->name('admin.pages.ma.langsave');
                 });
 
                 Route::get('componentList/{pageId}', 'PagesController@componentList')->name('admin.pages.componentList');
@@ -132,6 +141,7 @@ Route::middleware('om_not_installed')->group(function() {
 
                 Route::get('getFormComponentSettings/{compId}', 'PagesController@getFormComponentSettings')->name('admin.pages.getFormComponentSettings');
                 Route::post('saveSettings/{compId}', 'PagesController@saveSettings')->name('admin.pages.saveSettings');
+                Route::post('isComponentsTemplateUpToDate', 'PagesController@isComponentsTemplateUpToDate')->name('admin.pages.isComponentsTemplateUpToDate');
 
                 Route::post('create', 'PagesController@create')->name('admin.pages.create');
                 Route::get('edit/{id}/{tab?}', 'PagesController@edit')->name('admin.pages.edit');
@@ -146,9 +156,6 @@ Route::middleware('om_not_installed')->group(function() {
 
                 Route::get('{lang?}', 'PagesController@index')->name('admin.pages');
                 Route::post('chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
-
-
-
             });
 
             Route::get('media/library', 'MediasController@library')->name('media.library');

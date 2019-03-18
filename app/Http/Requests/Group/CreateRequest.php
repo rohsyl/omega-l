@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Group;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class CreateRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('group_add');
     }
 
     /**

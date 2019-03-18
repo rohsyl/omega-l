@@ -14,6 +14,7 @@ use Omega\Http\Requests\Medias\UpdateMediaRequest;
 use Omega\Http\Requests\Medias\UpdateMediaThumbnailRequest;
 use Omega\Http\Requests\Medias\UploaderRequest;
 use Omega\Models\Media;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MediaRepository;
 use Omega\Utils\Directory;
@@ -33,7 +34,13 @@ class MediasController extends AdminController
         $this->langRepository = $langRepository;
     }
 
+    /**
+     * Get the media library
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function library(){
+        if(OmegaGate::denies('can_access_media_library'))
+            return OmegaGate::accessDeniedView();
 
         return view('media.library')->with([
             'isAjax' => false,
@@ -43,7 +50,13 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Get the media library without the layout
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function library_modal(){
+        if(OmegaGate::denies('can_access_media_library'))
+            return OmegaGate::accessDeniedView();
 
         return view('media.library_ajax')->with([
             'isAjax' => true,
@@ -53,7 +66,15 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Get the uploader form
+     * @param UploaderRequest $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function uploader(UploaderRequest $request){
+        if(OmegaGate::denies('can_access_media_library'))
+            return OmegaGate::accessDeniedView();
+
         $parent = $request->input('parent');
         $maxUploadFileSize = humanReadableBytes(getMaximumFileUploadSize());
         $isWritable = Directory::isWritable(media_path());
@@ -65,16 +86,26 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Upload a file
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function uploadHandler(\Illuminate\Http\Request $request){
+        if(OmegaGate::denies('can_access_media_library'))
+            return OmegaGate::jsonResponse();
 
+        // if the media directory does not exists, then create it
         if (!is_dir(media_path())) {
             mkdir(media_path(), 0770);
         }
 
+        // validator for the uploaded file
         $validator = Validator::make($request->all(), [
             'file' => 'required|file',
         ]);
 
+        // stop upload of the file fails the validation
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()
@@ -85,6 +116,7 @@ class MediasController extends AdminController
         $FILE = $request->file('file');
 
         $success = false;
+        // upload the media
         $this->mediaRepository->UploadMedia($FILE, $parent, $success);
 
         return response()->json([
@@ -92,9 +124,12 @@ class MediasController extends AdminController
         ], 200);
     }
 
+    /**
+     * Get the content of a directory
+     * @param GetDCRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getDirectoryContent(GetDCRequest $request){
-
-        //has_right('can_access_media_library', true);
 
         $parent = $request->input('parent') != null ? $request->input('parent') : $this->mediaRepository->GetRoot()->id;
 
@@ -168,9 +203,12 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Add a new direcotry
+     * @param MkdirRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addfolder(MkdirRequest $request) {
-
-        //has_right('can_access_media_library', true);
 
         $folder = $this->mediaRepository->CreateFolder($request->input('newfolder'), $request->input('parent'));
 
@@ -179,8 +217,12 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Delete a file or a directory
+     * @param DeleteRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delete(DeleteRequest $request) {
-        //has_right('can_access_media_library', true);
 
         $file = $request->input('media');
         $multi = $request->input('multi');
@@ -208,6 +250,11 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Rename a file or a directory
+     * @param RenameRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function rn(RenameRequest $request) {
 
         $result = $this->mediaRepository->RenameMedia($request->input('id'), $request->input('newname'));
@@ -217,6 +264,11 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Create a new external video instance
+     * @param MakeVideoRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function mkvideo(MakeVideoRequest $request){
 
         $result = $this->mediaRepository->CreateVideo($request->input('parent'), $request->input('url'));
@@ -226,6 +278,11 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Copy of Move a file / directory
+     * @param CopyOrMoveRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function copyormove(CopyOrMoveRequest $request) {
 
         $files = json_decode($request->input('fileList'));
@@ -246,9 +303,14 @@ class MediasController extends AdminController
         ]);
     }
 
-
-
+    /**
+     * Get the form to edit a media
+     * @param $id int
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function editMedia($id) {
+        if(OmegaGate::denies('can_access_media_library'))
+            return OmegaGate::accessDeniedView();
 
         $media = $this->mediaRepository->GetMedia($id);
         return view('media.edit')->with([
@@ -258,6 +320,12 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Update the media
+     * @param UpdateMediaRequest $request
+     * @param $id int
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateMedia(UpdateMediaRequest $request, $id)
     {
         $title = !empty($request->input('title')) ? $request->input('title') : null;
@@ -291,6 +359,12 @@ class MediasController extends AdminController
         ]);
     }
 
+    /**
+     * Update the thumbnail of a media
+     * @param UpdateMediaThumbnailRequest $request
+     * @param $id int
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateMediaThumbnail(UpdateMediaThumbnailRequest $request, $id){
         $mediaId = !empty($request->input('mediaId')) ? $request->input('mediaId') : null;
         $media = $this->mediaRepository->GetMedia($id);

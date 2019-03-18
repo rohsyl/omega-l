@@ -10,7 +10,6 @@ class PublicController extends Controller
 {
 
     public function __construct() {
-
         if(OmegaUtils::isInstalled()){
             Entity::setSite(new Site());
         }

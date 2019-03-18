@@ -13,7 +13,7 @@ class UpdateFlangRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('setting_flang');
     }
 
     /**

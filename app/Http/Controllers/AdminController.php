@@ -11,6 +11,7 @@ class AdminController extends Controller
 {
     public function __construct()
     {
+        // the admin controller force the auth
         $this->middleware('auth');
     }
 }

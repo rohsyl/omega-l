@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Settings;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class MemberSettingsRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class MemberSettingsRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('setting_member');
     }
 
     /**

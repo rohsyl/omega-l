@@ -37,10 +37,6 @@
                         <span class="text-danger" role="alert">
                                 <strong>{{ $errors->first('password2') }}</strong>
                             </span>
-                    @else
-                        <div class="help-block">
-                            {{ __('Please use the strongest password as possible. (7 characters).') }}
-                        </div>
                     @endif
                 </div>
             </div>

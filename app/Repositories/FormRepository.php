@@ -16,6 +16,11 @@ use Omega\Models\FormEntryValue;
 
 class FormRepository
 {
+
+    public static function Get(){
+        return new self(new Form(), new FormEntry(), new FormEntryValue());
+    }
+
     private $form;
     private $formEntry;
     private $formEntryValue;

@@ -226,6 +226,7 @@ return [
         'Entity' => Omega\Facades\Entity::class,
         'ModuleArea' => Omega\Facades\ModuleArea::class,
         'OmegaUtils' => \Omega\Facades\OmegaUtils::class,
+        'FormFactory' => \Omega\Facades\FormFactory::class,
     ],
 
 ];

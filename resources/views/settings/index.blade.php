@@ -5,7 +5,6 @@
     @include('settings.menu')
     {{ Form::open(['route' => 'admin.settings.general.save', 'method' => 'POST', 'class' => 'form-horizontal']) }}
 
-
         <div class="form-group">
             {{ Form::label('title', __('Title'), ['class' => 'control-label col-sm-3']) }}
             <div class="col-sm-5">

@@ -2,19 +2,18 @@
 
 namespace Omega\Http\Controllers;
 
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Request;
 use Omega\Http\Requests\Page\Component\SaveSettingsRequest;
 use Omega\Http\Requests\Page\Module\CreateModuleRequest;
 use Omega\Http\Requests\Page\SortRequest;
+use Omega\Http\Requests\Page\CreatePageRequest;
+use Omega\Http\Requests\Page\UpdateRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\PageLangRelRepository;
 use Omega\Repositories\PageSecurityRepository;
 use Omega\Repositories\PageSecurityTypeRepository;
 use Omega\Repositories\PluginRepository;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
-use Omega\Http\Requests\Page\CreatePageRequest;
-use Omega\Http\Requests\Page\UpdateRequest;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MenuRepository;
 use Omega\Repositories\ModuleAreaRepository;
@@ -76,22 +75,26 @@ class PagesController extends AdminController
         $this->pluginRepository = $pluginRepository;
     }
 
+    #region index
+
     /**
      * The list of pages
      * @param null $lang If not null, filter by lang
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index($lang = null){
-
+    public function index($lang = null)
+    {
+        if (OmegaGate::denies('page_read'))
+            return OmegaGate::accessDeniedView();
 
         $enabledLang = om_config('om_enable_front_langauge');
         $defaultLang = om_config('om_default_front_langauge');
 
         $currentLang = null;
-        if($enabledLang){
+        if ($enabledLang) {
             $currentLang = isset($lang) ? $lang : null;
-
-            if(!isset($currentLang) && session()->has('backoffice_lang_pages')){
+            // if the lang is not given in the URL, then get the value from the session if it exists
+            if (!isset($currentLang) && session()->has('backoffice_lang_pages')) {
                 $currentLang = session('backoffice_lang_pages');
             }
         }
@@ -110,17 +113,72 @@ class PagesController extends AdminController
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function chooseLang(Request $request){
+    public function chooseLang(Request $request)
+    {
+        // set the chosen lang in a session variable
         session(['backoffice_lang_pages' => $request->input('lang')]);
+        // redirect back to the list of pages
         return redirect()->route('admin.pages', ['lang' => $request->input('lang')]);
     }
 
+    /**
+     * Sort the pages
+     * @param SortRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sort(SortRequest $request)
+    {
+        $orders = $request->input('order');
+        foreach ($orders as $p) {
+            $page = $this->pageRepository->get($p['id']);
+            $page->order = $p['order'];
+            $result = $page->save();
+            if (!$result)
+                break;
+        }
+        return response()->json([
+            'result' => $result,
+        ]);
+    }
+
+    /**
+     * Get the table with all the page filtered by lang
+     * @param null|string $lang
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getTable($lang = null)
+    {
+        if (OmegaGate::denies('page_read'))
+            return OmegaGate::accessDeniedView();
+
+        $enabledLang = om_config('om_enable_front_langauge');
+
+        $pages = !$enabledLang ?
+            $this->pageRepository->paginatePagesWithParent(null) :
+            $this->pageRepository->paginatePageWithParentAndLang($lang, null);
+
+        $pages->withPath(route('admin.pages'));
+
+        return view('pages.indextable')->with([
+            'enabledLang' => $enabledLang,
+            'currentLang' => $lang,
+            'pages' => $pages,
+        ]);
+    }
+    #endregion
+
+
+    #region add
     /**
      * Display the form to add a new page
      * @param null $lang If not null, set by default the given lang
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function add($lang = null){
+    public function add($lang = null)
+    {
+        if (OmegaGate::denies('page_add'))
+            return OmegaGate::accessDeniedView();
+
         $enabledLang = om_config('om_enable_front_langauge');
 
         $langs = $this->langRepository->allEnabled();
@@ -137,7 +195,13 @@ class PagesController extends AdminController
         ]);
     }
 
-    public function getPagesLevelZeroBylang($lang = null){
+    /**
+     * Get the list of page that can be a parent of a newly created page.
+     * @param null $lang
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getPagesLevelZeroBylang($lang = null)
+    {
 
         $pages = !isset($lang)
             ? $this->pageRepository->getPageWithParentAndLang(null, null)
@@ -153,24 +217,32 @@ class PagesController extends AdminController
      * @param CreatePageRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function create(CreatePageRequest $request){
+    public function create(CreatePageRequest $request)
+    {
         $inputs = $request->all();
         $this->pageRepository->create($inputs);
 
+        // Redirect to the list of page in the right language (if given)
         $args = [];
-        if(isset($inputs['lang']))
+        if (isset($inputs['lang']))
             $args['lang'] = $inputs['lang'];
 
         return redirect()->route('admin.pages', $args);
     }
+    #endregion
 
+
+    #region edit
     /**
      * Display the form to edit a page
      * @param $id int The id of the page
      * @param string $tab The selected tab
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function edit($id, $tab = 'content'){
+    public function edit($id, $tab = 'content')
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
 
         $enabledLang = om_config('om_enable_front_langauge');
         $currentTheme = $this->themeRepository->getCurrentThemeName();
@@ -179,10 +251,9 @@ class PagesController extends AdminController
 
         // Get the security type of the page
         $security = $page->security;
-        if($security != null) {
+        if ($security != null) {
             $securityType = $page->security->type;
-        }
-        // If not defined, set it to NoneSecurity
+        } // If not defined, set it to NoneSecurity
         else {
             $securityType = $this->pageSecurityTypeRepository->getSecurityNone();
             $security = $this->pageSecurityRepository->newInstanceOfType($securityType, $page->id);
@@ -196,7 +267,7 @@ class PagesController extends AdminController
 
             'pages' => remove_by_key(to_select($this->pageRepository->getPagesWithParent(null), 'name', 'id', [null => __('No parent')]), $page->id),
             'models' => array_to_select($this->themeRepository->getThemeTemplate($currentTheme), ['default' => __('Default model')]),
-            'menus' => to_select($this->menuRepository->getWithLang($enabledLang ? $page->lang : null), 'name','id', [null => __('Default menu')]),
+            'menus' => to_select($this->menuRepository->getWithLang($enabledLang ? $page->lang : null), 'name', 'id', [null => __('Default menu')]),
             'cssThemes' => array_to_select($this->themeRepository->getThemeCssThemes($currentTheme), ['none' => __('None')]),
 
             'langs_select' => to_select($langs, 'name', 'slug', [null => __('None')]),
@@ -215,7 +286,11 @@ class PagesController extends AdminController
      * @param $pageId int The id of the page
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function moduleareaList($pageId) {
+    public function moduleareaList($pageId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         $moduleAreas = $this->moduleAreaRepository->getAllModuleAreaByThemeName($this->themeRepository->getCurrentThemeName());
         return view('pages.modulearealist')->with([
             'moduleAreas' => $moduleAreas,
@@ -228,7 +303,11 @@ class PagesController extends AdminController
      * @param $pageId int The id of the page
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function componentList($pageId){
+    public function componentList($pageId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         $cs = $this->moduleRepository->getAllComponentsByPage($pageId);
         $components = array();
 
@@ -250,7 +329,11 @@ class PagesController extends AdminController
      * @param $pageId
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function moduleList($pageId){
+    public function moduleList($pageId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         $modules = $this->moduleRepository->getAllModulesByPage($pageId);
 
         return view('pages.modulelist')->with([
@@ -264,15 +347,15 @@ class PagesController extends AdminController
      * @param $id int The id of the page
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateRequest $request, $id){
+    public function update(UpdateRequest $request, $id)
+    {
 
         $enabledLang = om_config('om_enable_front_langauge');
 
 
         $lang = null;
-        if(om_config('om_enable_front_langauge')){
+        if (om_config('om_enable_front_langauge')) {
             $lang = real_null($request->input('lang'));
-
         }
 
         // TODO : unique slug
@@ -301,7 +384,7 @@ class PagesController extends AdminController
 
 
         // clear lang relation if the lang of the page is changed
-        if($enabledLang){
+        if ($enabledLang) {
             $this->pageLangRelRepository->clearRelIfLangChanged($page, $request->all());
         }
 
@@ -309,25 +392,24 @@ class PagesController extends AdminController
 
         // update the page basic data
         // update the name and slug in all menus
-        $this->pageRepository->update($page, $request->all(), function($name, $slug, $page) use ($mr) {
-            $mr->updateNameInCustomMenu($name, $page);
-            $mr->updateSlugInCustomMenu($slug, $page);
+        $this->pageRepository->update($page, $request->all(), function ($name, $slug, $lang, $page) use ($mr) {
+            $mr->updateNameInCustomMenu($name, $lang, $page);
+            $mr->updateSlugInCustomMenu($slug, $lang, $page);
         });
 
         // save the page relations
-        if($enabledLang){
-            if($request->has('plangs_rel')){
+        if ($enabledLang) {
+            if ($request->has('plangs_rel')) {
                 $langs_page_rel = $request->input('plangs_rel');
-                foreach($langs_page_rel as $lang => $rel){
-                    if($lang != $page->lang)
+                foreach ($langs_page_rel as $lang => $rel) {
+                    if ($lang != $page->lang)
                         $this->pageLangRelRepository->savePageLangRel($id, real_null($rel), $lang);
                 }
             }
         }
 
         // save the security settings
-        switch ($request->input('security'))
-        {
+        switch ($request->input('security')) {
             // secure the page with a password
             case 'bypassword':
                 $this->pageSecurityRepository->update(
@@ -364,80 +446,12 @@ class PagesController extends AdminController
 
         // Save all component fields
         $cs = $this->moduleRepository->getAllComponentsByPage($id);
-        foreach($cs as $c) {
+        foreach ($cs as $c) {
             Type::FormSave($c->fkPlugin, $c->id, $id);
         }
 
         toast()->success(__('Page saved'));
         return redirect()->route('admin.pages.edit', ['id' => $page->id, 'tab' => $request->input('tab')]);
-    }
-
-    /**
-     * Soft-Delete a page by id after confirmation
-     * @param $id int The id of the page
-     * @param bool $confirm
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
-     */
-    public function delete($id, $confirm = false){
-        if($confirm){
-            $this->pageRepository->delete($id);
-            toast()->success(__('Page deleted'));
-            return redirect()->route('admin.pages');
-        }
-        else{
-            return view('pages.delete')
-                ->with(['id' => $id]);
-        }
-    }
-
-    /**
-     * Enable or disable the given page
-     * @param $id int The id of the page
-     * @param $enable boolean
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function enable($id, $enable){
-        $page = $this->pageRepository->get($id);
-        $this->pageRepository->enable($page, $enable);
-        toast()->success($enable ? __('Page enabled') : __('Page disabled'));
-        return redirect()->back();
-    }
-
-
-    public function sort(SortRequest $request){
-        $orders = $request->input('order');
-        foreach($orders as $p)
-        {
-            $page = $this->pageRepository->get($p['id']);
-            $page->order = $p['order'];
-            $result = $page->save();
-            if(!$result)
-                break;
-        }
-        return response()->json([
-            'result' => $result,
-        ]);
-    }
-
-    /**
-     * Get the table with all the page filtered by lang
-     * @param null|string $lang
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function getTable($lang = null){
-        $enabledLang = om_config('om_enable_front_langauge');
-
-        $pages = !$enabledLang ?
-            $this->pageRepository->paginatePagesWithParent(null) :
-            $this->pageRepository->paginatePageWithParentAndLang($lang, null);
-
-        $pages->withPath(route('admin.pages'));
-
-        return view('pages.indextable')->with([
-            'enabledLang' => $enabledLang,
-            'currentLang' => $lang,
-            'pages' => $pages,
-        ]);
     }
 
     /**
@@ -448,12 +462,58 @@ class PagesController extends AdminController
      * @param null $idParent The id of the page parent
      * @return \Illuminate\Http\JsonResponse
      */
-    function getAllPageByParentAndLang($pid, $lang, $idParent = null){
+    function getAllPageByParentAndLang($pid, $lang, $idParent = null)
+    {
         return response()->json([
             'selected' => PageHelper::GetCorrespondingInLang($pid, $lang),
             'pages' => $this->pageRepository->getPageWithParentAndLang($lang, $idParent)
         ]);
     }
+    #endregion
+
+
+    #region delete
+    /**
+     * Soft-Delete a page by id after confirmation
+     * @param $id int The id of the page
+     * @param bool $confirm
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
+    public function delete($id, $confirm = false)
+    {
+        if (OmegaGate::denies('page_delete'))
+            return OmegaGate::accessDeniedView();
+
+        if ($confirm) {
+            $this->pageRepository->delete($id);
+            toast()->success(__('Page deleted'));
+            return redirect()->route('admin.pages');
+        } else {
+            return view('pages.delete')
+                ->with(['id' => $id]);
+        }
+    }
+    #endregion
+
+
+    #region enable_disable
+    /**
+     * Enable or disable the given page
+     * @param $id int The id of the page
+     * @param $enable boolean
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function enable($id, $enable)
+    {
+        if (OmegaGate::denies('page_disable'))
+            return OmegaGate::redirectBack();
+
+        $page = $this->pageRepository->get($id);
+        $this->pageRepository->enable($page, $enable);
+        toast()->success($enable ? __('Page enabled') : __('Page disabled'));
+        return redirect()->back();
+    }
+    #endregion
 
 
     #region component
@@ -461,7 +521,11 @@ class PagesController extends AdminController
      * Get the form to create a component
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getCreateFormForComponent(){
+    public function getCreateFormForComponent()
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         return view('pages.component.create')->with([
             'plugins' => $this->pluginRepository->getPluginsWithComponentsSupport()
         ]);
@@ -472,7 +536,11 @@ class PagesController extends AdminController
      * @param $id int The id of the component
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getComponentForm($id){
+    public function getComponentForm($id)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         $comp = $this->moduleRepository->get($id);
         $item = array(
             'id' => $comp->id,
@@ -493,11 +561,15 @@ class PagesController extends AdminController
      * @param $pluginId int The id of the plugin
      * @return \Illuminate\Http\JsonResponse
      */
-    function createComponent($pageId, $pluginId) {
+    function createComponent($pageId, $pluginId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $plugin = $this->pluginRepository->get($pluginId);
         $comp = $this->moduleRepository->createComponent($pageId, $plugin);
         return response()->json([
-            'result'  => $comp->id
+            'result' => $comp->id
         ]);
     }
 
@@ -506,10 +578,14 @@ class PagesController extends AdminController
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    function deleteComponent($id) {
+    function deleteComponent($id)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $result = $this->moduleRepository->delete($id);
         return response()->json([
-            'result'  => $result
+            'result' => $result
         ]);
     }
 
@@ -518,72 +594,73 @@ class PagesController extends AdminController
      * @param $compId int The id of the component
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getFormComponentSettings($compId) {
+    public function getFormComponentSettings($compId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
 
         $module = $this->moduleRepository->get($compId);
 
         // TODO : improve the managment of the settings
         // using a Form ? (class:Type)
 
+
         $themeName = $this->themeRepository->getCurrentThemeName();
         $pluginName = $module->plugin->name;
 
-        $pluginTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
-        array_unshift($pluginTemplates, null);
+        $componentsTemplates = $this->pluginRepository->getPluginTemplateViewsByTheme($themeName, $pluginName);
 
         $pluginTemplatesWithTitle = array();
-        foreach($pluginTemplates as $template){
-            if($template == null){
-                $pluginTemplatesWithTitle['null'] = __('Default');
-            }
-            else{
-                $pluginTemplatesWithTitle[$themeName . '/' . $pluginName . '/' . $template] = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(without_ext(prettify_text($template)));
+        $pluginTemplatesWithTitle['null'] = __('Default');
+        foreach ($componentsTemplates as $views) {
+            foreach ($views as $newView) {
+                $newViewName = $newView->getNewViewPath();
+                $label = $newView->getLabel();
+                if (!isset($label)) {
+                    $label = prettify_text($themeName) . ' - ' . prettify_text($pluginName) . ' - ' . without_ext(without_ext(prettify_text($newViewName)));
+                }
+                $pluginTemplatesWithTitle[theme_encode_components_template($themeName, $newView)] = $label;
             }
         }
 
         $themeColors = $this->themeRepository->getThemeColors($themeName);
         $viewBag = [];
         $args = json_decode($module->param, true);
-        if(isset($args['settings']['isWrapped'])) {
+        if (isset($args['settings']['isWrapped'])) {
             $viewBag['isWrapped'] = $args['settings']['isWrapped'];
-        }
-        else {
+        } else {
             $viewBag['isWrapped'] = true;
         }
-        if(isset($args['settings']['bgColorType'])) {
+        if (isset($args['settings']['bgColorType'])) {
             $viewBag['bgColorType'] = $args['settings']['bgColorType'];
-        }
-        else {
+        } else {
             $viewBag['bgColorType'] = 'transparent';
         }
-        if(isset($args['settings']['bgColor'])) {
+        if (isset($args['settings']['bgColor'])) {
             $viewBag['bgColor'] = $args['settings']['bgColor'];
-        }
-        else {
+        } else {
             $viewBag['bgColor'] = 'transparent';
         }
-        if(isset($args['settings']['isHidden'])) {
+        if (isset($args['settings']['isHidden'])) {
             $viewBag['isHidden'] = $args['settings']['isHidden'];
-        }
-        else {
+        } else {
             $viewBag['isHidden'] = false;
         }
-        if(isset($args['settings']['compId'])) {
+        if (isset($args['settings']['compId'])) {
             $viewBag['compId'] = $args['settings']['compId'];
-        }
-        else {
+        } else {
             $viewBag['compId'] = '';
         }
-        if(isset($args['settings']['pluginTemplate'])){
+        if (isset($args['settings']['pluginTemplate'])) {
             $viewBag['pluginTemplate'] = $args['settings']['pluginTemplate'];
-        }
-        else{
+            $viewBag['isPluginTemplateUpToDate'] = $this->pluginRepository->isPluginTemplateUpToDate($viewBag['pluginTemplate']);
+        } else {
             $viewBag['pluginTemplate'] = 'null';
+            $viewBag['isPluginTemplateUpToDate'] = null;
         }
-        if(isset($args['settings']['compTitle'])){
+        if (isset($args['settings']['compTitle'])) {
             $viewBag['compTitle'] = $args['settings']['compTitle'];
-        }
-        else{
+        } else {
             $viewBag['compTitle'] = '';
         }
 
@@ -593,20 +670,40 @@ class PagesController extends AdminController
     }
 
     /**
+     * Check if the component template is up to date
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function isComponentsTemplateUpToDate(Request $request)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
+        $bol = $this->pluginRepository->isPluginTemplateUpToDate($request->post('componentsTemplateString'));
+        return response()->json([
+            'upToDate' => $bol
+        ]);
+    }
+
+    /**
      * Save settings of a component
      * @param SaveSettingsRequest $request
      * @param $compId int The id of the component
      * @return \Illuminate\Http\JsonResponse
      */
-    public function saveSettings(SaveSettingsRequest $request, $compId) {
+    public function saveSettings(SaveSettingsRequest $request, $compId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $module = $this->moduleRepository->get($compId);
         $args = json_decode($module->param, true);
-        if(!isset($args['settings'])) $args['settings'] = array();
+        if (!isset($args['settings'])) $args['settings'] = array();
         $args['settings']['compId'] = $request->input('compId');
         $args['settings']['compTitle'] = $request->input('compTitle');
-        $args['settings']['isHidden'] = $request->input('is_hidden');
+        $args['settings']['isHidden'] = intval($request->input('is_hidden'));
         $args['settings']['isWrapped'] = $request->input('comp_width') == 'wrapped';
-        switch($_POST['bgcolor']) {
+        switch ($_POST['bgcolor']) {
             case 'custom':
                 $args['settings']['bgColor'] = $request->input('customcolor');
                 $args['settings']['bgColorType'] = 'custom';
@@ -625,7 +722,7 @@ class PagesController extends AdminController
 
         return response()->json([
             'args' => $args,
-            'result'  => true
+            'result' => true
         ]);
 
 
@@ -637,27 +734,35 @@ class PagesController extends AdminController
      * @param $position string The way of moving the component (upper, up, downer, down)
      * @return \Illuminate\Http\JsonResponse
      */
-    public function orderComponent($compId, $position){
+    public function orderComponent($compId, $position)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $module = $this->moduleRepository->get($compId);
         $pageId = $module->fkPage;
 
         $this->moduleRepository->componentOrderInitForPage($pageId);
-        switch($position){
+        switch ($position) {
+            // Move the component to the top
             case 'upper':
                 $this->moduleRepository->componentOrderSetOrderUpper($compId, $pageId);
                 break;
+            // Move the component up by one
             case 'up':
                 $this->moduleRepository->componentOrderSetOrderUp($compId, $pageId);
                 break;
+            // Move the component to the bottom
             case 'downer':
                 $this->moduleRepository->componentOrderSetOrderDowner($compId, $pageId);
                 break;
+            // Move the component down by one
             case 'down':
                 $this->moduleRepository->componentOrderSetOrderDown($compId, $pageId);
                 break;
         }
         return response()->json([
-            'result'  => true
+            'result' => true
         ]);
     }
     #endregion
@@ -668,7 +773,11 @@ class PagesController extends AdminController
      * Get the form to create a module
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getCreateFormForModule(){
+    public function getCreateFormForModule()
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         return view('pages.module.create')->with([
             'plugins' => to_select($this->pluginRepository->getPluginsWithModulesSupport(), 'name', 'id')
         ]);
@@ -679,7 +788,8 @@ class PagesController extends AdminController
      * @param CreateModuleRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function createModule(CreateModuleRequest $request) {
+    public function createModule(CreateModuleRequest $request)
+    {
         $this->moduleRepository->create(
             $request->input('pluginId'),
             $request->input('name'),
@@ -689,7 +799,7 @@ class PagesController extends AdminController
             $request->input('pageId')
         );
         return response()->json([
-            'result'  => true
+            'result' => true
         ]);
     }
 
@@ -699,7 +809,11 @@ class PagesController extends AdminController
      * @param $pageId int The id of the page
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
      */
-    public function getEditFormForModule($moduleId, $pageId) {
+    public function getEditFormForModule($moduleId, $pageId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
         $module = $this->moduleRepository->get($moduleId);
         $pluginId = $module->fkPlugin;
         return Type::FormRender($pluginId, $moduleId, $pageId);
@@ -707,38 +821,59 @@ class PagesController extends AdminController
 
     /**
      * Save the module
-     * @param $moduleId The id of the module
+     * @param $moduleId int The id of the module
      * @return \Illuminate\Http\JsonResponse
      */
-    public function saveModule($moduleId) {
+    public function saveModule($moduleId)
+    {
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::jsonResponse();
+
         $module = $this->moduleRepository->get($moduleId);
         $res = Type::FormSave($module->fkPlugin, $moduleId, $module->fkPage);
         return response()->json([
-            'result'  => $res
+            'result' => $res
         ]);
     }
     #endregion
 
 
-
-
-    public function trash(){
+    #region trash
+    /**
+     * Get the page that display the content of the trash
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function trash()
+    {
         return view('pages.trash')->with([
             'pages' => $this->pageRepository->deleted_paginate(),
         ]);
     }
 
-    public function restore($id){
+    /**
+     * Restore a page by id
+     * @param $id int The id of the page
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function restore($id)
+    {
         $this->pageRepository->restore($id);
 
         toast()->success(__('Page restored succesfully!'));
         return redirect()->route('admin.pages.edit', ['id' => $id]);
     }
 
-    public function forcedelete($id){
+    /**
+     * Delete permanently a page by id
+     * @param $id int The id of the page
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function forcedelete($id)
+    {
         $this->pageRepository->forcedelete($id);
 
         toast()->success(__('Page deleted permanently!'));
         return redirect()->route('admin.pages.trash');
     }
+    #endregion
 }

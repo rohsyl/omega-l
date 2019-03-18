@@ -32,8 +32,7 @@
     <div class="row">
         <div class="col-md-9">
 
-            {{-- if(has_right('user_update_data') || has_right('user_update_himself') || true) { --}}
-
+            @if(has_right ('user_update_data') || has_right('user_update_himself'))
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {{ __('Informations') }}
@@ -78,41 +77,11 @@
                     </div>
                 </div>
             </div>
+            @endif
 
 
 
-
-            {{-- if(has_right('user_update_rights') && !has_right('super_admin', false, $userId)) { --}}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    {{ __('Rights') }}
-                </div>
-                <div class="panel-body">
-                    <div style="height : 200px; overflow-y : scroll">
-                        <table class="table">
-                            <tr>
-                                <th></th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('Description') }}</th>
-                            </tr>
-
-                            @foreach($rights as $r)
-                                <tr>
-                                    <td>
-                                        {{ Form::checkbox('rights[]', $r->id, $user->rights->contains($r->id)) }}
-                                    </td>
-                                    <td>{{ $r->getNiceName() }}</td>
-                                    <td>{{ $r->description }}</td>
-                                </tr>
-                            @endforeach
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-
-
-            {{-- if(has_right('user_update_group') && !has_right('super_admin', false, $userId)) { --}}
+            @if(has_right('user_update_group'))
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {{ __('Groups') }}
@@ -139,7 +108,44 @@
                     </div>
                 </div>
             </div>
+            @endif
+
+
+
+
+            @if(has_right('user_update_rights'))
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        {{ __('Rights') }}
+                    </div>
+                    <div class="panel-body">
+                        <div style="height : 200px; overflow-y : scroll">
+                            <table class="table">
+                                <tr>
+                                    <th></th>
+                                    <th>{{ __('Name') }}</th>
+                                    <th>{{ __('Description') }}</th>
+                                </tr>
+
+                                @foreach($rights as $r)
+                                    <tr>
+                                        <td>
+                                            {{ Form::checkbox('rights[]', $r->id, $user->rights->contains($r->id)) }}
+                                        </td>
+                                        <td>{{ $r->getNiceName() }}</td>
+                                        <td>{{ $r->description }}</td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+
         </div>
+
+
         <div class="col-md-3">
 
             <div class="panel panel-default">

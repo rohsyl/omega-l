@@ -5,6 +5,7 @@ namespace Omega\Http\Controllers;
 use Illuminate\Http\Request;
 use Omega\Http\Requests\Group\CreateRequest;
 use Omega\Http\Requests\Group\UpdateRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\GroupRepository;
 use Omega\Repositories\RightRepository;
 use Omega\Repositories\UserRepository;
@@ -24,12 +25,18 @@ class GroupController extends AdminController
 
 
     public function index(){
+        if(OmegaGate::denies('group_read'))
+            return OmegaGate::accessDeniedView();
+
         return view('group.index')->with([
             'groups' => $this->groupRepository->all()
         ]);
     }
 
     public function add(){
+        if(OmegaGate::denies('group_add'))
+            return OmegaGate::accessDeniedView();
+
         return view('group.add')->with([
             'users' => $this->userRepository->all(),
             'rights' => $this->rightRepository->all()
@@ -50,6 +57,9 @@ class GroupController extends AdminController
 
 
     public function edit($id){
+        if(OmegaGate::denies('group_edit'))
+            return OmegaGate::accessDeniedView();
+
         $group = $this->groupRepository->getById($id);
 
         return view('group.edit')->with([
@@ -74,6 +84,9 @@ class GroupController extends AdminController
 
 
     public function delete($id, $confirm = false){
+        if(OmegaGate::denies('group_delete'))
+            return OmegaGate::accessDeniedView();
+
         if($confirm){
             $this->groupRepository->delete($id);
             toast()->success(__('Group deleted'));
@@ -87,6 +100,9 @@ class GroupController extends AdminController
 
 
     public function enable($id, $enable){
+        if(OmegaGate::denies('group_disable'))
+            return OmegaGate::redirectBack();
+
         $goup = $this->groupRepository->getById($id);
         $this->groupRepository->enable($goup, $enable);
         toast()->success($enable ? __('Group enabled') : __('Group disabled'));

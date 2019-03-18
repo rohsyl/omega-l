@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Member;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class CreateMemberRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class CreateMemberRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('member_add');
     }
 
     /**

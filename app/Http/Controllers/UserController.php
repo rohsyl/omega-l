@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use Omega\Http\Requests\User\ChangePasswordRequest;
 use Omega\Http\Requests\User\CreateRequest;
 use Omega\Http\Requests\User\UpdateRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\GroupRepository;
 use Omega\Repositories\RightRepository;
 use Omega\Repositories\UserRepository;
@@ -27,6 +28,7 @@ class UserController extends AdminController
 
 
     public function profile($id = null){
+        if(OmegaGate::denies('user_read')) return OmegaGate::accessDeniedView();
 
         if(isset($id)){
             $user = $this->userRepository->getById($id);
@@ -41,12 +43,16 @@ class UserController extends AdminController
     }
 
     public function index(){
+        if(OmegaGate::denies('user_read')) return OmegaGate::accessDeniedView();
+
         return view('user.index')->with([
            'users' => $this->userRepository->all()
         ]);
     }
 
     public function add(){
+        if(OmegaGate::denies('user_add')) return OmegaGate::accessDeniedView();
+
         return view('user.add')->with([
             'groups' => $this->groupRepository->all(),
             'rights' => $this->rightRepository->all()
@@ -68,6 +74,12 @@ class UserController extends AdminController
     }
 
     public function edit($id){
+        if( OmegaGate::denies('user_update_data') &&
+            OmegaGate::denies('user_update_himself') &&
+            OmegaGate::denies('user_update_rights') &&
+            OmegaGate::denies('user_update_group'))
+            return OmegaGate::accessDeniedView();
+
         $user = $this->userRepository->getById($id);
 
         return view('user.edit')->with([
@@ -79,18 +91,30 @@ class UserController extends AdminController
 
     public function update(UpdateRequest $request, $id){
         $user = $this->userRepository->getById($id);
-        $user = $this->userRepository->update($user, $request->all());
 
-        $this->userRepository->clearRights($user);
-        $this->userRepository->clearGroups($user);
-        $this->userRepository->attachRights($user, $request->input('rights'));
-        $this->userRepository->attachGroups($user, $request->input('groups'));
+        if(OmegaGate::allows('user_update_data') || OmegaGate::allows('user_update_himself')){
+            $user = $this->userRepository->update($user, $request->all());
+        }
+
+        if(OmegaGate::allows('user_update_rights')) {
+            $this->userRepository->clearRights($user);
+            $this->userRepository->attachRights($user, $request->input('rights'));
+        }
+
+        if(OmegaGate::allows('user_update_group')) {
+            $this->userRepository->clearGroups($user);
+            $this->userRepository->attachGroups($user, $request->input('groups'));
+        }
 
         toast()->success(__('User updated'));
         return redirect()->route('user.edit', ['id' => $id]);
     }
 
     public function editPassword($id){
+        if( OmegaGate::denies('user_update_data') &&
+            OmegaGate::denies('user_update_himself'))
+            return OmegaGate::accessDeniedView();
+
         $user = $this->userRepository->getById($id);
 
         return view('user.editPassword')->with([
@@ -101,12 +125,16 @@ class UserController extends AdminController
     public function updatePassword(ChangePasswordRequest $request, $id){
 
         $user = $this->userRepository->getById($id);
-        $user = $this->userRepository->changePassword($user, $request->all());
+        $this->userRepository->changePassword($user, $request->all());
+
         toast()->success(__('Password changed !'));
         return redirect()->route('user.edit', ['id' => $id]);
     }
 
     public function delete($id, $confirm = false){
+        if(OmegaGate::denies('user_delete'))
+            return OmegaGate::accessDeniedView();
+
         if($confirm){
             $this->userRepository->delete($id);
             toast()->success(__('User deleted'));
@@ -119,6 +147,9 @@ class UserController extends AdminController
     }
 
     public function enable($id, $enable){
+        if(OmegaGate::denies('user_disable'))
+            return OmegaGate::redirectBack();
+
         $user = $this->userRepository->getById($id);
         $this->userRepository->enable($user, $enable);
         toast()->success($enable ? __('User enabled') : __('User disabled'));

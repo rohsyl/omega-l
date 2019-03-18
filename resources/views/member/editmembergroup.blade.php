@@ -6,7 +6,9 @@
             <h1>{{ __('Edit member group') }}
                 <div class="toolbar">
                     <input type="submit" name="editmembergroup" class="btn btn-primary" value="{{ __('Save') }}" />
+                    @if(has_right('membergroup_delete'))
                     <a class="btn btn-danger"  href="{{ route('member.deletemembergroup', ['id' => $membergroup->id]) }}" >{{ __('Delete') }}</a>
+                    @endif
                     <a href="{{ route('member.index') }}" class="btn btn-default">{{ __('Cancel') }}</a>
                 </div>
             </h1>

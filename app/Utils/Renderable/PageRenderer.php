@@ -98,11 +98,11 @@ class PageRenderer
             return abort(404);
         }
 
-
         Entity::setPage(new Page($this->id));
-
+        Entity::setLangSlug(session('front_lang'));
         Entity::setMenu(new Menu());
         Entity::Menu()->setCurrentPage(Entity::Page());
+
         $themePath = $this->getThemePath(Entity::Site());
 
         if( file_exists( $themePath )) {

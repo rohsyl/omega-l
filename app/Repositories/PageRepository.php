@@ -244,9 +244,12 @@ class PageRepository
         //$slug = unique_slug($page, str_slug($inputs['slug']));
         $slug = $inputs['slug'];
 
+
+        $lang = isset($inputs['lang']) ? real_null($inputs['lang']) : null;
+
         // callback to update name and slug in menus
         if(isset($beforeSaveClosure))
-            $beforeSaveClosure($name, $slug, $page);
+            $beforeSaveClosure($name, $slug, $lang, $page);
 
         $page->showName = $inputs['showName'];
         $page->name = $name;
@@ -259,7 +262,7 @@ class PageRepository
         $page->fkMenu = $inputs['menu'];
         $page->fkPageParent = $inputs['parent'];
         if(om_config('om_enable_front_langauge')){
-            $page->lang = real_null($inputs['lang']);
+            $page->lang = $lang;
 
         }
 

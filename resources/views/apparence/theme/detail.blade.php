@@ -24,7 +24,7 @@
                     @endif
                 </div>
             </div>
-            @if($isCurrent)
+            @if($isCurrent && has_right(''))
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {{ __('Assets') }}
@@ -48,7 +48,11 @@
             @endif
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    {{ __('Module area') }}<a href="#" id="btnAddModulearea" class="btn btn-xs btn-primary" style="float:right;">Add</a>
+                    {{ __('Module area') }}
+
+                    @if(has_right('theme_modulearea'))
+                        <a href="#" id="btnAddModulearea" class="btn btn-xs btn-primary" style="float:right;">{{ __('Add') }}</a>
+                    @endif
                 </div>
                 <div class="panel-body" id="moduleareaList">
                     {{ __('Loading...') }}

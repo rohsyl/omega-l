@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Settings;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class SeoSettingsRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class SeoSettingsRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('setting_seo');
     }
 
     /**

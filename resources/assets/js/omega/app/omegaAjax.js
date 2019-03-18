@@ -71,6 +71,11 @@ window.$ = window.jQuery = require('jquery');
                     });
                 });
             },
+
+            getSpinner: function(){
+                return '<p class="text-center text-muted"><i class="fa fa-spinner fa-2x fa-spin"></i></p>';
+            },
+
             //---- Private method ----//
             _serializeForm: function($form){
                 return $form.serializeArray().reduce(function(obj, item) {

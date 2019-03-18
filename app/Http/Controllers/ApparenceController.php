@@ -2,11 +2,11 @@
 
 namespace Omega\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Omega\Http\Requests\Apparence\Menu\CreateRequest;
 use Omega\Http\Requests\Apparence\Menu\UpdateRequest;
 use Omega\Http\Requests\Apparence\Theme\CreateModuleAreaRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\MembergroupRepository;
 use Omega\Repositories\MenuRepository;
@@ -15,6 +15,10 @@ use Omega\Repositories\PageRepository;
 use Omega\Repositories\ThemeRepository;
 use Omega\Utils\Theme\Installer;
 
+/**
+ * Class ApparenceController
+ * @package Omega\Http\Controllers
+ */
 class ApparenceController extends AdminController
 {
     private $themeRepository;
@@ -40,7 +44,15 @@ class ApparenceController extends AdminController
         $this->langRepository = $langRepository;
     }
 
+    #region theme
+
+    /**
+     * Get the list of theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme(){
+        if(OmegaGate::denies('theme_read')) return OmegaGate::accessDeniedView();
+
         return view('apparence.theme.index')->with([
             'current' => $this->themeRepository->getCurrentThemeName(),
             'installed' => $this->themeRepository->getInstalledTheme(),
@@ -48,8 +60,14 @@ class ApparenceController extends AdminController
         ]);
     }
 
-
+    /**
+     * Get the detail page of a theme
+     * @param $name string The name of the theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme_detail($name) {
+        if(OmegaGate::denies('theme_read')) return OmegaGate::accessDeniedView();
+
         return view('apparence.theme.detail')->with([
             'isCurrent' => $this->themeRepository->getCurrentThemeName() == $name,
             'theme' => $this->themeRepository->getByName($name),
@@ -57,7 +75,13 @@ class ApparenceController extends AdminController
         ]);
     }
 
+    /**
+     * Publish the assets of the current theme
+     * @param $name
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_publish($name) {
+        if(OmegaGate::denies('theme_publish')) return OmegaGate::redirectBack();
 
         $code = Artisan::call('omega:theme:publish');
 
@@ -71,17 +95,34 @@ class ApparenceController extends AdminController
         return redirect()->back();
     }
 
+    /**
+     * Get the list of modulearea for the given theme name
+     * @param $name string The name of the theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme_ma_list($name){
+        if(OmegaGate::denies('theme_read')) return OmegaGate::jsonResponse();
         return view('apparence.theme.ma_list')->with([
             'theme' => $name,
             'moduleArea' => $this->moduleAreaRepository->getAllModuleAreaByThemeName($name)
         ]);
     }
 
+    /**
+     * Get the form to add a new modulearea to a theme
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function theme_ma_add(){
+        if(OmegaGate::denies('theme_modulearea')) return OmegaGate::accessDeniedView();
         return view('apparence.theme.ma_add');
     }
 
+    /**
+     * Create a new modulearea for the given theme
+     * @param CreateModuleAreaRequest $request
+     * @param $name string The name of the theme
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function theme_ma_create(CreateModuleAreaRequest $request, $name){
         $this->moduleAreaRepository->create(str_slug($request->input('modulearea'), '_'), $name);
         return response()->json([
@@ -89,19 +130,33 @@ class ApparenceController extends AdminController
         ]);
     }
 
+    /**
+     * Delete the given modulearea for the given theme
+     * @param $name string The name of the theme
+     * @param $area string The name of the modulearea
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function theme_ma_delete($name, $area){
+        if(OmegaGate::denies('theme_modulearea')) return OmegaGate::jsonResponse();
         $this->moduleAreaRepository->deleteByName($area, $name);
         return response()->json([
             'success' => true
         ]);
     }
 
+    /**
+     * Set the given theme as the one in use. Automatically publish the assets
+     * @param $name string The name of the theme
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_useit($name) {
+        if(OmegaGate::denies('theme_use')) return OmegaGate::accessDeniedView();
 
+        // Set the current theme
         $this->themeRepository->setCurrentThemeName($name);
         toast()->success(__('Theme set'));
 
-
+        // Publish the assets
         $code = Artisan::call('omega:theme:publish');
         $output = Artisan::output();
         if($code === 0)
@@ -109,11 +164,18 @@ class ApparenceController extends AdminController
         else
             toast()->error(__('Error') . '<br />' . $output);
 
-        
+        // Redirect back to the list of theme
         return redirect()->route('theme.index');
     }
 
+    /**
+     * Install a theme
+     * @param $name string The name of the theme to install
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_install($name) {
+        if(OmegaGate::denies('theme_install')) return OmegaGate::accessDeniedView();
+
         if(!$this->themeRepository->isInstalled($name)) {
 
             $installer = $this->themeRepository->getInstaller($name);
@@ -136,7 +198,14 @@ class ApparenceController extends AdminController
         return redirect()->route('theme.index');
     }
 
+    /**
+     * Uninstall a theme
+     * @param $name string The name of the theme to uninstall
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function theme_uninstall($name) {
+        if(OmegaGate::denies('theme_install')) return OmegaGate::accessDeniedView();
+
         if($this->themeRepository->getCurrentThemeName() == $name){
             toast()->error(__('Can\'t delete the used theme...'));
             return redirect()->route('theme.index');
@@ -148,16 +217,21 @@ class ApparenceController extends AdminController
     }
 
     public function theme_delete($name) {
+        if(OmegaGate::denies('theme_delete')) return OmegaGate::accessDeniedView();
 
     }
-
+    #endregion
 
 
     public function editor(){
 
     }
 
+
+    #region menu
     public function menu(){
+        if(OmegaGate::denies('menu_read')) return OmegaGate::accessDeniedView();
+
         return view('apparence.menu.index')->with([
             'menus' => $this->menuRepository->all(),
             'langEnabled' => om_config('om_enable_front_langauge')
@@ -165,6 +239,8 @@ class ApparenceController extends AdminController
     }
 
     public function menu_add(){
+        if(OmegaGate::denies('menu_add')) return OmegaGate::accessDeniedView();
+
         return view('apparence.menu.add')->with([
             'membergroups' => to_select($this->membergroupRepository->all(), 'name', 'id'),
             'langs' => to_select($this->langRepository->allEnabled(), 'name', 'slug'),
@@ -181,6 +257,8 @@ class ApparenceController extends AdminController
 
 
     public function menu_edit($id){
+        if(OmegaGate::denies('menu_update')) return OmegaGate::accessDeniedView();
+
         return view('apparence.menu.edit')->with([
             'menu' => $this->menuRepository->get($id),
             'membergroups' => to_select($this->membergroupRepository->all(), 'name', 'id'),
@@ -190,6 +268,7 @@ class ApparenceController extends AdminController
     }
 
     public function menu_edit_pages($id, $lang = null){
+        if(OmegaGate::denies('menu_update')) return OmegaGate::accessDeniedView();
 
         if(om_config('om_enable_front_langauge')){
             $pages = $this->pageRepository->all($lang);
@@ -212,6 +291,8 @@ class ApparenceController extends AdminController
     }
 
     public function menu_delete($id, $confirm = null){
+        if(OmegaGate::denies('menu_delete')) return OmegaGate::accessDeniedView();
+
         if(isset($confirm) && $confirm){
             $this->menuRepository->delete($id);
             toast()->success(__('Menu deleted'));
@@ -222,4 +303,5 @@ class ApparenceController extends AdminController
                 ->with(['id' => $id]);
         }
     }
+    #endregion
 }

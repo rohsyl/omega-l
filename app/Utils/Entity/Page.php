@@ -3,6 +3,7 @@ namespace Omega\Utils\Entity;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 use Omega\Facades\OmegaUtils;
 use Omega\Models\Lang;
 use Omega\Models\Module;
@@ -83,7 +84,7 @@ class Page{
 
     public function render()
     {
-        if($this->secure && (isset($_SESSION['public']['connectedToPage_'.$this->id]) || isset($_SESSION['member_connected'])))
+        if($this->secure && (session()->has('public.connectedToPage_'.$this->id) || isset($_SESSION['member_connected'])))
         {
             $this->renderComponent();
         }
@@ -99,50 +100,54 @@ class Page{
     }
 
     public function doSecurityAction() {
-        /*
+
+
         switch ($this->securityType)
         {
             case 'bypassword':
-                if(!isset($_SESSION['public']['connectedToPage_'.$this->id]))
+
+                $request = request();
+                if(!session()->has('public.connectedToPage_'.$this->id))
                 {
                     $hasLogin = false;
                     $hasError = false;
-                    if(isset($_POST['securityDoLogin']))
+
+                    if($request->has('securityDoLogin'))
                     {
                         $hasLogin = true;
-                        $password = $_POST['securityPassword'];
+                        $password = $request->input('securityPassword');
 
                         if($password == $this->securityData['password'])
                         {
-                            $_SESSION['public']['connectedToPage_'.$this->id] = true;
+                            session(['public.connectedToPage_'.$this->id => true]);
                             $this->reload();
                         }
                         else
                         {
                             $hasError = true;
-                            $this->securityData['error'] = 'Mots de passe erroné !';
+                            $this->securityData['error'] = __('Wrong password!');
                         }
                     }
                     if(!$hasLogin || ($hasLogin && $hasError))
                     {
-                        $this->renderView('view/webpart/page-security-bypassword', $this->securityData);
+                        $this->content = view('public.page.security.bypassword')->with($this->securityData)->render();
                         $this->model = 'default';
                     }
                 }
                 else
                 {
-                    $this->renderView('view/webpart/page-security-bypassword-logout', $this->securityData);
+                    $this->content .= view('public.page.security.bypassword_logout')->with($this->securityData)->render();
 
-                    if(isset($_GET['logout']))
+                    if($request->has('logout'))
                     {
-                        unset($_SESSION['public']['connectedToPage_'.$this->id]);
+                        session()->forget('public.connectedToPage_'.$this->id);
                         $this->reload();
                     }
                 }
                 break;
 
             case 'bymember':
-
+                /*
                 $error403 = function() {
                     if(isset($_SESSION['member_connected']) && $_SESSION['member_connected'] == true) {
                         MessageFront::error(Library\oo('You do not have permission to see this page', true));
@@ -164,13 +169,14 @@ class Page{
                         }
                     }
                 }
-                else $error403();
+                else $error403();*/
                 break;
-        }*/
+        }
     }
 
     public function reload() {
-        return redirect(self::GetUrl($this->page->id));
+        $this->needRedirect = true;
+        $this->redirectTo = redirect(self::GetUrl($this->page->id));
     }
 
     public static function RenderSpecialContent($content)
@@ -222,12 +228,8 @@ class Page{
             $args = json_decode($component->param, true);
 
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
-                $t = explode('/',  $args['settings']['pluginTemplate']);
-                $theme = $t[0];
-                $plugin = $t[1];
-                $template = $t[2];
-                $path = Path::Combine(theme_path($theme), 'template', $plugin, $template);
-                $instance->forceView($path);
+                $ct = theme_decode_components_template($args['settings']['pluginTemplate']);
+                $instance->forceView($ct->getViewName(), $ct->buildPath());
             }
 
             $isHidden = isset($args['settings']['isHidden']) ? $args['settings']['isHidden'] : false;
@@ -280,17 +282,12 @@ class Page{
 
             // force using an other view defined in the settings of the component
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
-                $t = explode('/',  $args['settings']['pluginTemplate']);
-                $theme = $t[0];
-                $plugin = $t[1];
-                $template = $t[2];
-                $path = Path::Combine(theme_path($theme), 'template', $plugin, $template);
-                $instance->forceView($path);
+                $ct = theme_decode_components_template($args['settings']['pluginTemplate']);
+                $instance->forceView($ct->getViewName(), $ct->buildPath());
             }
 
             $isHidden = isset($args['settings']['isHidden']) ? $args['settings']['isHidden'] : false;
             if(!$isHidden) {
-
 
                 $content = $instance->display($args, $data);
 

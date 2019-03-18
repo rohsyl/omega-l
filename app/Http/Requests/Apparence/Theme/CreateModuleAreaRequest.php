@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Apparence\Theme;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class CreateModuleAreaRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class CreateModuleAreaRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return OmegaGate::allows('theme_modulearea');
     }
 
     /**

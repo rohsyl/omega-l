@@ -1,5 +1,4 @@
 <?php
-
 namespace Omega\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -11,6 +10,7 @@ use Omega\Http\Requests\Settings\GeneralSettingsRequest;
 use Omega\Http\Requests\Settings\MemberSettingsRequest;
 use Omega\Http\Requests\Settings\SeoSettingsRequest;
 use Omega\Http\Requests\Settings\SmtpSettingsRequest;
+use Omega\Policies\OmegaGate;
 use Omega\Repositories\LangRepository;
 use Omega\Repositories\PageRepository;
 use Omega\Utils\Crypto;
@@ -29,6 +29,9 @@ class SettingsController extends AdminController
 
     #region general
     public function index(){
+        if(OmegaGate::denies('setting_general'))
+            return OmegaGate::accessDeniedView();
+
         $pages = $this->pageRepository->getPagesWithParent();
 
         return view('settings.index')
@@ -59,6 +62,9 @@ class SettingsController extends AdminController
 
     #region lang
     public function flang() {
+        if(OmegaGate::denies('setting_general'))
+            return OmegaGate::accessDeniedView();
+
         return view('settings.flang')
             ->with('defaultFrontLanguage', om_config('om_default_front_langauge'))
             ->with('enableFrontLanguage', om_config('om_enable_front_langauge'))
@@ -78,6 +84,9 @@ class SettingsController extends AdminController
 
     #region seo
     public function seo() {
+        if(OmegaGate::denies('setting_seo'))
+            return OmegaGate::accessDeniedView();
+
         return view('settings.seo')
             ->with('om_seo_keyword', om_config('om_seo_keyword'))
             ->with('om_seo_description', om_config('om_seo_description'));
@@ -153,6 +162,9 @@ class SettingsController extends AdminController
 
     #region member
     public function member() {
+        if(OmegaGate::denies('setting_member'))
+            return OmegaGate::accessDeniedView();
+
         return view('settings.member')
             ->with('member', [
                 'acceptTermsEnabled' => om_config('om_member_enable_checkbox_conditions'),
@@ -171,10 +183,16 @@ class SettingsController extends AdminController
 
     #region advanced
     public function advanced() {
+        if(OmegaGate::denies('setting_advanced'))
+            return OmegaGate::accessDeniedView();
+
         return view('settings.advanced');
     }
 
     public function clearCache(){
+        if(OmegaGate::denies('setting_advanced'))
+            return OmegaGate::accessDeniedView();
+
         Artisan::call('cache:clear');
         Artisan::call('route:clear');
         Artisan::call('view:clear');
@@ -186,11 +204,17 @@ class SettingsController extends AdminController
     #endregion
 
     public function langftable(){
+        if(OmegaGate::denies('setting_flang'))
+            return OmegaGate::accessDeniedView();
+
         return view('settings.flangtable')
             ->with('fallLang', $this->langRepository->all());
     }
 
     public function langfadd(){
+        if(OmegaGate::denies('setting_flang'))
+            return OmegaGate::accessDeniedView();
+
         return view('settings.flangadd');
     }
 
@@ -203,6 +227,9 @@ class SettingsController extends AdminController
     }
 
     public function langfedit($slug){
+        if(OmegaGate::denies('setting_flang'))
+            return OmegaGate::accessDeniedView();
+
         $lang = $this->langRepository->getBySlug($slug);
 
         return view('settings.flangedit')
@@ -220,6 +247,12 @@ class SettingsController extends AdminController
     }
 
     public function langfdelete($slug){
+        if(OmegaGate::denies('setting_flang'))
+            return response()->json([
+                'success' => false,
+                'message' => __('Access denied...')
+            ]);
+
         $this->langRepository->delete($slug);
 
         return response()->json([

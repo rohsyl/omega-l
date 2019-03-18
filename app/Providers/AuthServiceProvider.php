@@ -2,8 +2,8 @@
 
 namespace Omega\Providers;
 
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Omega\Policies\OmegaGate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -26,5 +26,6 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         //
+        OmegaGate::define();
     }
 }

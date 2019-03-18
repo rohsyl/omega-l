@@ -12,6 +12,8 @@ use Omega\Models\Plugin;
 use Omega\Utils\Path;
 use Omega\Utils\Plugin\PluginMeta;
 use Omega\Utils\Plugin\Type;
+use Omega\Utils\Theme\ComponentView;
+use Omega\Utils\Theme\Template;
 
 class PluginRepository
 {
@@ -111,12 +113,26 @@ class PluginRepository
         return $modules;
     }
 
+    /**
+     * @param $themeName
+     * @param $pluginName
+     * @return array
+     */
     public function getPluginTemplateViewsByTheme($themeName, $pluginName){
-        $folder = Path::Combine(theme_path(), $themeName, 'template', $pluginName);
-        $files = array();
-        if(file_exists($folder)){
-            $files = Path::GetFiles($folder);
-        }
-        return $files;
+
+        $register = get_template_register($themeName);
+
+        if(!isset($register)) return [];
+
+        return $register->getAllComponentsViewForPlugin($pluginName);
+    }
+
+    public function isPluginTemplateUpToDate($pluginTemplateString){
+        $cv = theme_decode_components_template($pluginTemplateString);
+
+        if(!isset($cv)) return null;
+
+        $pm = new PluginMeta($cv->getPluginName());
+        return version_compare($pm->getVersion(), $cv->getVersionString(), "<=");
     }
 }
