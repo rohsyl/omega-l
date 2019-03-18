@@ -1,0 +1,23 @@
+<?php
+namespace OmegaPlugin\{{PluginName}};
+
+use Omega\Utils\Plugin\BController;
+
+class BController{{PluginName}} extends  BController {
+
+    public function __construct() {
+        parent::__construct('{{plugin_name}}');
+    }
+
+    public function install() {
+        return true;
+    }
+
+    public function uninstall() {
+        return true;
+    }
+
+    public function index() {
+        return $this->meta_view();
+    }
+}

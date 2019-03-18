@@ -1,0 +1,4 @@
+<h1> Plugin {{PluginName}}</h1>
+<pre>
+{!! print_r($data, true) !!}
+</pre>
