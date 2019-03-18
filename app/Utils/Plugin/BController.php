@@ -1,6 +1,7 @@
 <?php 
 namespace Omega\Utils\Plugin;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Omega\Repositories\PluginRepository;
 use Omega\Models\Plugin as PluginModel;
@@ -142,5 +143,28 @@ class BController extends AbstractController{
         $plugin = $this->pluginRepository->getByName($this->name);
         return $plugin->id;
 	}
+
+
+    /**
+     * Migrate all migrations files for the plugin
+     *
+     */
+	protected function migrate(){
+        $exitCode = Artisan::call('omega:plugin:migrate ', [
+            'name' => $this->name, '--force' => true
+        ]);
+        return $exitCode;
+    }
+
+    /**
+     * Reset all migrations files for this plugin
+     *
+     */
+    protected function reset(){
+        $exitCode = Artisan::call('omega:plugin:migrate:reset ', [
+            'name' => $this->name, '--force' => true
+        ]);
+        return $exitCode;
+    }
 }
 

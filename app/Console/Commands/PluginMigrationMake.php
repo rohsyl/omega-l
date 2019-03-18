@@ -50,4 +50,9 @@ class PluginMigrationMake extends MigrateMakeCommand
     {
         parent::handle();
     }
+
+
+    private function getPluginName(){
+        return trim($this->input->getArgument('plugin'));
+    }
 }
