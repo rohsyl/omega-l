@@ -25,6 +25,17 @@ if(!function_exists('plugin_path')){
 }
 
 
+if(!function_exists('plugin_migrations_path')){
+    /**
+     * Get the path to the migrations directory for the given plugin
+     * @return string
+     */
+    function plugin_migrations_path($name){
+        return plugin_path($name) . '/database/migrations';
+    }
+}
+
+
 if(!function_exists('plugin_asset')) {
     /**
      * @return string

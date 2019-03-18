@@ -52,9 +52,6 @@ class AppServiceProvider extends ServiceProvider
         // register all plugin in one group for mass publishing
         $this->publishes($pluginsAssets, 'plugins');
 
-
-
-
     }
 
     /**
