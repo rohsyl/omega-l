@@ -59,6 +59,8 @@ use Collective\Html\FormFacade;
 use Omega\Models\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Omega\Facades\OmegaConfig;
+use Omega\Policies\OmegaGate;
 
 if (!function_exists('add_action')) {
     /**
@@ -96,9 +98,17 @@ if (!function_exists('om_config')) {
             $config = Config::firstOrNew(['key' => $key]);
             $config->value = $arg[$key];
             $config->save();
+            OmegaConfig::updateIfExists($config);
             return $config->value;
         }
         else{
+            // first try to load the value from the global cache
+            $value = OmegaConfig::get($arg);
+            if(isset($value)){
+                return $value;
+            }
+
+            // and then if null, then load it from the database
             $config = Config::where('key', $arg)->first();
             return isset($config) ? $config->value : null;
         }
@@ -409,13 +419,13 @@ if(!function_exists('substr_if_longer')) {
 
 if(!function_exists('has_right')){
     function has_right($ability){
-        return \Omega\Policies\OmegaGate::allows($ability);
+        return OmegaGate::allows($ability);
     }
 }
 
 if(!function_exists('has_right_for_user')){
     function has_right_for_user($user, $ability){
-        return \Omega\Policies\OmegaGate::allowsForUser($user, $ability);
+        return OmegaGate::allowsForUser($user, $ability);
     }
 }
 

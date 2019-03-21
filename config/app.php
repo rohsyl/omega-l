@@ -225,8 +225,9 @@ return [
         // OmegaCMS Facades
         'Entity' => Omega\Facades\Entity::class,
         'ModuleArea' => Omega\Facades\ModuleArea::class,
-        'OmegaUtils' => \Omega\Facades\OmegaUtils::class,
-        'FormFactory' => \Omega\Facades\FormFactory::class,
+        'OmegaUtils' => Omega\Facades\OmegaUtils::class,
+        'FormFactory' => Omega\Facades\FormFactory::class,
+        'OmegaConfig' => Omega\Facades\OmegaConfig::class,
     ],
 
 ];

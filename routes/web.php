@@ -18,7 +18,7 @@
  * if it's not the case, it redirect the user to the installation
  * page.
  ********************************************************************/
-Route::middleware('om_not_installed')->group(function() {
+Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
 
 
     /********************************************************************
@@ -231,39 +231,40 @@ Route::middleware('om_not_installed')->group(function() {
      * Public routes
      ********************************************************************/
 
-    // Homepage
-    Route::any('/', 'PublicController@home')
-        ->name('public');
+    Route::group(['middleware' => ['om_load_entity']], function () {
+        // Homepage
+        Route::any('/', 'PublicController@home')
+            ->name('public');
 
 
-    if (OmegaUtils::isInstalled()) {
-        if (!om_config('om_enable_front_langauge')) {
+        if (OmegaUtils::isInstalled()) {
+            if (!om_config('om_enable_front_langauge')) {
 
-            // Page by slug
-            Route::any('/{slug}', 'PublicController@slug')
-                ->name('public.byslug');
-        } else {
+                // Page by slug
+                Route::any('/{slug}', 'PublicController@slug')
+                    ->name('public.byslug');
+            } else {
 
-            // Homepage with lang
-            Route::any('/{lang}', 'PublicController@home_with_lang')
-                ->where(['lang' => '[a-z]{2}'])
-                ->name('public.homelang');
+                // Homepage with lang
+                Route::any('/{lang}', 'PublicController@home_with_lang')
+                    ->where(['lang' => '[a-z]{2}'])
+                    ->name('public.homelang');
 
 
-            // Page by slug and lang
-            Route::any('/{lang}/{slug}', 'PublicController@slug_and_lang')
-                ->where(['lang' => '[a-z]{2}'])
-                ->name('public.bylangandslug');
+                // Page by slug and lang
+                Route::any('/{lang}/{slug}', 'PublicController@slug_and_lang')
+                    ->where(['lang' => '[a-z]{2}'])
+                    ->name('public.bylangandslug');
 
+            }
         }
-    }
 
-
-
-    // Modules
-    Route::prefix('/module')->group(function(){
-        Route::get('language/change/{target}/{referer?}', 'PublicControllers\LanguageController@change')->name('public.language.change');
+        // Modules
+        Route::prefix('/module')->group(function(){
+            Route::get('language/change/{target}/{referer?}', 'PublicControllers\LanguageController@change')->name('public.language.change');
+        });
     });
+
 });
 
 

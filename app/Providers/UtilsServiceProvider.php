@@ -11,6 +11,7 @@ namespace Omega\Providers;
 use Illuminate\Support\ServiceProvider;
 use Omega\Utils\Entity\ModuleArea;
 use Omega\Utils\Entity\Entity;
+use Omega\Utils\Entity\OmegaConfig;
 use Omega\Utils\OmegaUtils;
 use Omega\Utils\Plugin\Form\FormFactory;
 
@@ -30,9 +31,12 @@ class UtilsServiceProvider  extends ServiceProvider
             return new OmegaUtils;
         });
 
-
         $this->app->bind('omega:formfactory', function () {
             return new FormFactory;
+        });
+
+        $this->app->bind('omega:config', function () {
+            return new OmegaConfig;
         });
     }
 }

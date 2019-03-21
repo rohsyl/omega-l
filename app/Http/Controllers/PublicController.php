@@ -8,13 +8,6 @@ use Omega\Utils\Entity\Site;
 
 class PublicController extends Controller
 {
-
-    public function __construct() {
-        if(OmegaUtils::isInstalled()){
-            Entity::setSite(new Site());
-        }
-    }
-
     public function home() {
         return page()
             ->get();
