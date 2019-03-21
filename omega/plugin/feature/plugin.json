@@ -1,0 +1,12 @@
+{
+    "pluginName": "feature",
+    "pluginTitle": "Feature",
+    "pluginVersion": "1.0.0",
+    "author": "",
+    "authorMail": "",
+    "authorWebsite": "",
+    "description": "",
+    "options": {
+        "displayInMenu": 0
+    }
+}

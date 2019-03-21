@@ -42,7 +42,7 @@ class FormFactory
      * @param string $title The title of the form
      * @return Form The form
      */
-    public static function newForm(string $formName, string $pluginName, bool $isModule, bool $isComponent, string $title) {
+    public function newForm(string $formName, string $pluginName, bool $isModule, bool $isComponent, string $title) {
         $form = new Form();
         $form->name = $formName;
         $form->title = $title;
@@ -65,7 +65,7 @@ class FormFactory
      * @param string $description The description
      * @param bool $mandatory True if this entry must be mandatory
      */
-    public static function newFormEntry($form, string $entryName, int $order, string $type, array $param, string $title, string $description, bool $mandatory = false) {
+    public function newFormEntry($form, string $entryName, int $order, string $type, array $param, string $title, string $description, bool $mandatory = false) {
 
         // If the $form is not an instance of form, then we assume that $form is the name of the form as a string
         if (!$form instanceof Form){

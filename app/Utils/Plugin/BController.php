@@ -1,6 +1,7 @@
 <?php 
 namespace Omega\Utils\Plugin;
 
+use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Omega\Repositories\PluginRepository;
@@ -112,7 +113,7 @@ class BController extends AbstractController{
 				if (trim($req) != '')
 				    DB::statement($req);
 			}
-			catch(\Exception $e)
+			catch(Exception $e)
 			{
 				die('ERROR : '.$req . '<br />'. $e->getMessage());
 			}
@@ -150,7 +151,7 @@ class BController extends AbstractController{
      *
      */
 	protected function migrate(){
-        $exitCode = Artisan::call('omega:plugin:migrate ', [
+        $exitCode = Artisan::call('omega:plugin:migrate', [
             'name' => $this->name, '--force' => true
         ]);
         return $exitCode;
@@ -161,7 +162,7 @@ class BController extends AbstractController{
      *
      */
     protected function reset(){
-        $exitCode = Artisan::call('omega:plugin:migrate:reset ', [
+        $exitCode = Artisan::call('omega:plugin:migrate:reset', [
             'name' => $this->name, '--force' => true
         ]);
         return $exitCode;
