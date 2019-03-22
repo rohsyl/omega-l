@@ -2,6 +2,7 @@
 namespace Omega\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
+use Omega\Facades\OmegaConfig;
 use Omega\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -47,5 +48,14 @@ class LoginController extends Controller
 
     protected function credentials(Request $request) {
         return array_merge($request->only($this->username(), 'password'), ['isEnabled' => 1]);
+    }
+
+
+    protected function authenticated(Request $request, $user)
+    {
+        // When the user is authenticated, we will load in the session his permissions
+        // We pre-load perm of the user in the session to prevent from doing many many
+        // request to the database while check perm.
+        OmegaConfig::loadUserPermissionsInSession($user);
     }
 }

@@ -19,6 +19,7 @@ use Omega\Utils\Entity\Site;
  * @method static void get(string $key)
  * @method static void load(array $configKeys)
  * @method static void updateIfExists(Config $config)
+ * @method static void loadUserPermissionsInSession(User $user)
  *
  * @see \Omega\Utils\Entity\OmegaConfig
  */

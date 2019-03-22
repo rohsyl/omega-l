@@ -48,12 +48,26 @@ class User extends Authenticatable
         return isset($this->fullname) ? $this->fullname : $this->username;
     }
 
-    public function hasRight($ability){
-        DB::statement('CALL om_UserHasRight(:ability, :id, @hasRight);', [
-            $ability,
-            $this->id
-        ]);
-        $results = DB::select('SELECT @hasRight as hasRight');
-        return boolval($results[0]->hasRight);
+    /**
+     * Check if the user has the given permission
+     *
+     * @param $ability string The name of the permission
+     * @param bool $force Force to check in the database
+     * @return bool|int
+     */
+    public function hasRight($ability, $force = false){
+        // if force is true, then we check the perm from the database
+        if($force) {
+            DB::statement('CALL om_UserHasRight(:ability, :id, @hasRight);', [
+                $ability,
+                $this->id
+            ]);
+            $results = DB::select('SELECT @hasRight as hasRight');
+            return boolval($results[0]->hasRight);
+        }
+        // else we check the perm in the session
+        $rightMasks = session('perm.masks');
+        $userMask = session('perm.umask');
+        return $userMask & $rightMasks[$ability] == $rightMasks[$ability];
     }
 }
