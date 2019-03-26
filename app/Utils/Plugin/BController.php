@@ -120,7 +120,16 @@ class BController extends AbstractController{
 		}
 	}
 
+    /**
+     * @param $name
+     * @return \Illuminate\Contracts\View\View
+     */
     public function view($name){
+        $names = explode('.', $name);
+        $name = '';
+        foreach($names as $n) {
+            $name .= DS . $n;
+        }
         return View::file($this->root . DS . 'view' . DS . $name . '.blade.php')->with([
             'meta' => $this->getMeta()
         ]);
