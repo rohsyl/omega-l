@@ -95,6 +95,12 @@
                 {!! add_action(route('admin.plugins'), 'fa fa-cubes',  __('Plugins'), add_sub_actions_plugin(), has_right('plugin_read')) !!}
 
                 {!! add_action(route('media.library'), 'glyphicon glyphicon-picture',  __('Media Library'), null, has_right('can_access_media_library')) !!}
+
+                {!! add_action('#', 'fa fa-code',  __('Developer'), [
+
+                    add_action(route('admin.developer.datatypes'), 'fa fa-tags', __('Datatypes')),
+
+                ], has_any_rights(['is_developper'])) !!}
             </ul>
         </div>
     </div>

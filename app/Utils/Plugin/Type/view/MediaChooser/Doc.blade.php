@@ -26,7 +26,9 @@
    ]
 }
 </pre>
-<p>Exemple of SQL insert with MediaChooser type:</p>
+<p>Exemple :</p>
 <pre>
-CALL `om_CreateFormEntry`('[form_name]', '[field_name]', 1, 'Omega\\Library\\Plugin\\Type\\MediaChooser', '[param]', '[field_title]', '[field_description]', 0);
+&lt;?php
+	FormFactory::newFormEntry('[form_name]', '[entry_name]', [order], Omega\Utils\Plugin\Type\MediaChooser::class, [param], '[title]', '[description]', '[mandatory]')
+?&gt;
 </pre>

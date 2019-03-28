@@ -16,14 +16,13 @@
 </p>
 <pre>
 {
-"model" : "Omega\\\\Plugin\\\\News\\\\Model\\\\CheckBoxesCategoriesModel"
+	"model" : "OmegaPlugin\\News\\Model\\CheckBoxesCategoriesModel"
 }
 </pre>
-<p>Model must extends from Omega\Library\Plugin\Type\CheckBoxes\ACheckBoxesModel</p>
-<div class="alert alert-warning">
-    <strong>Be careful !</strong> When JSON inserted via SQL Query, must add 4 "\" !!
-</div>
-<p>Exemple of SQL insert with CheckBoxes type:</p>
+<p>Model must extends from Omega\Utils\Plugin\Type\CheckBoxes\ACheckBoxesModel</p>
+<p>Exemple :</p>
 <pre>
-CALL `om_CreateFormEntry`('[form_name]', '[field_name]', 1, 'Omega\\Library\\Plugin\\Type\\CheckBoxes', '[param]', '[field_title]', '[field_description]', 0);
+&lt;?php
+	FormFactory::newFormEntry('[form_name]', '[entry_name]', [order], Omega\Utils\Plugin\Type\CheckBoxes::class, [param], '[title]', '[description]', '[mandatory]')
+?&gt;
 </pre>

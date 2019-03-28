@@ -6,7 +6,9 @@
 	"text": "The text message you want to show up! It can contain html tags."
 }
 </pre>
-<p>Exemple of SQL insert with Alert type:</p>
+<p>Exemple :</p>
 <pre>
-CALL `om_CreateFormEntry`('[form_name]', '[field_name]', 1, 'Omega\\Library\\Plugin\\Type\\Alert', '[param]', '[field_title]', '[field_description]', 0);
+&lt;?php
+	FormFactory::newFormEntry('[form_name]', '[entry_name]', [order], Omega\Utils\Plugin\Type\Alert::class, [param], '[title]', '[description]', '[mandatory]')
+?&gt;
 </pre>

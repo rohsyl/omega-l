@@ -3,7 +3,9 @@
 <pre>
 {}
 </pre>
-<p>Exemple of SQL insert with LinkChooser type:</p>
+<p>Exemple :</p>
 <pre>
-CALL `om_CreateFormEntry`('[form_name]', '[field_name]', 1, 'Omega\\Library\\Plugin\\Type\\LinkChooser', '[param]', '[field_title]', '[field_description]', 0);
+&lt;?php
+	FormFactory::newFormEntry('[form_name]', '[entry_name]', [order], Omega\Utils\Plugin\Type\LinkChooser::class, [param], '[title]', '[description]', '[mandatory]')
+?&gt;
 </pre>

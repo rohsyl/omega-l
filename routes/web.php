@@ -223,6 +223,10 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
             Route::get('linkchooser/form', 'LinkChooserController@getForm')->name('linkchooser.form');
             Route::get('linkchooser/bc/{id}', 'LinkChooserController@getBreadcrumb')->name('linkchooser.bc');
             Route::get('linkchooser/dc/{id}', 'LinkChooserController@getDirectoryContent')->name('linkchooser.dc');
+
+
+
+            Route::get('developer/datatypes', 'DeveloperController@getDatatypesHelp')->name('admin.developer.datatypes');
         });
     });
 

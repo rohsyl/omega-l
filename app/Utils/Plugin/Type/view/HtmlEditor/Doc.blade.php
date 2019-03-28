@@ -1,7 +1,10 @@
 <p>Parameters:
 </p>
 <pre>{}</pre>
-<p>Exemple of SQL insert with HtmlEditor type:</p>
+
+<p>Exemple :</p>
 <pre>
-CALL `om_CreateFormEntry`('html', 'html', 1, 'Omega\\Utils\\Plugin\\Type\\HtmlEditor', '{}', '', '', 0);
+&lt;?php
+	FormFactory::newFormEntry('[form_name]', '[entry_name]', [order], Omega\Utils\Plugin\Type\HtmlEditor::class, [param], '[title]', '[description]', '[mandatory]')
+?&gt;
 </pre>

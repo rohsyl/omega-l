@@ -1,7 +1,9 @@
 <p>Parameters:
 </p>
 <pre>{}</pre>
-<p>Exemple of SQL insert with TextRich type:</p>
+<p>Exemple :</p>
 <pre>
-CALL `om_CreateFormEntry`('[form_name]', '[field_name]', 1, 'Omega\\Library\\Plugin\\Type\\TextRich', '[param]', '[field_title]', '[field_description]', 0);
+&lt;?php
+	FormFactory::newFormEntry('[form_name]', '[entry_name]', [order], Omega\Utils\Plugin\Type\TextRich::class, [param], '[title]', '[description]', '[mandatory]')
+?&gt;
 </pre>
