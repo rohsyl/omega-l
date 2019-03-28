@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 use Omega\Repositories\PluginRepository;
 use Omega\Models\Plugin as PluginModel;
 use Omega\Utils\Path;
-use Illuminate\Support\Facades\View;
 
 class BController extends AbstractController{
 
@@ -125,12 +124,7 @@ class BController extends AbstractController{
      * @return \Illuminate\Contracts\View\View
      */
     public function view($name){
-        $names = explode('.', $name);
-        $name = '';
-        foreach($names as $n) {
-            $name .= DS . $n;
-        }
-        return View::file($this->root . DS . 'view' . DS . $name . '.blade.php')->with([
+        return plugin_view($this->name, $name)->with([
             'meta' => $this->getMeta()
         ]);
     }

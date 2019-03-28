@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Omega\Utils\Plugin\PluginMeta;
 use Omega\Repositories\PluginRepository;
 use Omega\Utils\Path;
+use Illuminate\Support\Facades\View;
 
 if(!function_exists('plugin_path')){
     /**
@@ -108,5 +109,25 @@ if(!function_exists('add_sub_actions_plugin')){
             $actions[] = add_action(route_plugin($plugin->name, 'index'), 'fa fa-cube', $meta->getTitle());
         }
         return $actions;
+    }
+}
+
+
+if(!function_exists('plugin_view')){
+    /**
+     * This method return a view for the given plugin name
+     *
+     * @param $pluginName string the name of the plugin
+     * @param $viewName string The name of the view
+     * @return \Illuminate\Contracts\View\View
+     */
+    function plugin_view($pluginName, $viewName)
+    {
+        $names = explode('.', $viewName);
+        $name = '';
+        foreach($names as $n) {
+            $name .= DS . $n;
+        }
+        return View::file(plugin_path($pluginName) . DS . 'view' . DS . $name . '.blade.php');
     }
 }
