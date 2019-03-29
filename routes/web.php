@@ -90,6 +90,10 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
                 Route::post('edit/{id}/password', 'UserController@updatePassword')->name('user.update.passwd');
                 Route::get('delete/{id}/{confirm?}', 'UserController@delete')->name('user.delete');
                 Route::get('enable/{id}/{enable}', 'UserController@enable')->name('user.enable');
+
+
+                Route::get('saveAvatar/{userId}/{mediaId}', 'UserController@saveAvatar')->name('user.saveAvatar');
+                Route::get('deleteAvatar/{userId}', 'UserController@deleteAvatar')->name('user.deleteAvatar');
             });
 
 

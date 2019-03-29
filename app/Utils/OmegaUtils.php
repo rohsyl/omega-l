@@ -36,7 +36,7 @@ class OmegaUtils{
 
         if ($hasAvatar) {
             //$media = new Media($mediaId);
-            return '<div class="userAvatarImage" style="background-image: url()"></div>';
+            return '<div class="userAvatarImage" style="background-image: url(\'' . $user->getAvatarMedia() . '\')"></div>';
         } elseif (!empty($user->fullname)) {
             $initial = strtoupper(substr($user->fullname, 0, 1));
             return '<span class="userAvatarText">' . $initial . '</span>';

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use Omega\Http\Requests\User\ChangePasswordRequest;
 use Omega\Http\Requests\User\CreateRequest;
 use Omega\Http\Requests\User\UpdateRequest;
+use Omega\Models\Media;
 use Omega\Policies\OmegaGate;
 use Omega\Repositories\GroupRepository;
 use Omega\Repositories\RightRepository;
@@ -155,4 +156,78 @@ class UserController extends AdminController
         toast()->success($enable ? __('User enabled') : __('User disabled'));
         return redirect()->back();
     }
+
+    public function saveAvatar($userId, $mediaId) {
+
+        $result = false;
+        $url = 'undefined';
+
+        $user = $this->userRepository->getById($userId);
+        $user->avatar = $mediaId;
+        $result = $user->save();
+
+        if($result) {
+            $url = asset(Media::Get($mediaId)->path);
+        }
+
+        return response()->json([
+            'result' => $result,
+            'url' => $url,
+        ]);
+    }
+
+    public function deleteAvatar($userId) {
+        $user = $this->userRepository->getById($userId);
+        $user->avatar = null;
+        $result = $user->save();
+        return response()->json([
+            'result' => $result
+        ]);
+    }
+
+
+    /*	public function saveAvatar(){
+
+        $result = false;
+        $url = 'undefined';
+	    if( isset($_GET['userId']) && !empty($_GET['userId']) &&
+            isset($_GET['mediaId']) && !empty($_GET['mediaId'])) {
+
+            $idUser = $_GET['userId'];
+            $idMedia = $_GET['mediaId'];
+
+            $user = UserManager::GetUser($idUser);
+
+            $user->userAvatar = $idMedia;
+
+            $result = UserManager::Save($user);
+
+            if($result){
+                $media = new Media($idMedia);
+                $url = Url::CombAndAbs(ABSPATH, $media->path);
+            }
+        }
+
+        $this->view->Set('url', $url);
+        $this->view->Set('result', $result);
+        return $this->view->RenderAjax();
+    }
+
+    public function deleteAvatar(){
+
+        $result = false;
+        if( isset($_GET['userId']) && !empty($_GET['userId'])) {
+
+            $idUser = $_GET['userId'];
+
+            $user = UserManager::GetUser($idUser);
+
+            $user->userAvatar = null;
+
+            $result = UserManager::Save($user);
+
+        }
+        $this->view->Set('result', $result);
+        return $this->view->RenderAjax();
+    }*/
 }

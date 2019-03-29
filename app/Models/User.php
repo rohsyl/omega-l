@@ -39,7 +39,7 @@ class User extends Authenticatable
 
     public function getAvatarMedia(){
         if(isset($this->avatar)){
-            return new Media($this->avatar);
+            return asset(Media::Get($this->avatar)->path);
         }
         return null;
     }

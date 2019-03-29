@@ -13,6 +13,10 @@ class UserRepository{
         $this->user = $user;
     }
 
+    /**
+     * @param $id
+     * @return User
+     */
     public function getById($id){
         return $this->user->find($id);
     }

@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@push('scripts')
-    <script language="JavaScript" src="{{ asset('js/plupload.full.min.js') }}"></script>
-@endpush
-
 @section('content')
 {{ Form::open(['url' => route('user.update', ['id' => $user->id]), 'method' => 'post', 'class' => 'form-horizontal']) }}
     <div class="page-header">
@@ -155,7 +151,7 @@
                 <div class="panel-body">
                     <div class="userAvatarContainer">
                         @if(isset($user->avatar))
-                            <div class="userAvatarImage" style="background-image: url('{{ asset($this->getAvatarMedia()->path) }}')"></div>
+                            <div class="userAvatarImage" style="background-image: url('{{ $user->getAvatarMedia() }}')"></div>
                         @elseif(!empty($user->fullname))
                         <span class="userAvatarText">
                                 {{ strtoupper(substr($user->fullname, 0, 1)) }}
@@ -177,47 +173,48 @@
 
 @endsection
 
-{{--
-<script>
-    $(function(){
-        var userInitial = '{{ echo strtoupper(substr($user->userFirstName, 0, 1) . substr($user->userName, 0, 1)); }}';
-        var userInitialSet = {{ echo !empty($user->userFirstName) && !empty($user->userName) ? 'true' : 'false' }};
-        var userId = {{ echo $userId }};
-        var $btnUpdateAvatar = $('#updateAvatar');
-        var $btnDeleteAvatar = $('#deleteAvatar');
-        var $userAvatarContainer = $('.userAvatarContainer');
+@push('scripts')
+    <script>
+        $(function(){
+            var userInitial = '{{ strtoupper(substr($user->userFirstName, 0, 1) . substr($user->userName, 0, 1)) }}';
+            var userInitialSet = {{ !empty($user->userFirstName) && !empty($user->userName) ? 'true' : 'false' }};
+            var userId = {{ $user->id }};
+            var $btnUpdateAvatar = $('#updateAvatar');
+            var $btnDeleteAvatar = $('#deleteAvatar');
+            var $userAvatarContainer = $('.userAvatarContainer');
 
-        $btnUpdateAvatar.rsMediaChooser({
-            multiple: false,
-            allowedMedia: [
-                'picture'
-            ],
-            doneFunction: function (data) {
-                id = data.id;
-                var url = omega.mvc.url('user', 'saveAvatar');
-                omega.ajax.query(url, {userId: userId, mediaId: id}, omega.ajax.GET, function(json){
-                    var html = '<div class="userAvatarImage" style="background-image: url(\''+json.url+'\')"></div>';
+            $btnUpdateAvatar.rsMediaChooser({
+                multiple: false,
+                allowedMedia: [
+                    'picture'
+                ],
+                doneFunction: function (data) {
+                    id = data.id;
+                    var url = route('user.saveAvatar', {userId: userId, mediaId: id});
+                    omega.ajax.query(url, {}, omega.ajax.GET, function(json){
+                        var html = '<div class="userAvatarImage" style="background-image: url(\''+json.url+'\')"></div>';
+                        $userAvatarContainer.html(html);
+                        $btnDeleteAvatar.show();
+                        omega.notice.success('Success', 'Avatar updated');
+                    }, undefined, {dataType: 'json'});
+                }
+            });
+
+            $btnDeleteAvatar.click(function(){
+                var url = route('user.deleteAvatar', {userId: userId});
+                omega.ajax.query(url, {}, omega.ajax.GET, function(json){
+                    $btnDeleteAvatar.hide();
+                    var html;
+                    if(userInitialSet){
+                        html = '<span class="userAvatarText">'+userInitial+'</span>';
+                    }
+                    else{
+                        html = '<span class="userAvatarIcon"><i class="fa fa-user fa-4x"></i></span>';
+                    }
                     $userAvatarContainer.html(html);
-                    $btnDeleteAvatar.show();
                     omega.notice.success('Success', 'Avatar updated');
                 }, undefined, {dataType: 'json'});
-            }
+            });
         });
-
-        $btnDeleteAvatar.click(function(){
-            var url = omega.mvc.url('user', 'deleteAvatar');
-            omega.ajax.query(url, {userId: userId}, omega.ajax.GET, function(json){
-                $btnDeleteAvatar.hide();
-                var html;
-                if(userInitialSet){
-                    html = '<span class="userAvatarText">'+userInitial+'</span>';
-                }
-                else{
-                    html = '<span class="userAvatarIcon"><i class="fa fa-user fa-4x"></i></span>';
-                }
-                $userAvatarContainer.html(html);
-                omega.notice.success('Success', 'Avatar updated');
-            }, undefined, {dataType: 'json'});
-        });
-    });
-</script>--}}
+    </script>
+@endpush
