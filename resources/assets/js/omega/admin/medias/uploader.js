@@ -68,7 +68,7 @@ uploader.bind('UploadProgress', function(up, file) {
 
 uploader.bind('Error', function(up, err) {
     console.log(up, err);
-    $('#pourcent_'+err.file.id).html("Error, the file is too big...");
+    $('#pourcent_'+err.file.id).html(err.message);
     $('#progress_'+err.file.id).addClass('progress-bar-danger').removeClass('progress-bar-success').removeClass('active');
     /*console.log(up, err);
     for(var i = 0; i < up.files.length; i++){
@@ -82,9 +82,10 @@ uploader.bind('Error', function(up, err) {
 });
 
 uploader.bind('FileUploaded', function(up, file, res) {
+    console.log(res);
     json = $.parseJSON(res.response);
-
-    if(json.OK)
+    console.log(json);
+    if(json.success)
     {
         $('#image_'+file.id).append('<a href="'+json.url+'"><img width="80" src="'+json.url+'" alt="'+file.name+'" /></a>');
         $('#pourcent_'+file.id).html(__('Ok'));
@@ -100,6 +101,7 @@ uploader.bind('FileUploaded', function(up, file, res) {
 });
 
 uploader.bind('UploadComplete', function() {
+    console.log('uplaoded');
     omega.notice.success(undefined, __('Upload completed !'));
 });
 

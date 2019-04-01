@@ -7,7 +7,7 @@
 
             siteUrl: '{{ url('/') }}',
             uploaderUrl: '{{ route('media.uploader') }}',
-            gifLoader: '{{ asset('img/loading-light.gif')  }}',
+            gifLoader: '{{ asset('images/loading.gif')  }}',
             inception: {{ $inception ? 'true' : 'false' }}
         });
 

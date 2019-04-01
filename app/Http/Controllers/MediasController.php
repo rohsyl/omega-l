@@ -117,11 +117,17 @@ class MediasController extends AdminController
 
         $success = false;
         // upload the media
-        $this->mediaRepository->UploadMedia($FILE, $parent, $success);
+        $media = $this->mediaRepository->UploadMedia($FILE, $parent, $success);
 
-        return response()->json([
+        $response = [
             'success' => $success
-        ], 200);
+        ];
+
+        if($success) {
+            $response['url'] = asset($media->path);
+        }
+
+        return response()->json($response, 200);
     }
 
     /**
