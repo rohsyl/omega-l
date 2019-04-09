@@ -16,6 +16,8 @@
                 <div id="container">
                     <input type="hidden" id="upload-url" value="{{ route('media.uploadhandler') }}" />
                     <input type="hidden" id="upload-parent" value="{{ $parent }}" />
+                    <input type="hidden" id="upload-multiupload" value="{{ $multiupload }}" />
+                    <input type="hidden" id="upload-replace" value="{{ $replace }}" />
                     <p>Select files from your computer</p>
                     <a id="browse" href="javascript:" class="btn btn-primary">{{ __('Browse...') }}</a>
                     <a id="start-upload" href="javascript:" class="btn btn-warning">{{ __('Start Upload') }}</a>

@@ -100,7 +100,7 @@ class Path{
 	        return false;
     }
 
-    public static function RRmdir($dir)
+    public static function  RRmdir($dir, $deleteHimself = true)
     {
 
         $dir_content = scandir($dir);
@@ -116,7 +116,10 @@ class Path{
                 }
             }
         }
-        return rmdir($dir);
+        if ($deleteHimself)
+            return rmdir($dir);
+        else
+            return true;
     }
 
     public static function GetFiles($pathToFolder)

@@ -76,11 +76,19 @@ class MediasController extends AdminController
             return OmegaGate::accessDeniedView();
 
         $parent = $request->input('parent');
+        $replace = null;
+        $multiupload = true;
+        if($request->has('replace')) {
+            $replace = $request->input('replace');
+            $multiupload = false;
+        }
         $maxUploadFileSize = humanReadableBytes(getMaximumFileUploadSize());
         $isWritable = Directory::isWritable(media_path());
         return view(Request::ajax() ? 'media.uploader' : 'media.framed.uploader')->with([
             'isModal' => Request::ajax(),
             'parent' => $parent,
+            'multiupload' => $multiupload,
+            'replace' => $replace,
             'isWritable' => $isWritable,
             'maxUploadFileSize' => $maxUploadFileSize
         ]);
@@ -113,11 +121,19 @@ class MediasController extends AdminController
         }
 
         $parent = $request->input('parent') ?? null;
+        $replace = $request->input('replace') ?? null;
         $FILE = $request->file('file');
 
         $success = false;
+
+        if(isset($replace)) {
+            $media = $this->mediaRepository->ReplaceMedia($replace, $FILE, $success);
+        }
+        else {
+            $media = $this->mediaRepository->UploadMedia($FILE, $parent, $success);
+        }
+
         // upload the media
-        $media = $this->mediaRepository->UploadMedia($FILE, $parent, $success);
 
         $response = [
             'success' => $success

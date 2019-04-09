@@ -297,6 +297,41 @@ class MediaRepository implements InterfaceMediaConstant {
     #endregion
 
     /**
+     * @param $FILES
+     * @param null|int $parent The id of the parent. If null upload to the root
+     * @param $success bool True if success
+     * @return null|Media
+     */
+    public function ReplaceMedia($mediaId, UploadedFile &$FILE, &$success)
+    {
+        $success = true;
+
+        $name = pathinfo($FILE->getClientOriginalName(), PATHINFO_FILENAME);
+        $ext = strtolower(pathinfo($FILE->getClientOriginalName(), PATHINFO_EXTENSION));
+
+        $media = self::GetMedia($mediaId);
+
+        $media->name = $name;
+        $media->ext = $ext;
+
+        $path = Path::Combine(media_path(), $media->id);
+
+        $filename = $media->name . '.' . $media->ext;
+
+        if(file_exists($path)) {
+            $success = Path::RRmdir($path, false);
+        }
+
+        $webPath = Url::Combine('media', $media->id, $filename);
+        $media->path = $webPath;
+        $this->Save($media);
+
+        $FILE->move($path, $filename);
+
+        return $media;
+    }
+
+    /**
      * Rename a media in the database and on the fs if needed
      * @param $mediaId int The id of the media
      * @param $newName string The new name

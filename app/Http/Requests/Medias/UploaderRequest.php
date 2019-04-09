@@ -24,7 +24,8 @@ class UploaderRequest extends FormRequest
     public function rules()
     {
         return [
-            'parent' => 'required|integer|exists:medias,id'
+            'parent' => 'required|integer|exists:medias,id',
+            'replace' => 'nullable|integer|exists:medias,id'
         ];
     }
 }
