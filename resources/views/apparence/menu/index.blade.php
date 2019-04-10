@@ -16,10 +16,7 @@
             @endif
             <th></th>
         </tr>
-        @if(sizeof($menus) == 0)
-        <tr><td colspan="4" align="center">No menu <a href="{{ route('menu.add') }}" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}</a></td></tr>
-        @else
-            @foreach($menus as $menu)
+        @forelse($menus as $menu)
             <tr>
                 <td width="10px">{!! $menu->isMain ? '<span class="glyphicon glyphicon-home"></span>' : '' !!}</td>
                 <td><a href="{{ route('menu.edit', ['id' => $menu->id]) }}">{{ $menu->name }}</a></td>
@@ -40,7 +37,16 @@
                         </span>
                 </td>
             </tr>
-            @endforeach
-        @endif
+        @empty
+            <tr>
+                <td colspan="4" align="center">
+                    {{ __('No menu') }}
+                    <a href="{{ route('menu.add') }}" class="btn btn-xs btn-primary">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        {{ __('Add new') }}
+                    </a>
+                </td>
+            </tr>
+        @endforelse
     </table>
 @endsection

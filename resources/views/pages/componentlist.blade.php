@@ -1,7 +1,3 @@
-@php
-$i = 0;
-$count = count($components);
-@endphp
 @foreach($components as $component)
 <div class="component-item" id="component-{{ $component['id'] }}">
     <div class="component-item-top">
@@ -41,12 +37,11 @@ $count = count($components);
             <a href="#" class="settingsComponent" data-id="{{ $component['id'] }}"><i class="fa fa-cog"></i></a>
             <a href="#" class="deleteComponent" data-id="{{ $component['id'] }}"><i class="fa fa-trash"></i></a>
 
-            <a href="#" class="upupComponent @if(!($i > 0)) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-double-up"></i></a>
-            <a href="#" class="upComponent  @if(!($i > 0)) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-up"></i></a>
-            <a href="#" class="downComponent @if(!($i < $count - 1)) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-down"></i></a>
-            <a href="#" class="downdownComponent @if(!($i < $count - 1)) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-double-down"></i></a>
+            <a href="#" class="upupComponent @if($loop->first) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-double-up"></i></a>
+            <a href="#" class="upComponent  @if($loop->first) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-up"></i></a>
+            <a href="#" class="downComponent @if($loop->last) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-down"></i></a>
+            <a href="#" class="downdownComponent @if($loop->last) hidden  @endif" data-id="{{ $component['id'] }}"><i class="fa fa-angle-double-down"></i></a>
         </div>
     </div>
 </div>
-@php $i++ @endphp
 @endforeach

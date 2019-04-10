@@ -4,7 +4,6 @@
     <h1 class="page-header">{{ __('Settings') }}</h1>
     @include('settings.menu')
 
-
     <div class="form-horizontal">
 
         <div class="form-group">

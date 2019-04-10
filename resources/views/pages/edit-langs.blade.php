@@ -27,23 +27,23 @@
                 <th></th>
             </tr>
             @foreach($langs as $l)
-                @if($l->slug != $page->lang)
-                    <tr class="row-plangs" data-idparent="{{ isset($correspondingParents[$l->slug]) ? $correspondingParents[$l->slug] : 'null' }}" data-lang="{{ $l->slug }}" data-pid="{{ $page->id }}">
-                        <td>{{ $l->name }}</td>
-                        <td>
-                            <select class="form-control" id="select-plangs-{{ $l->slug }}" name="plangs_rel[{{ $l->slug }}]">
-                                <option>{{ __('Loading') }}</option>
-                            </select>
+                @continue($l->slug == $page->lang)
 
-                            @if ($errors->has('plangs_rel.'.$l->slug))
-                                <span class="text-danger" role="alert">
-                                    <strong>{{ $errors->first('plangs_rel.'.$l->slug) }}</strong>
-                                </span>
-                            @endif
-                        </td>
-                        <td></td>
-                    </tr>
-                @endif
+                <tr class="row-plangs" data-idparent="{{ isset($correspondingParents[$l->slug]) ? $correspondingParents[$l->slug] : 'null' }}" data-lang="{{ $l->slug }}" data-pid="{{ $page->id }}">
+                    <td>{{ $l->name }}</td>
+                    <td>
+                        <select class="form-control" id="select-plangs-{{ $l->slug }}" name="plangs_rel[{{ $l->slug }}]">
+                            <option>{{ __('Loading') }}</option>
+                        </select>
+
+                        @if ($errors->has('plangs_rel.'.$l->slug))
+                            <span class="text-danger" role="alert">
+                                <strong>{{ $errors->first('plangs_rel.'.$l->slug) }}</strong>
+                            </span>
+                        @endif
+                    </td>
+                    <td></td>
+                </tr>
             @endforeach
         </table>
     </div>

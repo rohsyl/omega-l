@@ -7,8 +7,8 @@
     <div class="row">
         <div class="col-sm-12 pull">
             <p class="text-right">
-
-                <a href="{{ route('admin.pages') }}" class="btn btn-default btn-tooltip" title="{{ __('Back to the list of pages') }}"><i class="fa fa-list"></i> {{ __('Back to pages') }}</a>
+                <a href="{{ route('admin.pages') }}" class="btn btn-default btn-tooltip" title="{{ __('Back to the list of pages') }}">
+                    <i class="fa fa-list"></i> {{ __('Back to pages') }}
                 </a>
             </p>
         </div>

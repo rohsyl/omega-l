@@ -22,8 +22,12 @@
         <div class="col-sm-6 pull">
             <p class="text-right">
                 @php $args = $enabledLang ? ['lang' => $currentLang] : []; @endphp
-                <a href="{{ route('admin.pages.trash') }}" class="btn btn-default btn-tooltip" title="{{ __('Manage and restore deleted pages') }}"><i class="fa fa-trash"></i> {{ __('Manage Trash') }}</a>
-                <a href="#" id="sortPages" class="btn btn-default btn-tooltip" title="{{ __('Sort pages') }}"><span class="glyphicon glyphicon-sort"></span> {{ __('Sort') }}</a>
+                <a href="{{ route('admin.pages.trash') }}" class="btn btn-default btn-tooltip" title="{{ __('Manage and restore deleted pages') }}">
+                    <i class="fa fa-trash"></i> {{ __('Manage Trash') }}
+                </a>
+                <a href="#" id="sortPages" class="btn btn-default btn-tooltip" title="{{ __('Sort pages') }}">
+                    <span class="glyphicon glyphicon-sort"></span> {{ __('Sort') }}
+                </a>
                 <a href="{{ route('admin.pages.add', $args) }}" class="btn btn-primary btn-tooltip" title="{{ __('Add a new page to your website') }}">
                     <span class="glyphicon glyphicon-plus-sign"></span> {{ __('Add new') }}
                 </a>

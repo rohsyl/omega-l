@@ -141,13 +141,13 @@
                             <th></th>
                         </tr>
                         @foreach($users as $user)
-                        <tr>
-                            <td>{{ $user->displayName() }}</td>
-                            <td class="text-right">
-                                <a href="{{ route('profile', ['id' => $user->id]) }}"><i class="fa fa-search"></i></a>&nbsp;
-                                <a href="{{ route('user.edit', ['id' => $user->id]) }}"><i class="fa fa-edit"></i></a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>{{ $user->displayName() }}</td>
+                                <td class="text-right">
+                                    <a href="{{ route('profile', ['id' => $user->id]) }}"><i class="fa fa-search"></i></a>&nbsp;
+                                    <a href="{{ route('user.edit', ['id' => $user->id]) }}"><i class="fa fa-edit"></i></a>
+                                </td>
+                            </tr>
                         @endforeach
                     </table>
                 </div>

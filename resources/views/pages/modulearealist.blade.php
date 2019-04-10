@@ -25,7 +25,7 @@
                                data-positionid="{{ $position->id }}"><i class="{{ is_null($position->fkPage) ? 'fa fa-star' : 'fa fa-star-o' }}"></i></a>
 
                             @if(om_config('om_enable_front_langauge'))
-                            <a href="#" class="setLang badge" data-positionid="{{ $position->id }}"><i class="fa fa-language"></i></a>
+                                <a href="#" class="setLang badge" data-positionid="{{ $position->id }}"><i class="fa fa-language"></i></a>
                             @endif
                         </li>
 
