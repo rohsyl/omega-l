@@ -20,6 +20,13 @@
       ],
       "extensions": "*",
       "quiet": false
+    },
+    "plugin": {
+      "patterns": [
+        "omega/plugin/*/assets/*"
+      ],
+      "extensions": "*",
+      "quiet": false
     }
   },
   "devDependencies": {
