@@ -45,6 +45,6 @@ class LinkChooser{
                     break;
             }
         }
-        return ABSPATH;
+        return null;
     }
 }

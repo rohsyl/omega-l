@@ -1,0 +1,12 @@
+{
+    "pluginName": "banner",
+    "pluginTitle": "Banner",
+    "pluginVersion": "1.0.0",
+    "author": "Roh Sylvain",
+    "authorMail": "",
+    "authorWebsite": "",
+    "description": "Display a nice banner with a title, some text, a nice background and an action button.",
+    "options": {
+        "displayInMenu": 0
+    }
+}
