@@ -21,6 +21,14 @@ return [
      */
     'last_update_filename' => 'current.json',
 
+    /* ********************
+     * POST INSTALL SCRIPT
+     * ********************
+     * If this file exists in your app after the extraction of the archive and if
+     * it contains a laraupdater_post_upgrade($currentVersion, $lastVersion) method it will be executed.
+     */
+    'post_upgrade_file_location' => 'update/update.php',
+
     /**
      * The name of the file that contains the current version
      * This file is located at the root of the project
