@@ -14,7 +14,7 @@ return [
     /*
     * URL where your updates are stored ( e.g. for a folder named 'updates', under http://site.com/yourapp ).
     */
-    'update_baseurl' => 'https://omega.rohs.ch/update/releases/',
+    'update_baseurl' => 'http://localhost/update/',
 
     /*
      * The name of the file in which the last version information are stored on your webserver
