@@ -1,6 +1,6 @@
 
 
-@if($param['displayLogo'] && isset($param['contactLogo']))
+@if(isset($param['displayLogo']) && $param['displayLogo'] && isset($param['contactLogo']))
     <div class="contact-contactlogo">
         <img src="{{ asset($image()->path) }}" alt="{{ $image()->name }}"/>
     </div>
