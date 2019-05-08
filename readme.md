@@ -19,6 +19,10 @@ OmegaCMS is a content management system created by Sylvain Roh. It is based on L
 
 Follow this [guide](https://github.com/rohsyl/omega-l-documentation/blob/master/install.md) to install Omega-L.
 
+## Documentation
+
+Documation available [here](https://github.com/rohsyl/omega-l-documentation).
+
 ## Versioning
 
 We use [Git](https://git-scm.com/) for versioning on [GitHub](https://github.com/rohsyl/omega-l).
