@@ -27,8 +27,10 @@
                     $alert.empty();
                     $ouput.hide();
                     if(response != ''){
-                        $alert.append('<strong>Update Available <span class="badge badge-pill badge-info">'+response+'</span></strong>');
-                        $alert.append('<a role="button" href="javascript:update()" class="btn btn-sm btn-info pull-right">Update Now</a>');
+                        $alert.append('<p><strong>Update Available <span class="badge badge-pill badge-info">'+response+'</span></strong></p>');
+                        $alert.append('<br />');
+                        $alert.append('<p>Click on this button to start the update process.</p>');
+                        $alert.append('<a role="button" href="javascript:update()" class="btn btn-xl btn-info" id="update_now">Update Now</a>');
                     }
                     else {
                         $alert.append('<strong>No Update Available</strong>');
@@ -43,6 +45,7 @@
         function update() {
 
             $ouput.show();
+            $('#update_now').disable();
 
             xhr = new XMLHttpRequest();
             xhr.open("GET", route('laraupdater.update'), true);
