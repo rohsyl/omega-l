@@ -30,7 +30,7 @@
 
     <hr />
 
-    {{ Form::open(['route' => 'install.do', 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['route' => 'install.do', 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
         {{ Form::submit(__('Do the installation'), ['class' => 'btn btn-primary btn-block']) }}
     {{ Form::close() }}
     <br />

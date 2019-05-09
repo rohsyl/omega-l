@@ -68,7 +68,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * jQuery JavaScript Library v3.3.1
+ * jQuery JavaScript Library v3.4.0
  * https://jquery.com/
  *
  * Includes Sizzle.js
@@ -78,7 +78,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2018-01-20T17:24Z
+ * Date: 2019-04-10T19:48Z
  */
 ( function( global, factory ) {
 
@@ -160,20 +160,33 @@ var isWindow = function isWindow( obj ) {
 	var preservedScriptAttributes = {
 		type: true,
 		src: true,
+		nonce: true,
 		noModule: true
 	};
 
-	function DOMEval( code, doc, node ) {
+	function DOMEval( code, node, doc ) {
 		doc = doc || document;
 
-		var i,
+		var i, val,
 			script = doc.createElement( "script" );
 
 		script.text = code;
 		if ( node ) {
 			for ( i in preservedScriptAttributes ) {
-				if ( node[ i ] ) {
-					script[ i ] = node[ i ];
+
+				// Support: Firefox 64+, Edge 18+
+				// Some browsers don't support the "nonce" property on scripts.
+				// On the other hand, just using `getAttribute` is not enough as
+				// the `nonce` attribute is reset to an empty string whenever it
+				// becomes browsing-context connected.
+				// See https://github.com/whatwg/html/issues/2369
+				// See https://html.spec.whatwg.org/#nonce-attributes
+				// The `node.getAttribute` check was added for the sake of
+				// `jQuery.globalEval` so that it can fake a nonce-containing node
+				// via an object.
+				val = node[ i ] || node.getAttribute && node.getAttribute( i );
+				if ( val ) {
+					script.setAttribute( i, val );
 				}
 			}
 		}
@@ -198,7 +211,7 @@ function toType( obj ) {
 
 
 var
-	version = "3.3.1",
+	version = "3.4.0",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
@@ -327,25 +340,28 @@ jQuery.extend = jQuery.fn.extend = function() {
 
 			// Extend the base object
 			for ( name in options ) {
-				src = target[ name ];
 				copy = options[ name ];
 
+				// Prevent Object.prototype pollution
 				// Prevent never-ending loop
-				if ( target === copy ) {
+				if ( name === "__proto__" || target === copy ) {
 					continue;
 				}
 
 				// Recurse if we're merging plain objects or arrays
 				if ( deep && copy && ( jQuery.isPlainObject( copy ) ||
 					( copyIsArray = Array.isArray( copy ) ) ) ) {
+					src = target[ name ];
 
-					if ( copyIsArray ) {
-						copyIsArray = false;
-						clone = src && Array.isArray( src ) ? src : [];
-
+					// Ensure proper type for the source value
+					if ( copyIsArray && !Array.isArray( src ) ) {
+						clone = [];
+					} else if ( !copyIsArray && !jQuery.isPlainObject( src ) ) {
+						clone = {};
 					} else {
-						clone = src && jQuery.isPlainObject( src ) ? src : {};
+						clone = src;
 					}
+					copyIsArray = false;
 
 					// Never move original objects, clone them
 					target[ name ] = jQuery.extend( deep, clone, copy );
@@ -398,9 +414,6 @@ jQuery.extend( {
 	},
 
 	isEmptyObject: function( obj ) {
-
-		/* eslint-disable no-unused-vars */
-		// See https://github.com/eslint/eslint/issues/6125
 		var name;
 
 		for ( name in obj ) {
@@ -410,8 +423,8 @@ jQuery.extend( {
 	},
 
 	// Evaluates a script in a global context
-	globalEval: function( code ) {
-		DOMEval( code );
+	globalEval: function( code, options ) {
+		DOMEval( code, { nonce: options && options.nonce } );
 	},
 
 	each: function( obj, callback ) {
@@ -567,14 +580,14 @@ function isArrayLike( obj ) {
 }
 var Sizzle =
 /*!
- * Sizzle CSS Selector Engine v2.3.3
+ * Sizzle CSS Selector Engine v2.3.4
  * https://sizzlejs.com/
  *
- * Copyright jQuery Foundation and other contributors
+ * Copyright JS Foundation and other contributors
  * Released under the MIT license
- * http://jquery.org/license
+ * https://js.foundation/
  *
- * Date: 2016-08-08
+ * Date: 2019-04-08
  */
 (function( window ) {
 
@@ -608,6 +621,7 @@ var i,
 	classCache = createCache(),
 	tokenCache = createCache(),
 	compilerCache = createCache(),
+	nonnativeSelectorCache = createCache(),
 	sortOrder = function( a, b ) {
 		if ( a === b ) {
 			hasDuplicate = true;
@@ -669,8 +683,7 @@ var i,
 
 	rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*" ),
 	rcombinators = new RegExp( "^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace + "*" ),
-
-	rattributeQuotes = new RegExp( "=" + whitespace + "*([^\\]'\"]*?)" + whitespace + "*\\]", "g" ),
+	rdescend = new RegExp( whitespace + "|>" ),
 
 	rpseudo = new RegExp( pseudos ),
 	ridentifier = new RegExp( "^" + identifier + "$" ),
@@ -691,6 +704,7 @@ var i,
 			whitespace + "*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" )
 	},
 
+	rhtml = /HTML$/i,
 	rinputs = /^(?:input|select|textarea|button)$/i,
 	rheader = /^h\d$/i,
 
@@ -745,9 +759,9 @@ var i,
 		setDocument();
 	},
 
-	disabledAncestor = addCombinator(
+	inDisabledFieldset = addCombinator(
 		function( elem ) {
-			return elem.disabled === true && ("form" in elem || "label" in elem);
+			return elem.disabled === true && elem.nodeName.toLowerCase() === "fieldset";
 		},
 		{ dir: "parentNode", next: "legend" }
 	);
@@ -860,18 +874,22 @@ function Sizzle( selector, context, results, seed ) {
 
 			// Take advantage of querySelectorAll
 			if ( support.qsa &&
-				!compilerCache[ selector + " " ] &&
-				(!rbuggyQSA || !rbuggyQSA.test( selector )) ) {
+				!nonnativeSelectorCache[ selector + " " ] &&
+				(!rbuggyQSA || !rbuggyQSA.test( selector )) &&
 
-				if ( nodeType !== 1 ) {
-					newContext = context;
-					newSelector = selector;
-
-				// qSA looks outside Element context, which is not what we want
-				// Thanks to Andrew Dupont for this workaround technique
-				// Support: IE <=8
+				// Support: IE 8 only
 				// Exclude object elements
-				} else if ( context.nodeName.toLowerCase() !== "object" ) {
+				(nodeType !== 1 || context.nodeName.toLowerCase() !== "object") ) {
+
+				newSelector = selector;
+				newContext = context;
+
+				// qSA considers elements outside a scoping root when evaluating child or
+				// descendant combinators, which is not what we want.
+				// In such cases, we work around the behavior by prefixing every selector in the
+				// list with an ID selector referencing the scope context.
+				// Thanks to Andrew Dupont for this technique.
+				if ( nodeType === 1 && rdescend.test( selector ) ) {
 
 					// Capture the context ID, setting it first if necessary
 					if ( (nid = context.getAttribute( "id" )) ) {
@@ -893,17 +911,16 @@ function Sizzle( selector, context, results, seed ) {
 						context;
 				}
 
-				if ( newSelector ) {
-					try {
-						push.apply( results,
-							newContext.querySelectorAll( newSelector )
-						);
-						return results;
-					} catch ( qsaError ) {
-					} finally {
-						if ( nid === expando ) {
-							context.removeAttribute( "id" );
-						}
+				try {
+					push.apply( results,
+						newContext.querySelectorAll( newSelector )
+					);
+					return results;
+				} catch ( qsaError ) {
+					nonnativeSelectorCache( selector, true );
+				} finally {
+					if ( nid === expando ) {
+						context.removeAttribute( "id" );
 					}
 				}
 			}
@@ -1067,7 +1084,7 @@ function createDisabledPseudo( disabled ) {
 					// Where there is no isDisabled, check manually
 					/* jshint -W018 */
 					elem.isDisabled !== !disabled &&
-						disabledAncestor( elem ) === disabled;
+						inDisabledFieldset( elem ) === disabled;
 			}
 
 			return elem.disabled === disabled;
@@ -1124,10 +1141,13 @@ support = Sizzle.support = {};
  * @returns {Boolean} True iff elem is a non-HTML XML node
  */
 isXML = Sizzle.isXML = function( elem ) {
-	// documentElement is verified for cases where it doesn't yet exist
-	// (such as loading iframes in IE - #4833)
-	var documentElement = elem && (elem.ownerDocument || elem).documentElement;
-	return documentElement ? documentElement.nodeName !== "HTML" : false;
+	var namespace = elem.namespaceURI,
+		docElem = (elem.ownerDocument || elem).documentElement;
+
+	// Support: IE <=8
+	// Assume HTML when documentElement doesn't yet exist, such as inside loading iframes
+	// https://bugs.jquery.com/ticket/4833
+	return !rhtml.test( namespace || docElem && docElem.nodeName || "HTML" );
 };
 
 /**
@@ -1549,11 +1569,8 @@ Sizzle.matchesSelector = function( elem, expr ) {
 		setDocument( elem );
 	}
 
-	// Make sure that attribute selectors are quoted
-	expr = expr.replace( rattributeQuotes, "='$1']" );
-
 	if ( support.matchesSelector && documentIsHTML &&
-		!compilerCache[ expr + " " ] &&
+		!nonnativeSelectorCache[ expr + " " ] &&
 		( !rbuggyMatches || !rbuggyMatches.test( expr ) ) &&
 		( !rbuggyQSA     || !rbuggyQSA.test( expr ) ) ) {
 
@@ -1567,7 +1584,9 @@ Sizzle.matchesSelector = function( elem, expr ) {
 					elem.document && elem.document.nodeType !== 11 ) {
 				return ret;
 			}
-		} catch (e) {}
+		} catch (e) {
+			nonnativeSelectorCache( expr, true );
+		}
 	}
 
 	return Sizzle( expr, document, null, [ elem ] ).length > 0;
@@ -2026,7 +2045,7 @@ Expr = Sizzle.selectors = {
 		"contains": markFunction(function( text ) {
 			text = text.replace( runescape, funescape );
 			return function( elem ) {
-				return ( elem.textContent || elem.innerText || getText( elem ) ).indexOf( text ) > -1;
+				return ( elem.textContent || getText( elem ) ).indexOf( text ) > -1;
 			};
 		}),
 
@@ -2165,7 +2184,11 @@ Expr = Sizzle.selectors = {
 		}),
 
 		"lt": createPositionalPseudo(function( matchIndexes, length, argument ) {
-			var i = argument < 0 ? argument + length : argument;
+			var i = argument < 0 ?
+				argument + length :
+				argument > length ?
+					length :
+					argument;
 			for ( ; --i >= 0; ) {
 				matchIndexes.push( i );
 			}
@@ -3215,18 +3238,18 @@ jQuery.each( {
 		return siblings( elem.firstChild );
 	},
 	contents: function( elem ) {
-        if ( nodeName( elem, "iframe" ) ) {
-            return elem.contentDocument;
-        }
+		if ( typeof elem.contentDocument !== "undefined" ) {
+			return elem.contentDocument;
+		}
 
-        // Support: IE 9 - 11 only, iOS 7 only, Android Browser <=4.3 only
-        // Treat the template element as a regular one in browsers that
-        // don't support it.
-        if ( nodeName( elem, "template" ) ) {
-            elem = elem.content || elem;
-        }
+		// Support: IE 9 - 11 only, iOS 7 only, Android Browser <=4.3 only
+		// Treat the template element as a regular one in browsers that
+		// don't support it.
+		if ( nodeName( elem, "template" ) ) {
+			elem = elem.content || elem;
+		}
 
-        return jQuery.merge( [], elem.childNodes );
+		return jQuery.merge( [], elem.childNodes );
 	}
 }, function( name, fn ) {
 	jQuery.fn[ name ] = function( until, selector ) {
@@ -4535,6 +4558,22 @@ var rcssNum = new RegExp( "^(?:([+-])=|)(" + pnum + ")([a-z%]*)$", "i" );
 
 var cssExpand = [ "Top", "Right", "Bottom", "Left" ];
 
+var documentElement = document.documentElement;
+
+
+
+	var isAttached = function( elem ) {
+			return jQuery.contains( elem.ownerDocument, elem );
+		},
+		composed = { composed: true };
+
+	// Check attachment across shadow DOM boundaries when possible (gh-3504)
+	if ( documentElement.attachShadow ) {
+		isAttached = function( elem ) {
+			return jQuery.contains( elem.ownerDocument, elem ) ||
+				elem.getRootNode( composed ) === elem.ownerDocument;
+		};
+	}
 var isHiddenWithinTree = function( elem, el ) {
 
 		// isHiddenWithinTree might be called from jQuery#filter function;
@@ -4549,7 +4588,7 @@ var isHiddenWithinTree = function( elem, el ) {
 			// Support: Firefox <=43 - 45
 			// Disconnected elements can have computed display: none, so first confirm that elem is
 			// in the document.
-			jQuery.contains( elem.ownerDocument, elem ) &&
+			isAttached( elem ) &&
 
 			jQuery.css( elem, "display" ) === "none";
 	};
@@ -4591,7 +4630,8 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 		unit = valueParts && valueParts[ 3 ] || ( jQuery.cssNumber[ prop ] ? "" : "px" ),
 
 		// Starting value computation is required for potential unit mismatches
-		initialInUnit = ( jQuery.cssNumber[ prop ] || unit !== "px" && +initial ) &&
+		initialInUnit = elem.nodeType &&
+			( jQuery.cssNumber[ prop ] || unit !== "px" && +initial ) &&
 			rcssNum.exec( jQuery.css( elem, prop ) );
 
 	if ( initialInUnit && initialInUnit[ 3 ] !== unit ) {
@@ -4738,7 +4778,7 @@ jQuery.fn.extend( {
 } );
 var rcheckableType = ( /^(?:checkbox|radio)$/i );
 
-var rtagName = ( /<([a-z][^\/\0>\x20\t\r\n\f]+)/i );
+var rtagName = ( /<([a-z][^\/\0>\x20\t\r\n\f]*)/i );
 
 var rscriptType = ( /^$|^module$|\/(?:java|ecma)script/i );
 
@@ -4810,7 +4850,7 @@ function setGlobalEval( elems, refElements ) {
 var rhtml = /<|&#?\w+;/;
 
 function buildFragment( elems, context, scripts, selection, ignored ) {
-	var elem, tmp, tag, wrap, contains, j,
+	var elem, tmp, tag, wrap, attached, j,
 		fragment = context.createDocumentFragment(),
 		nodes = [],
 		i = 0,
@@ -4874,13 +4914,13 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 			continue;
 		}
 
-		contains = jQuery.contains( elem.ownerDocument, elem );
+		attached = isAttached( elem );
 
 		// Append to fragment
 		tmp = getAll( fragment.appendChild( elem ), "script" );
 
 		// Preserve script evaluation history
-		if ( contains ) {
+		if ( attached ) {
 			setGlobalEval( tmp );
 		}
 
@@ -4923,8 +4963,6 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 	div.innerHTML = "<textarea>x</textarea>";
 	support.noCloneChecked = !!div.cloneNode( true ).lastChild.defaultValue;
 } )();
-var documentElement = document.documentElement;
-
 
 
 var
@@ -4940,8 +4978,19 @@ function returnFalse() {
 	return false;
 }
 
+// Support: IE <=9 - 11+
+// focus() and blur() are asynchronous, except when they are no-op.
+// So expect focus to be synchronous when the element is already active,
+// and blur to be synchronous when the element is not already active.
+// (focus and blur are always synchronous in other supported browsers,
+// this just defines when we can count on it).
+function expectSync( elem, type ) {
+	return ( elem === safeActiveElement() ) === ( type === "focus" );
+}
+
 // Support: IE <=9 only
-// See #13393 for more info
+// Accessing document.activeElement can throw unexpectedly
+// https://bugs.jquery.com/ticket/13393
 function safeActiveElement() {
 	try {
 		return document.activeElement;
@@ -5241,9 +5290,10 @@ jQuery.event = {
 			while ( ( handleObj = matched.handlers[ j++ ] ) &&
 				!event.isImmediatePropagationStopped() ) {
 
-				// Triggered event must either 1) have no namespace, or 2) have namespace(s)
-				// a subset or equal to those in the bound event (both can have no namespace).
-				if ( !event.rnamespace || event.rnamespace.test( handleObj.namespace ) ) {
+				// If the event is namespaced, then each handler is only invoked if it is
+				// specially universal or its namespaces are a superset of the event's.
+				if ( !event.rnamespace || handleObj.namespace === false ||
+					event.rnamespace.test( handleObj.namespace ) ) {
 
 					event.handleObj = handleObj;
 					event.data = handleObj.data;
@@ -5367,39 +5417,53 @@ jQuery.event = {
 			// Prevent triggered image.load events from bubbling to window.load
 			noBubble: true
 		},
-		focus: {
-
-			// Fire native event if possible so blur/focus sequence is correct
-			trigger: function() {
-				if ( this !== safeActiveElement() && this.focus ) {
-					this.focus();
-					return false;
-				}
-			},
-			delegateType: "focusin"
-		},
-		blur: {
-			trigger: function() {
-				if ( this === safeActiveElement() && this.blur ) {
-					this.blur();
-					return false;
-				}
-			},
-			delegateType: "focusout"
-		},
 		click: {
 
-			// For checkbox, fire native event so checked state will be right
-			trigger: function() {
-				if ( this.type === "checkbox" && this.click && nodeName( this, "input" ) ) {
-					this.click();
-					return false;
+			// Utilize native event to ensure correct state for checkable inputs
+			setup: function( data ) {
+
+				// For mutual compressibility with _default, replace `this` access with a local var.
+				// `|| data` is dead code meant only to preserve the variable through minification.
+				var el = this || data;
+
+				// Claim the first handler
+				if ( rcheckableType.test( el.type ) &&
+					el.click && nodeName( el, "input" ) &&
+					dataPriv.get( el, "click" ) === undefined ) {
+
+					// dataPriv.set( el, "click", ... )
+					leverageNative( el, "click", returnTrue );
 				}
+
+				// Return false to allow normal processing in the caller
+				return false;
+			},
+			trigger: function( data ) {
+
+				// For mutual compressibility with _default, replace `this` access with a local var.
+				// `|| data` is dead code meant only to preserve the variable through minification.
+				var el = this || data;
+
+				// Force setup before triggering a click
+				if ( rcheckableType.test( el.type ) &&
+					el.click && nodeName( el, "input" ) &&
+					dataPriv.get( el, "click" ) === undefined ) {
+
+					leverageNative( el, "click" );
+				}
+
+				// Return non-false to allow normal event-path propagation
+				return true;
 			},
 
-			// For cross-browser consistency, don't fire native .click() on links
+			// For cross-browser consistency, suppress native .click() on links
+			// Also prevent it if we're currently inside a leveraged native-event stack
 			_default: function( event ) {
-				return nodeName( event.target, "a" );
+				var target = event.target;
+				return rcheckableType.test( target.type ) &&
+					target.click && nodeName( target, "input" ) &&
+					dataPriv.get( target, "click" ) ||
+					nodeName( target, "a" );
 			}
 		},
 
@@ -5415,6 +5479,85 @@ jQuery.event = {
 		}
 	}
 };
+
+// Ensure the presence of an event listener that handles manually-triggered
+// synthetic events by interrupting progress until reinvoked in response to
+// *native* events that it fires directly, ensuring that state changes have
+// already occurred before other listeners are invoked.
+function leverageNative( el, type, expectSync ) {
+
+	// Missing expectSync indicates a trigger call, which must force setup through jQuery.event.add
+	if ( !expectSync ) {
+		jQuery.event.add( el, type, returnTrue );
+		return;
+	}
+
+	// Register the controller as a special universal handler for all event namespaces
+	dataPriv.set( el, type, false );
+	jQuery.event.add( el, type, {
+		namespace: false,
+		handler: function( event ) {
+			var notAsync, result,
+				saved = dataPriv.get( this, type );
+
+			if ( ( event.isTrigger & 1 ) && this[ type ] ) {
+
+				// Interrupt processing of the outer synthetic .trigger()ed event
+				if ( !saved ) {
+
+					// Store arguments for use when handling the inner native event
+					saved = slice.call( arguments );
+					dataPriv.set( this, type, saved );
+
+					// Trigger the native event and capture its result
+					// Support: IE <=9 - 11+
+					// focus() and blur() are asynchronous
+					notAsync = expectSync( this, type );
+					this[ type ]();
+					result = dataPriv.get( this, type );
+					if ( saved !== result || notAsync ) {
+						dataPriv.set( this, type, false );
+					} else {
+						result = undefined;
+					}
+					if ( saved !== result ) {
+
+						// Cancel the outer synthetic event
+						event.stopImmediatePropagation();
+						event.preventDefault();
+						return result;
+					}
+
+				// If this is an inner synthetic event for an event with a bubbling surrogate
+				// (focus or blur), assume that the surrogate already propagated from triggering the
+				// native event and prevent that from happening again here.
+				// This technically gets the ordering wrong w.r.t. to `.trigger()` (in which the
+				// bubbling surrogate propagates *after* the non-bubbling base), but that seems
+				// less bad than duplication.
+				} else if ( ( jQuery.event.special[ type ] || {} ).delegateType ) {
+					event.stopPropagation();
+				}
+
+			// If this is a native event triggered above, everything is now in order
+			// Fire an inner synthetic event with the original arguments
+			} else if ( saved ) {
+
+				// ...and capture the result
+				dataPriv.set( this, type, jQuery.event.trigger(
+
+					// Support: IE <=9 - 11+
+					// Extend with the prototype to reset the above stopImmediatePropagation()
+					jQuery.extend( saved.shift(), jQuery.Event.prototype ),
+					saved,
+					this
+				) );
+
+				// Abort handling of the native event
+				event.stopImmediatePropagation();
+			}
+		}
+	} );
+}
 
 jQuery.removeEvent = function( elem, type, handle ) {
 
@@ -5528,6 +5671,7 @@ jQuery.each( {
 	shiftKey: true,
 	view: true,
 	"char": true,
+	code: true,
 	charCode: true,
 	key: true,
 	keyCode: true,
@@ -5573,6 +5717,33 @@ jQuery.each( {
 		return event.which;
 	}
 }, jQuery.event.addProp );
+
+jQuery.each( { focus: "focusin", blur: "focusout" }, function( type, delegateType ) {
+	jQuery.event.special[ type ] = {
+
+		// Utilize native event if possible so blur/focus sequence is correct
+		setup: function() {
+
+			// Claim the first handler
+			// dataPriv.set( this, "focus", ... )
+			// dataPriv.set( this, "blur", ... )
+			leverageNative( this, type, expectSync );
+
+			// Return false to allow normal processing in the caller
+			return false;
+		},
+		trigger: function() {
+
+			// Force setup before trigger
+			leverageNative( this, type );
+
+			// Return non-false to allow normal event-path propagation
+			return true;
+		},
+
+		delegateType: delegateType
+	};
+} );
 
 // Create mouseenter/leave events using mouseover/out and event-time checks
 // so that event delegation works in jQuery.
@@ -5824,11 +5995,13 @@ function domManip( collection, args, callback, ignored ) {
 						if ( node.src && ( node.type || "" ).toLowerCase()  !== "module" ) {
 
 							// Optional AJAX dependency, but won't run scripts if not present
-							if ( jQuery._evalUrl ) {
-								jQuery._evalUrl( node.src );
+							if ( jQuery._evalUrl && !node.noModule ) {
+								jQuery._evalUrl( node.src, {
+									nonce: node.nonce || node.getAttribute( "nonce" )
+								} );
 							}
 						} else {
-							DOMEval( node.textContent.replace( rcleanScript, "" ), doc, node );
+							DOMEval( node.textContent.replace( rcleanScript, "" ), node, doc );
 						}
 					}
 				}
@@ -5850,7 +6023,7 @@ function remove( elem, selector, keepData ) {
 		}
 
 		if ( node.parentNode ) {
-			if ( keepData && jQuery.contains( node.ownerDocument, node ) ) {
+			if ( keepData && isAttached( node ) ) {
 				setGlobalEval( getAll( node, "script" ) );
 			}
 			node.parentNode.removeChild( node );
@@ -5868,7 +6041,7 @@ jQuery.extend( {
 	clone: function( elem, dataAndEvents, deepDataAndEvents ) {
 		var i, l, srcElements, destElements,
 			clone = elem.cloneNode( true ),
-			inPage = jQuery.contains( elem.ownerDocument, elem );
+			inPage = isAttached( elem );
 
 		// Fix IE cloning issues
 		if ( !support.noCloneChecked && ( elem.nodeType === 1 || elem.nodeType === 11 ) &&
@@ -6164,8 +6337,10 @@ var rboxStyle = new RegExp( cssExpand.join( "|" ), "i" );
 
 		// Support: IE 9 only
 		// Detect overflow:scroll screwiness (gh-3699)
+		// Support: Chrome <=64
+		// Don't get tricked when zoom affects offsetWidth (gh-4029)
 		div.style.position = "absolute";
-		scrollboxSizeVal = div.offsetWidth === 36 || "absolute";
+		scrollboxSizeVal = roundPixelMeasures( div.offsetWidth / 3 ) === 12;
 
 		documentElement.removeChild( container );
 
@@ -6236,7 +6411,7 @@ function curCSS( elem, name, computed ) {
 	if ( computed ) {
 		ret = computed.getPropertyValue( name ) || computed[ name ];
 
-		if ( ret === "" && !jQuery.contains( elem.ownerDocument, elem ) ) {
+		if ( ret === "" && !isAttached( elem ) ) {
 			ret = jQuery.style( elem, name );
 		}
 
@@ -6292,29 +6467,12 @@ function addGetHookIf( conditionFn, hookFn ) {
 }
 
 
-var
+var cssPrefixes = [ "Webkit", "Moz", "ms" ],
+	emptyStyle = document.createElement( "div" ).style,
+	vendorProps = {};
 
-	// Swappable if display is none or starts with table
-	// except "table", "table-cell", or "table-caption"
-	// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
-	rdisplayswap = /^(none|table(?!-c[ea]).+)/,
-	rcustomProp = /^--/,
-	cssShow = { position: "absolute", visibility: "hidden", display: "block" },
-	cssNormalTransform = {
-		letterSpacing: "0",
-		fontWeight: "400"
-	},
-
-	cssPrefixes = [ "Webkit", "Moz", "ms" ],
-	emptyStyle = document.createElement( "div" ).style;
-
-// Return a css property mapped to a potentially vendor prefixed property
+// Return a vendor-prefixed property or undefined
 function vendorPropName( name ) {
-
-	// Shortcut for names that are not vendor prefixed
-	if ( name in emptyStyle ) {
-		return name;
-	}
 
 	// Check for vendor prefixed names
 	var capName = name[ 0 ].toUpperCase() + name.slice( 1 ),
@@ -6328,15 +6486,32 @@ function vendorPropName( name ) {
 	}
 }
 
-// Return a property mapped along what jQuery.cssProps suggests or to
-// a vendor prefixed property.
+// Return a potentially-mapped jQuery.cssProps or vendor prefixed property
 function finalPropName( name ) {
-	var ret = jQuery.cssProps[ name ];
-	if ( !ret ) {
-		ret = jQuery.cssProps[ name ] = vendorPropName( name ) || name;
+	var final = jQuery.cssProps[ name ] || vendorProps[ name ];
+
+	if ( final ) {
+		return final;
 	}
-	return ret;
+	if ( name in emptyStyle ) {
+		return name;
+	}
+	return vendorProps[ name ] = vendorPropName( name ) || name;
 }
+
+
+var
+
+	// Swappable if display is none or starts with table
+	// except "table", "table-cell", or "table-caption"
+	// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+	rdisplayswap = /^(none|table(?!-c[ea]).+)/,
+	rcustomProp = /^--/,
+	cssShow = { position: "absolute", visibility: "hidden", display: "block" },
+	cssNormalTransform = {
+		letterSpacing: "0",
+		fontWeight: "400"
+	};
 
 function setPositiveNumber( elem, value, subtract ) {
 
@@ -6409,7 +6584,10 @@ function boxModelAdjustment( elem, dimension, box, isBorderBox, styles, computed
 			delta -
 			extra -
 			0.5
-		) );
+
+		// If offsetWidth/offsetHeight is unknown, then we can't determine content-box scroll gutter
+		// Use an explicit zero to avoid NaN (gh-3964)
+		) ) || 0;
 	}
 
 	return delta;
@@ -6419,9 +6597,16 @@ function getWidthOrHeight( elem, dimension, extra ) {
 
 	// Start with computed style
 	var styles = getStyles( elem ),
+
+		// To avoid forcing a reflow, only fetch boxSizing if we need it (gh-4322).
+		// Fake content-box until we know it's needed to know the true value.
+		boxSizingNeeded = !support.boxSizingReliable() || extra,
+		isBorderBox = boxSizingNeeded &&
+			jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+		valueIsBorderBox = isBorderBox,
+
 		val = curCSS( elem, dimension, styles ),
-		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
-		valueIsBorderBox = isBorderBox;
+		offsetProp = "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 );
 
 	// Support: Firefox <=54
 	// Return a confounding non-pixel value or feign ignorance, as appropriate.
@@ -6432,22 +6617,29 @@ function getWidthOrHeight( elem, dimension, extra ) {
 		val = "auto";
 	}
 
-	// Check for style in case a browser which returns unreliable values
-	// for getComputedStyle silently falls back to the reliable elem.style
-	valueIsBorderBox = valueIsBorderBox &&
-		( support.boxSizingReliable() || val === elem.style[ dimension ] );
 
 	// Fall back to offsetWidth/offsetHeight when value is "auto"
 	// This happens for inline elements with no explicit setting (gh-3571)
 	// Support: Android <=4.1 - 4.3 only
 	// Also use offsetWidth/offsetHeight for misreported inline dimensions (gh-3602)
-	if ( val === "auto" ||
-		!parseFloat( val ) && jQuery.css( elem, "display", false, styles ) === "inline" ) {
+	// Support: IE 9-11 only
+	// Also use offsetWidth/offsetHeight for when box sizing is unreliable
+	// We use getClientRects() to check for hidden/disconnected.
+	// In those cases, the computed value can be trusted to be border-box
+	if ( ( !support.boxSizingReliable() && isBorderBox ||
+		val === "auto" ||
+		!parseFloat( val ) && jQuery.css( elem, "display", false, styles ) === "inline" ) &&
+		elem.getClientRects().length ) {
 
-		val = elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ];
+		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
 
-		// offsetWidth/offsetHeight provide border-box values
-		valueIsBorderBox = true;
+		// Where available, offsetWidth/offsetHeight approximate border box dimensions.
+		// Where not available (e.g., SVG), assume unreliable box-sizing and interpret the
+		// retrieved value as a content box dimension.
+		valueIsBorderBox = offsetProp in elem;
+		if ( valueIsBorderBox ) {
+			val = elem[ offsetProp ];
+		}
 	}
 
 	// Normalize "" and auto
@@ -6493,6 +6685,13 @@ jQuery.extend( {
 		"flexGrow": true,
 		"flexShrink": true,
 		"fontWeight": true,
+		"gridArea": true,
+		"gridColumn": true,
+		"gridColumnEnd": true,
+		"gridColumnStart": true,
+		"gridRow": true,
+		"gridRowEnd": true,
+		"gridRowStart": true,
 		"lineHeight": true,
 		"opacity": true,
 		"order": true,
@@ -6548,7 +6747,9 @@ jQuery.extend( {
 			}
 
 			// If a number was passed in, add the unit (except for certain CSS properties)
-			if ( type === "number" ) {
+			// The isCustomProp check can be removed in jQuery 4.0 when we only auto-append
+			// "px" to a few hardcoded values.
+			if ( type === "number" && !isCustomProp ) {
 				value += ret && ret[ 3 ] || ( jQuery.cssNumber[ origName ] ? "" : "px" );
 			}
 
@@ -6648,18 +6849,29 @@ jQuery.each( [ "height", "width" ], function( i, dimension ) {
 		set: function( elem, value, extra ) {
 			var matches,
 				styles = getStyles( elem ),
-				isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
-				subtract = extra && boxModelAdjustment(
-					elem,
-					dimension,
-					extra,
-					isBorderBox,
-					styles
-				);
+
+				// Only read styles.position if the test has a chance to fail
+				// to avoid forcing a reflow.
+				scrollboxSizeBuggy = !support.scrollboxSize() &&
+					styles.position === "absolute",
+
+				// To avoid forcing a reflow, only fetch boxSizing if we need it (gh-3991)
+				boxSizingNeeded = scrollboxSizeBuggy || extra,
+				isBorderBox = boxSizingNeeded &&
+					jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+				subtract = extra ?
+					boxModelAdjustment(
+						elem,
+						dimension,
+						extra,
+						isBorderBox,
+						styles
+					) :
+					0;
 
 			// Account for unreliable border-box dimensions by comparing offset* to computed and
 			// faking a content-box to get border and padding (gh-3699)
-			if ( isBorderBox && support.scrollboxSize() === styles.position ) {
+			if ( isBorderBox && scrollboxSizeBuggy ) {
 				subtract -= Math.ceil(
 					elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ] -
 					parseFloat( styles[ dimension ] ) -
@@ -6827,9 +7039,9 @@ Tween.propHooks = {
 			// Use .style if available and use plain properties where available.
 			if ( jQuery.fx.step[ tween.prop ] ) {
 				jQuery.fx.step[ tween.prop ]( tween );
-			} else if ( tween.elem.nodeType === 1 &&
-				( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null ||
-					jQuery.cssHooks[ tween.prop ] ) ) {
+			} else if ( tween.elem.nodeType === 1 && (
+					jQuery.cssHooks[ tween.prop ] ||
+					tween.elem.style[ finalPropName( tween.prop ) ] != null ) ) {
 				jQuery.style( tween.elem, tween.prop, tween.now + tween.unit );
 			} else {
 				tween.elem[ tween.prop ] = tween.now;
@@ -8536,6 +8748,10 @@ jQuery.param = function( a, traditional ) {
 				encodeURIComponent( value == null ? "" : value );
 		};
 
+	if ( a == null ) {
+		return "";
+	}
+
 	// If an array was passed in, assume that it is an array of form elements.
 	if ( Array.isArray( a ) || ( a.jquery && !jQuery.isPlainObject( a ) ) ) {
 
@@ -9038,12 +9254,14 @@ jQuery.extend( {
 						if ( !responseHeaders ) {
 							responseHeaders = {};
 							while ( ( match = rheaders.exec( responseHeadersString ) ) ) {
-								responseHeaders[ match[ 1 ].toLowerCase() ] = match[ 2 ];
+								responseHeaders[ match[ 1 ].toLowerCase() + " " ] =
+									( responseHeaders[ match[ 1 ].toLowerCase() + " " ] || [] )
+										.concat( match[ 2 ] );
 							}
 						}
-						match = responseHeaders[ key.toLowerCase() ];
+						match = responseHeaders[ key.toLowerCase() + " " ];
 					}
-					return match == null ? null : match;
+					return match == null ? null : match.join( ", " );
 				},
 
 				// Raw string
@@ -9432,7 +9650,7 @@ jQuery.each( [ "get", "post" ], function( i, method ) {
 } );
 
 
-jQuery._evalUrl = function( url ) {
+jQuery._evalUrl = function( url, options ) {
 	return jQuery.ajax( {
 		url: url,
 
@@ -9442,7 +9660,16 @@ jQuery._evalUrl = function( url ) {
 		cache: true,
 		async: false,
 		global: false,
-		"throws": true
+
+		// Only evaluate the response if it is successful (gh-4126)
+		// dataFilter is not invoked for failure responses, so using it instead
+		// of the default converter is kludgy but it works.
+		converters: {
+			"text script": function() {}
+		},
+		dataFilter: function( response ) {
+			jQuery.globalEval( response, options );
+		}
 	} );
 };
 
@@ -9725,24 +9952,21 @@ jQuery.ajaxPrefilter( "script", function( s ) {
 // Bind script tag hack transport
 jQuery.ajaxTransport( "script", function( s ) {
 
-	// This transport only deals with cross domain requests
-	if ( s.crossDomain ) {
+	// This transport only deals with cross domain or forced-by-attrs requests
+	if ( s.crossDomain || s.scriptAttrs ) {
 		var script, callback;
 		return {
 			send: function( _, complete ) {
-				script = jQuery( "<script>" ).prop( {
-					charset: s.scriptCharset,
-					src: s.url
-				} ).on(
-					"load error",
-					callback = function( evt ) {
+				script = jQuery( "<script>" )
+					.attr( s.scriptAttrs || {} )
+					.prop( { charset: s.scriptCharset, src: s.url } )
+					.on( "load error", callback = function( evt ) {
 						script.remove();
 						callback = null;
 						if ( evt ) {
 							complete( evt.type === "error" ? 404 : 200, evt.type );
 						}
-					}
-				);
+					} );
 
 				// Use native DOM manipulation to avoid our domManip AJAX trickery
 				document.head.appendChild( script[ 0 ] );
@@ -14045,7 +14269,6 @@ module.exports = {
           { width = cur.text.firstChild.getBoundingClientRect().right - box.left - 1; }
       }
       var diff = cur.line.height - height;
-      if (height < 2) { height = textHeight(display); }
       if (diff > .005 || diff < -.005) {
         updateLineHeight(cur.line, height);
         updateWidgetHeight(cur.line);
@@ -18449,6 +18672,8 @@ module.exports = {
       throw new Error("inputStyle can not (yet) be changed in a running editor") // FIXME
     }, true);
     option("spellcheck", false, function (cm, val) { return cm.getInputField().spellcheck = val; }, true);
+    option("autocorrect", false, function (cm, val) { return cm.getInputField().autocorrect = val; }, true);
+    option("autocapitalize", false, function (cm, val) { return cm.getInputField().autocapitalize = val; }, true);
     option("rtlMoveVisually", !windows);
     option("wholeLineUpdateBefore", true);
 
@@ -18597,7 +18822,7 @@ module.exports = {
       delayingBlurEvent: false,
       focused: false,
       suppressEdits: false, // used to disable editing during key handlers when in readOnly mode
-      pasteIncoming: false, cutIncoming: false, // help recognize paste/cut edits in input.poll
+      pasteIncoming: -1, cutIncoming: -1, // help recognize paste/cut edits in input.poll
       selectingText: false,
       draggingText: false,
       highlight: new Delayed(), // stores highlight worker timeout
@@ -18830,7 +19055,8 @@ module.exports = {
     cm.display.shift = false;
     if (!sel) { sel = doc.sel; }
 
-    var paste = cm.state.pasteIncoming || origin == "paste";
+    var recent = +new Date - 200;
+    var paste = origin == "paste" || cm.state.pasteIncoming > recent;
     var textLines = splitLinesAuto(inserted), multiPaste = null;
     // When pasting N lines into N selections, insert one line per selection
     if (paste && sel.ranges.length > 1) {
@@ -18859,7 +19085,7 @@ module.exports = {
           { from = to = Pos(from.line, 0); }
       }
       var changeEvent = {from: from, to: to, text: multiPaste ? multiPaste[i$1 % multiPaste.length] : textLines,
-                         origin: origin || (paste ? "paste" : cm.state.cutIncoming ? "cut" : "+input")};
+                         origin: origin || (paste ? "paste" : cm.state.cutIncoming > recent ? "cut" : "+input")};
       makeChange(cm.doc, changeEvent);
       signalLater(cm, "inputRead", cm, changeEvent);
     }
@@ -18869,7 +19095,7 @@ module.exports = {
     ensureCursorVisible(cm);
     if (cm.curOp.updateInput < 2) { cm.curOp.updateInput = updateInput; }
     cm.curOp.typing = true;
-    cm.state.pasteIncoming = cm.state.cutIncoming = false;
+    cm.state.pasteIncoming = cm.state.cutIncoming = -1;
   }
 
   function handlePaste(e, cm) {
@@ -18917,9 +19143,9 @@ module.exports = {
     return {text: text, ranges: ranges}
   }
 
-  function disableBrowserMagic(field, spellcheck) {
-    field.setAttribute("autocorrect", "off");
-    field.setAttribute("autocapitalize", "off");
+  function disableBrowserMagic(field, spellcheck, autocorrect, autocapitalize) {
+    field.setAttribute("autocorrect", !!autocorrect);
+    field.setAttribute("autocapitalize", !!autocapitalize);
     field.setAttribute("spellcheck", !!spellcheck);
   }
 
@@ -19490,7 +19716,7 @@ module.exports = {
 
     var input = this, cm = input.cm;
     var div = input.div = display.lineDiv;
-    disableBrowserMagic(div, cm.options.spellcheck);
+    disableBrowserMagic(div, cm.options.spellcheck, cm.options.autocorrect, cm.options.autocapitalize);
 
     on(div, "paste", function (e) {
       if (signalDOMEvent(cm, e) || handlePaste(e, cm)) { return }
@@ -20030,7 +20256,7 @@ module.exports = {
     on(te, "paste", function (e) {
       if (signalDOMEvent(cm, e) || handlePaste(e, cm)) { return }
 
-      cm.state.pasteIncoming = true;
+      cm.state.pasteIncoming = +new Date;
       input.fastPoll();
     });
 
@@ -20051,15 +20277,23 @@ module.exports = {
           selectInput(te);
         }
       }
-      if (e.type == "cut") { cm.state.cutIncoming = true; }
+      if (e.type == "cut") { cm.state.cutIncoming = +new Date; }
     }
     on(te, "cut", prepareCopyCut);
     on(te, "copy", prepareCopyCut);
 
     on(display.scroller, "paste", function (e) {
       if (eventInWidget(display, e) || signalDOMEvent(cm, e)) { return }
-      cm.state.pasteIncoming = true;
-      input.focus();
+      if (!te.dispatchEvent) {
+        cm.state.pasteIncoming = +new Date;
+        input.focus();
+        return
+      }
+
+      // Pass the `paste` event to the textarea so it's handled by its event listener.
+      var event = new Event("paste");
+      event.clipboardData = e.clipboardData;
+      te.dispatchEvent(event);
     });
 
     // Prevent normal selection in the editor (we handle our own)
@@ -20482,7 +20716,7 @@ module.exports = {
 
   addLegacyProps(CodeMirror);
 
-  CodeMirror.version = "5.42.2";
+  CodeMirror.version = "5.45.0";
 
   return CodeMirror;
 
@@ -21001,7 +21235,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.6
+ * @version 1.15.0
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -21569,7 +21803,11 @@ function isFixed(element) {
   if (getStyleComputedProperty(element, 'position') === 'fixed') {
     return true;
   }
-  return isFixed(getParentNode(element));
+  var parentNode = getParentNode(element);
+  if (!parentNode) {
+    return false;
+  }
+  return isFixed(parentNode);
 }
 
 /**
@@ -22225,18 +22463,23 @@ function getRoundedOffsets(data, shouldRound) {
   var _data$offsets = data.offsets,
       popper = _data$offsets.popper,
       reference = _data$offsets.reference;
+  var round = Math.round,
+      floor = Math.floor;
 
-
-  var isVertical = ['left', 'right'].indexOf(data.placement) !== -1;
-  var isVariation = data.placement.indexOf('-') !== -1;
-  var sameWidthOddness = reference.width % 2 === popper.width % 2;
-  var bothOddWidth = reference.width % 2 === 1 && popper.width % 2 === 1;
   var noRound = function noRound(v) {
     return v;
   };
 
-  var horizontalToInteger = !shouldRound ? noRound : isVertical || isVariation || sameWidthOddness ? Math.round : Math.floor;
-  var verticalToInteger = !shouldRound ? noRound : Math.round;
+  var referenceWidth = round(reference.width);
+  var popperWidth = round(popper.width);
+
+  var isVertical = ['left', 'right'].indexOf(data.placement) !== -1;
+  var isVariation = data.placement.indexOf('-') !== -1;
+  var sameWidthParity = referenceWidth % 2 === popperWidth % 2;
+  var bothOddWidth = referenceWidth % 2 === 1 && popperWidth % 2 === 1;
+
+  var horizontalToInteger = !shouldRound ? noRound : isVertical || isVariation || sameWidthParity ? round : floor;
+  var verticalToInteger = !shouldRound ? noRound : round;
 
   return {
     left: horizontalToInteger(bothOddWidth && !isVariation && shouldRound ? popper.left - 1 : popper.left),
@@ -22596,7 +22839,14 @@ function flip(data, options) {
 
     // flip the variation if required
     var isVertical = ['top', 'bottom'].indexOf(placement) !== -1;
-    var flippedVariation = !!options.flipVariations && (isVertical && variation === 'start' && overflowsLeft || isVertical && variation === 'end' && overflowsRight || !isVertical && variation === 'start' && overflowsTop || !isVertical && variation === 'end' && overflowsBottom);
+
+    // flips variation if reference element overflows boundaries
+    var flippedVariationByRef = !!options.flipVariations && (isVertical && variation === 'start' && overflowsLeft || isVertical && variation === 'end' && overflowsRight || !isVertical && variation === 'start' && overflowsTop || !isVertical && variation === 'end' && overflowsBottom);
+
+    // flips variation if popper content overflows boundaries
+    var flippedVariationByContent = !!options.flipVariationsByContent && (isVertical && variation === 'start' && overflowsRight || isVertical && variation === 'end' && overflowsLeft || !isVertical && variation === 'start' && overflowsBottom || !isVertical && variation === 'end' && overflowsTop);
+
+    var flippedVariation = flippedVariationByRef || flippedVariationByContent;
 
     if (overlapsRef || overflowsBoundaries || flippedVariation) {
       // this boolean to detect any flip loop
@@ -23203,7 +23453,23 @@ var modifiers = {
      * The popper will never be placed outside of the defined boundaries
      * (except if `keepTogether` is enabled)
      */
-    boundariesElement: 'viewport'
+    boundariesElement: 'viewport',
+    /**
+     * @prop {Boolean} flipVariations=false
+     * The popper will switch placement variation between `-start` and `-end` when
+     * the reference element overlaps its boundaries.
+     *
+     * The original placement should have a set variation.
+     */
+    flipVariations: false,
+    /**
+     * @prop {Boolean} flipVariationsByContent=false
+     * The popper will switch placement variation between `-start` and `-end` when
+     * the popper element overlaps its reference boundaries.
+     *
+     * The original placement should have a set variation.
+     */
+    flipVariationsByContent: false
   },
 
   /**
@@ -23420,8 +23686,8 @@ var Popper = function () {
   /**
    * Creates a new Popper.js instance.
    * @class Popper
-   * @param {HTMLElement|referenceObject} reference - The reference element used to position the popper
-   * @param {HTMLElement} popper - The HTML element used as the popper
+   * @param {Element|referenceObject} reference - The reference element used to position the popper
+   * @param {Element} popper - The HTML / XML element used as the popper
    * @param {Object} options - Your custom options to override the ones defined in [Defaults](#defaults)
    * @return {Object} instance - The generated Popper.js instance
    */
@@ -24157,6 +24423,7 @@ module.exports = Cancel;
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
  * Sortable
  * @author	RubaXa   <trash@rubaxa.org>
+ * @author	owenm    <owen23355@gmail.com>
  * @license MIT
  */
 
@@ -24198,26 +24465,47 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		scrollParentEl,
 		scrollCustomFn,
 
-		lastEl,
-		lastCSS,
-		lastParentCSS,
-
 		oldIndex,
 		newIndex,
 
 		activeGroup,
 		putSortable,
 
-		autoScroll = {},
+		autoScrolls = [],
+		scrolling = false,
+
+		awaitingDragStarted = false,
+		ignoreNextClick = false,
+		sortables = [],
+
+		pointerElemChangedInterval,
+		lastPointerElemX,
+		lastPointerElemY,
 
 		tapEvt,
 		touchEvt,
 
 		moved,
 
+
+		lastTarget,
+		lastDirection,
+		pastFirstInvertThresh = false,
+		isCircumstantialInvert = false,
+		lastMode, // 'swap' or 'insert'
+
+		targetMoveDistance,
+
+		// For positioning ghost absolutely
+		ghostRelativeParent,
+		ghostRelativeParentInitialScroll = [], // (left, top)
+
+
+		forRepaintDummy,
+		realDragElRect, // dragEl rect after current animation
+
 		/** @const */
 		R_SPACE = /\s+/g,
-		R_FLOAT = /left|right|inline/,
 
 		expando = 'Sortable' + (new Date).getTime(),
 
@@ -24229,135 +24517,328 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
-		captureMode = false,
-		passiveMode = false,
+		captureMode = {
+			capture: false,
+			passive: false
+		},
 
+		IE11OrLess = !!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie|iemobile)/i),
+		Edge = !!navigator.userAgent.match(/Edge/i),
+		FireFox = !!navigator.userAgent.match(/firefox/i),
+		Safari = !!(navigator.userAgent.match(/safari/i) && !navigator.userAgent.match(/chrome/i) && !navigator.userAgent.match(/android/i)),
+		IOS = !!(navigator.userAgent.match(/iP(ad|od|hone)/i)),
+
+		PositionGhostAbsolutely = IOS,
+
+		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
+
+		// This will not pass for IE9, because IE9 DnD only works on anchors
 		supportDraggable = ('draggable' in document.createElement('div')),
-		supportCssPointerEvents = (function (el) {
-			// false when IE11
-			if (!!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie)/i)) {
+
+		supportCssPointerEvents = (function() {
+			// false when <= IE11
+			if (IE11OrLess) {
 				return false;
 			}
-			el = document.createElement('x');
+			var el = document.createElement('x');
 			el.style.cssText = 'pointer-events:auto';
 			return el.style.pointerEvents === 'auto';
 		})(),
 
 		_silent = false,
+		_alignedSilent = false,
 
 		abs = Math.abs,
 		min = Math.min,
+		max = Math.max,
 
 		savedInputChecked = [],
-		touchDragOverListeners = [],
 
-		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
+		_detectDirection = function(el, options) {
+			var elCSS = _css(el),
+				elWidth = parseInt(elCSS.width)
+					- parseInt(elCSS.paddingLeft)
+					- parseInt(elCSS.paddingRight)
+					- parseInt(elCSS.borderLeftWidth)
+					- parseInt(elCSS.borderRightWidth),
+				child1 = _getChild(el, 0, options),
+				child2 = _getChild(el, 1, options),
+				firstChildCSS = child1 && _css(child1),
+				secondChildCSS = child2 && _css(child2),
+				firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + _getRect(child1).width,
+				secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + _getRect(child2).width;
+
+			if (elCSS.display === 'flex') {
+				return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
+				? 'vertical' : 'horizontal';
+			}
+
+			if (elCSS.display === 'grid') {
+				return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';
+			}
+
+			if (child1 && firstChildCSS.float !== 'none') {
+				var touchingSideChild2 = firstChildCSS.float === 'left' ? 'left' : 'right';
+
+				return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ?
+					'vertical' : 'horizontal';
+			}
+
+			return (child1 &&
+				(
+					firstChildCSS.display === 'block' ||
+					firstChildCSS.display === 'flex' ||
+					firstChildCSS.display === 'table' ||
+					firstChildCSS.display === 'grid' ||
+					firstChildWidth >= elWidth &&
+					elCSS[CSSFloatProperty] === 'none' ||
+					child2 &&
+					elCSS[CSSFloatProperty] === 'none' &&
+					firstChildWidth + secondChildWidth > elWidth
+				) ?
+				'vertical' : 'horizontal'
+			);
+		},
+
+		/**
+		 * Detects first nearest empty sortable to X and Y position using emptyInsertThreshold.
+		 * @param  {Number} x      X position
+		 * @param  {Number} y      Y position
+		 * @return {HTMLElement}   Element of the first found nearest Sortable
+		 */
+		_detectNearestEmptySortable = function(x, y) {
+			for (var i = 0; i < sortables.length; i++) {
+				if (_lastChild(sortables[i])) continue;
+
+				var rect = _getRect(sortables[i]),
+					threshold = sortables[i][expando].options.emptyInsertThreshold,
+					insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
+					insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
+
+				if (insideHorizontally && insideVertically) {
+					return sortables[i];
+				}
+			}
+		},
+
+		_isClientInRowColumn = function(x, y, el, axis, options) {
+			var targetRect = _getRect(el),
+				targetS1Opp = axis === 'vertical' ? targetRect.left : targetRect.top,
+				targetS2Opp = axis === 'vertical' ? targetRect.right : targetRect.bottom,
+				mouseOnOppAxis = axis === 'vertical' ? x : y;
+
+			return targetS1Opp < mouseOnOppAxis && mouseOnOppAxis < targetS2Opp;
+		},
+
+		_isElInRowColumn = function(el1, el2, axis) {
+			var el1Rect = el1 === dragEl && realDragElRect || _getRect(el1),
+				el2Rect = el2 === dragEl && realDragElRect || _getRect(el2),
+				el1S1Opp = axis === 'vertical' ? el1Rect.left : el1Rect.top,
+				el1S2Opp = axis === 'vertical' ? el1Rect.right : el1Rect.bottom,
+				el1OppLength = axis === 'vertical' ? el1Rect.width : el1Rect.height,
+				el2S1Opp = axis === 'vertical' ? el2Rect.left : el2Rect.top,
+				el2S2Opp = axis === 'vertical' ? el2Rect.right : el2Rect.bottom,
+				el2OppLength = axis === 'vertical' ? el2Rect.width : el2Rect.height;
+
+			return (
+				el1S1Opp === el2S1Opp ||
+				el1S2Opp === el2S2Opp ||
+				(el1S1Opp + el1OppLength / 2) === (el2S1Opp + el2OppLength / 2)
+			);
+		},
+
+		_getParentAutoScrollElement = function(el, includeSelf) {
+			// skip to window
+			if (!el || !el.getBoundingClientRect) return _getWindowScrollingElement();
+
+			var elem = el;
+			var gotSelf = false;
+			do {
+				// we don't need to get elem css if it isn't even overflowing in the first place (performance)
+				if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
+					var elemCSS = _css(elem);
+					if (
+						elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
+						elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
+					) {
+						if (!elem || !elem.getBoundingClientRect || elem === document.body) return _getWindowScrollingElement();
+
+						if (gotSelf || includeSelf) return elem;
+						gotSelf = true;
+					}
+				}
+			/* jshint boss:true */
+			} while (elem = elem.parentNode);
+
+			return _getWindowScrollingElement();
+		},
+
+		_getWindowScrollingElement = function() {
+			if (IE11OrLess) {
+				return document.documentElement;
+			} else {
+				return document.scrollingElement;
+			}
+		},
+
+		_scrollBy = function(el, x, y) {
+			el.scrollLeft += x;
+			el.scrollTop += y;
+		},
+
+		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, /**Boolean*/isFallback) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
-			if (rootEl && options.scroll) {
-				var _this = rootEl[expando],
-					el,
-					rect,
+			if (options.scroll) {
+				var _this = rootEl ? rootEl[expando] : window,
 					sens = options.scrollSensitivity,
 					speed = options.scrollSpeed,
 
 					x = evt.clientX,
 					y = evt.clientY,
 
-					winWidth = window.innerWidth,
-					winHeight = window.innerHeight,
+					winScroller = _getWindowScrollingElement(),
 
-					vx,
-					vy,
+					scrollThisInstance = false;
 
-					scrollOffsetX,
-					scrollOffsetY
-				;
-
-				// Delect scrollEl
+				// Detect scrollEl
 				if (scrollParentEl !== rootEl) {
+					_clearAutoScrolls();
+
 					scrollEl = options.scroll;
-					scrollParentEl = rootEl;
 					scrollCustomFn = options.scrollFn;
 
 					if (scrollEl === true) {
-						scrollEl = rootEl;
-
-						do {
-							if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
-								(scrollEl.offsetHeight < scrollEl.scrollHeight)
-							) {
-								break;
-							}
-							/* jshint boss:true */
-						} while (scrollEl = scrollEl.parentNode);
+						scrollEl = _getParentAutoScrollElement(rootEl, true);
+						scrollParentEl = scrollEl;
 					}
 				}
 
-				if (scrollEl) {
-					el = scrollEl;
-					rect = scrollEl.getBoundingClientRect();
-					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
-					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
-				}
+
+				var layersOut = 0;
+				var currentParent = scrollEl;
+				do {
+					var	el = currentParent,
+						rect = _getRect(el),
+
+						top = rect.top,
+						bottom = rect.bottom,
+						left = rect.left,
+						right = rect.right,
+
+						width = rect.width,
+						height = rect.height,
+
+						scrollWidth,
+						scrollHeight,
+
+						css,
+
+						vx,
+						vy,
+
+						canScrollX,
+						canScrollY,
+
+						scrollPosX,
+						scrollPosY;
 
 
-				if (!(vx || vy)) {
-					vx = (winWidth - x <= sens) - (x <= sens);
-					vy = (winHeight - y <= sens) - (y <= sens);
+					scrollWidth = el.scrollWidth;
+					scrollHeight = el.scrollHeight;
 
-					/* jshint expr:true */
-					(vx || vy) && (el = win);
-				}
+					css = _css(el);
 
+					scrollPosX = el.scrollLeft;
+					scrollPosY = el.scrollTop;
 
-				if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
-					autoScroll.el = el;
-					autoScroll.vx = vx;
-					autoScroll.vy = vy;
-
-					clearInterval(autoScroll.pid);
-
-					if (el) {
-						autoScroll.pid = setInterval(function () {
-							scrollOffsetY = vy ? vy * speed : 0;
-							scrollOffsetX = vx ? vx * speed : 0;
-
-							if ('function' === typeof(scrollCustomFn)) {
-								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
-							}
-
-							if (el === win) {
-								win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
-							} else {
-								el.scrollTop += scrollOffsetY;
-								el.scrollLeft += scrollOffsetX;
-							}
-						}, 24);
+					if (el === winScroller) {
+						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll' || css.overflowX === 'visible');
+						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll' || css.overflowY === 'visible');
+					} else {
+						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll');
+						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll');
 					}
-				}
+
+					vx = canScrollX && (abs(right - x) <= sens && (scrollPosX + width) < scrollWidth) - (abs(left - x) <= sens && !!scrollPosX);
+
+					vy = canScrollY && (abs(bottom - y) <= sens && (scrollPosY + height) < scrollHeight) - (abs(top - y) <= sens && !!scrollPosY);
+
+
+					if (!autoScrolls[layersOut]) {
+						for (var i = 0; i <= layersOut; i++) {
+							if (!autoScrolls[i]) {
+								autoScrolls[i] = {};
+							}
+						}
+					}
+
+					if (autoScrolls[layersOut].vx != vx || autoScrolls[layersOut].vy != vy || autoScrolls[layersOut].el !== el) {
+						autoScrolls[layersOut].el = el;
+						autoScrolls[layersOut].vx = vx;
+						autoScrolls[layersOut].vy = vy;
+
+						clearInterval(autoScrolls[layersOut].pid);
+
+						if (el && (vx != 0 || vy != 0)) {
+							scrollThisInstance = true;
+							/* jshint loopfunc:true */
+							autoScrolls[layersOut].pid = setInterval((function () {
+								// emulate drag over during autoscroll (fallback), emulating native DnD behaviour
+								if (isFallback && this.layer === 0) {
+									Sortable.active._emulateDragOver(true);
+									Sortable.active._onTouchMove(touchEvt, true);
+								}
+								var scrollOffsetY = autoScrolls[this.layer].vy ? autoScrolls[this.layer].vy * speed : 0;
+								var scrollOffsetX = autoScrolls[this.layer].vx ? autoScrolls[this.layer].vx * speed : 0;
+
+								if ('function' === typeof(scrollCustomFn)) {
+									if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, autoScrolls[this.layer].el) !== 'continue') {
+										return;
+									}
+								}
+
+								_scrollBy(autoScrolls[this.layer].el, scrollOffsetX, scrollOffsetY);
+							}).bind({layer: layersOut}), 24);
+						}
+					}
+					layersOut++;
+				} while (options.bubbleScroll && currentParent !== winScroller && (currentParent = _getParentAutoScrollElement(currentParent, false)));
+				scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not
 			}
 		}, 30),
 
+		_clearAutoScrolls = function () {
+			autoScrolls.forEach(function(autoScroll) {
+				clearInterval(autoScroll.pid);
+			});
+			autoScrolls = [];
+		},
+
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
-				if (value === void 0 || value === true) {
-					value = group.name;
-				}
+				return function(to, from, dragEl, evt) {
+					var sameGroup = to.options.group.name &&
+									from.options.group.name &&
+									to.options.group.name === from.options.group.name;
 
-				if (typeof value === 'function') {
-					return value;
-				} else {
-					return function (to, from) {
-						var fromGroup = from.options.group.name;
+					if (value == null && (pull || sameGroup)) {
+						// Default pull value
+						// Default pull and put value if same group
+						return true;
+					} else if (value == null || value === false) {
+						return false;
+					} else if (pull && value === 'clone') {
+						return value;
+					} else if (typeof value === 'function') {
+						return toFn(value(to, from, dragEl, evt), pull)(to, from, dragEl, evt);
+					} else {
+						var otherGroup = (pull ? to : from).options.group.name;
 
-						return pull
-							? value
-							: value && (value.join
-								? value.indexOf(fromGroup) > -1
-								: (fromGroup == value)
-							);
-					};
-				}
+						return (value === true ||
+						(typeof value === 'string' && value === otherGroup) ||
+						(value.join && value.indexOf(otherGroup) > -1));
+					}
+				};
 			}
 
 			var group = {};
@@ -24373,23 +24854,79 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			group.revertClone = originalGroup.revertClone;
 
 			options.group = group;
-		}
-	;
+		},
 
-	// Detect support a passive mode
-	try {
-		window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
-			get: function () {
-				// `false`, because everything starts to work incorrectly and instead of d'n'd,
-				// begins the page has scrolled.
-				passiveMode = false;
-				captureMode = {
-					capture: false,
-					passive: passiveMode
-				};
+		_checkAlignment = function(evt) {
+			if (!dragEl || !dragEl.parentNode) return;
+			dragEl.parentNode[expando] && dragEl.parentNode[expando]._computeIsAligned(evt);
+		},
+
+		_isTrueParentSortable = function(el, target) {
+			var trueParent = target;
+			while (!trueParent[expando]) {
+				trueParent = trueParent.parentNode;
 			}
-		}));
-	} catch (err) {}
+
+			return el === trueParent;
+		},
+
+		_artificalBubble = function(sortable, originalEvt, method) {
+			// Artificial IE bubbling
+			var nextParent = sortable.parentNode;
+			while (nextParent && !nextParent[expando]) {
+				nextParent = nextParent.parentNode;
+			}
+
+			if (nextParent) {
+				nextParent[expando][method](_extend(originalEvt, {
+					artificialBubble: true
+				}));
+			}
+		},
+
+		_hideGhostForTarget = function() {
+			if (!supportCssPointerEvents && ghostEl) {
+				_css(ghostEl, 'display', 'none');
+			}
+		},
+
+		_unhideGhostForTarget = function() {
+			if (!supportCssPointerEvents && ghostEl) {
+				_css(ghostEl, 'display', '');
+			}
+		};
+
+
+	// #1184 fix - Prevent click event on fallback if dragged but item not changed position
+	document.addEventListener('click', function(evt) {
+		if (ignoreNextClick) {
+			evt.preventDefault();
+			evt.stopPropagation && evt.stopPropagation();
+			evt.stopImmediatePropagation && evt.stopImmediatePropagation();
+			ignoreNextClick = false;
+			return false;
+		}
+	}, true);
+
+	var nearestEmptyInsertDetectEvent = function(evt) {
+		evt = evt.touches ? evt.touches[0] : evt;
+		if (dragEl) {
+			var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
+
+			if (nearest) {
+				nearest[expando]._onDragOver({
+					clientX: evt.clientX,
+					clientY: evt.clientY,
+					target: nearest,
+					rootEl: nearest
+				});
+			}
+		}
+	};
+	// We do not want this to be triggered if completed (bubbling canceled), so only define it here
+	_on(document, 'dragover', nearestEmptyInsertDetectEvent);
+	_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
+	_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
 
 	/**
 	 * @class  Sortable
@@ -24398,7 +24935,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 	 */
 	function Sortable(el, options) {
 		if (!(el && el.nodeType && el.nodeType === 1)) {
-			throw 'Sortable: `el` must be HTMLElement, and not ' + {}.toString.call(el);
+			throw 'Sortable: `el` must be HTMLElement, not ' + {}.toString.call(el);
 		}
 
 		this.el = el; // root element
@@ -24410,7 +24947,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 		// Default options
 		var defaults = {
-			group: Math.random(),
+			group: null,
 			sort: true,
 			disabled: false,
 			store: null,
@@ -24418,7 +24955,15 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
-			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
+			bubbleScroll: true,
+			draggable: /[uo]l/i.test(el.nodeName) ? '>li' : '>*',
+			swapThreshold: 1, // percentage; 0 <= x <= 1
+			invertSwap: false, // invert always
+			invertedSwapThreshold: null, // will be set to same as swapThreshold if default
+			removeCloneOnHide: true,
+			direction: function() {
+				return _detectDirection(el, this.options);
+			},
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
@@ -24426,6 +24971,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			filter: null,
 			preventOnFilter: true,
 			animation: 0,
+			easing: null,
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
 			},
@@ -24433,12 +24979,17 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
 			delay: 0,
+			touchStartThreshold: parseInt(window.devicePixelRatio, 10) || 1,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
 			fallbackTolerance: 0,
 			fallbackOffset: {x: 0, y: 0},
-			supportPointer: Sortable.supportPointer !== false
+			supportPointer: Sortable.supportPointer !== false && (
+				('PointerEvent' in window) ||
+				window.navigator && ('msPointerEnabled' in window.navigator) // microsoft
+			),
+			emptyInsertThreshold: 5
 		};
 
 
@@ -24459,27 +25010,73 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		// Setup drag mode
 		this.nativeDraggable = options.forceFallback ? false : supportDraggable;
 
+		if (this.nativeDraggable) {
+			// Touch start threshold cannot be greater than the native dragstart threshold
+			this.options.touchStartThreshold = 1;
+		}
+
 		// Bind events
-		_on(el, 'mousedown', this._onTapStart);
-		_on(el, 'touchstart', this._onTapStart);
-		options.supportPointer && _on(el, 'pointerdown', this._onTapStart);
+		if (options.supportPointer) {
+			_on(el, 'pointerdown', this._onTapStart);
+		} else {
+			_on(el, 'mousedown', this._onTapStart);
+			_on(el, 'touchstart', this._onTapStart);
+		}
 
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
 			_on(el, 'dragenter', this);
 		}
 
-		touchDragOverListeners.push(this._onDragOver);
+		sortables.push(this.el);
 
 		// Restore sorting
-		options.store && this.sort(options.store.get(this));
+		options.store && options.store.get && this.sort(options.store.get(this) || []);
 	}
-
 
 	Sortable.prototype = /** @lends Sortable.prototype */ {
 		constructor: Sortable,
 
+		_computeIsAligned: function(evt) {
+			var target;
+
+			if (ghostEl && !supportCssPointerEvents) {
+				_hideGhostForTarget();
+				target = document.elementFromPoint(evt.clientX, evt.clientY);
+				_unhideGhostForTarget();
+			} else {
+				target = evt.target;
+			}
+
+			target = _closest(target, this.options.draggable, this.el, false);
+			if (_alignedSilent) return;
+			if (!dragEl || dragEl.parentNode !== this.el) return;
+
+			var children = this.el.children;
+			for (var i = 0; i < children.length; i++) {
+				// Don't change for target in case it is changed to aligned before onDragOver is fired
+				if (_closest(children[i], this.options.draggable, this.el, false) && children[i] !== target) {
+					children[i].sortableMouseAligned = _isClientInRowColumn(evt.clientX, evt.clientY, children[i], this._getDirection(evt, null), this.options);
+				}
+			}
+			// Used for nulling last target when not in element, nothing to do with checking if aligned
+			if (!_closest(target, this.options.draggable, this.el, true)) {
+				lastTarget = null;
+			}
+
+			_alignedSilent = true;
+			setTimeout(function() {
+				_alignedSilent = false;
+			}, 30);
+
+		},
+
+		_getDirection: function(evt, target) {
+			return (typeof this.options.direction === 'function') ? this.options.direction.call(this, evt, target, dragEl) : this.options.direction;
+		},
+
 		_onTapStart: function (/** Event|TouchEvent */evt) {
+			if (!evt.cancelable) return;
 			var _this = this,
 				el = this.el,
 				options = this.options,
@@ -24487,12 +25084,18 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
-				originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0]) || target,
+				originalTarget = evt.target.shadowRoot && ((evt.path && evt.path[0]) || (evt.composedPath && evt.composedPath()[0])) || target,
 				filter = options.filter,
 				startIndex;
 
 			_saveInputCheckedState(el);
 
+
+			// IE: Calls events in capture mode if event element is nested. This ensures only correct element's _onTapStart goes through.
+			// This process is also done in _onDragOver
+			if (IE11OrLess && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
+				return;
+			}
 
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
@@ -24500,7 +25103,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			}
 
 			if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {
-				return; // only left button or enabled
+				return; // only left button and enabled
 			}
 
 			// cancel dnd if original target is content editable
@@ -24508,9 +25111,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				return;
 			}
 
-			target = _closest(target, options.draggable, el);
+			target = _closest(target, options.draggable, el, false);
 
 			if (!target) {
+				if (IE11OrLess) {
+					_artificalBubble(el, evt, '_onTapStart');
+				}
 				return;
 			}
 
@@ -24526,13 +25132,13 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
 					_dispatchEvent(_this, originalTarget, 'filter', target, el, el, startIndex);
-					preventOnFilter && evt.preventDefault();
+					preventOnFilter && evt.cancelable && evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
 			else if (filter) {
 				filter = filter.split(',').some(function (criteria) {
-					criteria = _closest(originalTarget, criteria.trim(), el);
+					criteria = _closest(originalTarget, criteria.trim(), el, false);
 
 					if (criteria) {
 						_dispatchEvent(_this, criteria, 'filter', target, el, el, startIndex);
@@ -24541,17 +25147,70 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				});
 
 				if (filter) {
-					preventOnFilter && evt.preventDefault();
+					preventOnFilter && evt.cancelable && evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
 
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+			if (options.handle && !_closest(originalTarget, options.handle, el, false)) {
 				return;
 			}
 
 			// Prepare `dragstart`
 			this._prepareDragStart(evt, touch, target, startIndex);
+		},
+
+
+		_handleAutoScroll: function(evt, fallback) {
+			if (!dragEl || !this.options.scroll) return;
+			var x = evt.clientX,
+				y = evt.clientY,
+
+				elem = document.elementFromPoint(x, y),
+				_this = this;
+
+			// IE does not seem to have native autoscroll,
+			// Edge's autoscroll seems too conditional,
+			// MACOS Safari does not have autoscroll,
+			// Firefox and Chrome are good
+			if (fallback || Edge || IE11OrLess || Safari) {
+				_autoScroll(evt, _this.options, elem, fallback);
+
+				// Listener for pointer element change
+				var ogElemScroller = _getParentAutoScrollElement(elem, true);
+				if (
+					scrolling &&
+					(
+						!pointerElemChangedInterval ||
+						x !== lastPointerElemX ||
+						y !== lastPointerElemY
+					)
+				) {
+
+					pointerElemChangedInterval && clearInterval(pointerElemChangedInterval);
+					// Detect for pointer elem change, emulating native DnD behaviour
+					pointerElemChangedInterval = setInterval(function() {
+						if (!dragEl) return;
+						// could also check if scroll direction on newElem changes due to parent autoscrolling
+						var newElem = _getParentAutoScrollElement(document.elementFromPoint(x, y), true);
+						if (newElem !== ogElemScroller) {
+							ogElemScroller = newElem;
+							_clearAutoScrolls();
+							_autoScroll(evt, _this.options, ogElemScroller, fallback);
+						}
+					}, 10);
+					lastPointerElemX = x;
+					lastPointerElemY = y;
+				}
+
+			} else {
+				// if DnD is enabled (and browser has good autoscrolling), first autoscroll will already scroll, so get parent autoscroll of first autoscroll
+				if (!_this.options.bubbleScroll || _getParentAutoScrollElement(elem, true) === _getWindowScrollingElement()) {
+					_clearAutoScrolls();
+					return;
+				}
+				_autoScroll(evt, _this.options, _getParentAutoScrollElement(elem, false), false);
+			}
 		},
 
 		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target, /** Number */startIndex) {
@@ -24562,8 +25221,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				dragStartFn;
 
 			if (target && !dragEl && (target.parentNode === el)) {
-				tapEvt = evt;
-
 				rootEl = el;
 				dragEl = target;
 				parentEl = dragEl.parentNode;
@@ -24572,27 +25229,37 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				activeGroup = options.group;
 				oldIndex = startIndex;
 
+				tapEvt = {
+					target: dragEl,
+					clientX: (touch || evt).clientX,
+					clientY: (touch || evt).clientY
+				};
+
 				this._lastX = (touch || evt).clientX;
 				this._lastY = (touch || evt).clientY;
 
 				dragEl.style['will-change'] = 'all';
+				// undo animation if needed
+				dragEl.style.transition = '';
+				dragEl.style.transform = '';
 
 				dragStartFn = function () {
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
-					_this._disableDelayedDrag();
+					_this._disableDelayedDragEvents();
 
-					// Make the element draggable
-					dragEl.draggable = _this.nativeDraggable;
-
-					// Chosen item
-					_toggleClass(dragEl, options.chosenClass, true);
+					if (!FireFox && _this.nativeDraggable) {
+						dragEl.draggable = true;
+					}
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(evt, touch);
 
 					// Drag start event
 					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
+
+					// Chosen item
+					_toggleClass(dragEl, options.chosenClass, true);
 				};
 
 				// Disable "draggable"
@@ -24600,61 +25267,77 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 					_find(dragEl, criteria.trim(), _disableDraggable);
 				});
 
-				_on(ownerDocument, 'mouseup', _this._onDrop);
-				_on(ownerDocument, 'touchend', _this._onDrop);
-				_on(ownerDocument, 'touchcancel', _this._onDrop);
-				_on(ownerDocument, 'selectstart', _this);
-				options.supportPointer && _on(ownerDocument, 'pointercancel', _this._onDrop);
+				if (options.supportPointer) {
+					_on(ownerDocument, 'pointerup', _this._onDrop);
+				} else {
+					_on(ownerDocument, 'mouseup', _this._onDrop);
+					_on(ownerDocument, 'touchend', _this._onDrop);
+					_on(ownerDocument, 'touchcancel', _this._onDrop);
+				}
 
-				if (options.delay) {
+				// Make dragEl draggable (must be before delay for FireFox)
+				if (FireFox && this.nativeDraggable) {
+					this.options.touchStartThreshold = 4;
+					dragEl.draggable = true;
+				}
+
+				// Delay is impossible for native DnD in Edge or IE
+				if (options.delay && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
 					// If the user moves the pointer or let go the click or touch
 					// before the delay has been reached:
 					// disable the delayed drag
 					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchend', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
-					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
-					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
-					options.supportPointer && _on(ownerDocument, 'pointermove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'mousemove', _this._delayedDragTouchMoveHandler);
+					_on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
+					options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
 
 					_this._dragStartTimer = setTimeout(dragStartFn, options.delay);
 				} else {
 					dragStartFn();
 				}
+			}
+		},
 
-
+		_delayedDragTouchMoveHandler: function (/** TouchEvent|PointerEvent **/e) {
+			var touch = e.touches ? e.touches[0] : e;
+			if (max(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY))
+					>= Math.floor(this.options.touchStartThreshold / (this.nativeDraggable && window.devicePixelRatio || 1))
+			) {
+				this._disableDelayedDrag();
 			}
 		},
 
 		_disableDelayedDrag: function () {
-			var ownerDocument = this.el.ownerDocument;
-
+			dragEl && _disableDraggable(dragEl);
 			clearTimeout(this._dragStartTimer);
+
+			this._disableDelayedDragEvents();
+		},
+
+		_disableDelayedDragEvents: function () {
+			var ownerDocument = this.el.ownerDocument;
 			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
-			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
-			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
-			_off(ownerDocument, 'pointermove', this._disableDelayedDrag);
+			_off(ownerDocument, 'mousemove', this._delayedDragTouchMoveHandler);
+			_off(ownerDocument, 'touchmove', this._delayedDragTouchMoveHandler);
+			_off(ownerDocument, 'pointermove', this._delayedDragTouchMoveHandler);
 		},
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
 			touch = touch || (evt.pointerType == 'touch' ? evt : null);
 
-			if (touch) {
-				// Touch device support
-				tapEvt = {
-					target: dragEl,
-					clientX: touch.clientX,
-					clientY: touch.clientY
-				};
-
-				this._onDragStart(tapEvt, 'touch');
-			}
-			else if (!this.nativeDraggable) {
-				this._onDragStart(tapEvt, true);
-			}
-			else {
+			if (!this.nativeDraggable || touch) {
+				if (this.options.supportPointer) {
+					_on(document, 'pointermove', this._onTouchMove);
+				} else if (touch) {
+					_on(document, 'touchmove', this._onTouchMove);
+				} else {
+					_on(document, 'mousemove', this._onTouchMove);
+				}
+			} else {
 				_on(dragEl, 'dragend', this);
 				_on(rootEl, 'dragstart', this._onDragStart);
 			}
@@ -24672,41 +25355,47 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			}
 		},
 
-		_dragStarted: function () {
+		_dragStarted: function (fallback, evt) {
+			awaitingDragStarted = false;
 			if (rootEl && dragEl) {
+				if (this.nativeDraggable) {
+					_on(document, 'dragover', this._handleAutoScroll);
+					_on(document, 'dragover', _checkAlignment);
+				}
 				var options = this.options;
 
 				// Apply effect
+				!fallback && _toggleClass(dragEl, options.dragClass, false);
 				_toggleClass(dragEl, options.ghostClass, true);
-				_toggleClass(dragEl, options.dragClass, false);
+
+				// In case dragging an animated element
+				_css(dragEl, 'transform', '');
 
 				Sortable.active = this;
 
+				fallback && this._appendGhost();
+
 				// Drag start event
-				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex);
+				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex, undefined, evt);
 			} else {
 				this._nulling();
 			}
 		},
 
-		_emulateDragOver: function () {
+		_emulateDragOver: function (forAutoScroll) {
 			if (touchEvt) {
-				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY) {
+				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY && !forAutoScroll) {
 					return;
 				}
-
 				this._lastX = touchEvt.clientX;
 				this._lastY = touchEvt.clientY;
 
-				if (!supportCssPointerEvents) {
-					_css(ghostEl, 'display', 'none');
-				}
+				_hideGhostForTarget();
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				var parent = target;
-				var i = touchDragOverListeners.length;
 
-				if (target && target.shadowRoot) {
+				while (target && target.shadowRoot) {
 					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 					parent = target;
 				}
@@ -24714,16 +25403,18 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				if (parent) {
 					do {
 						if (parent[expando]) {
-							while (i--) {
-								touchDragOverListeners[i]({
-									clientX: touchEvt.clientX,
-									clientY: touchEvt.clientY,
-									target: target,
-									rootEl: parent
-								});
-							}
+							var inserted;
 
-							break;
+							inserted = parent[expando]._onDragOver({
+								clientX: touchEvt.clientX,
+								clientY: touchEvt.clientY,
+								target: target,
+								rootEl: parent
+							});
+
+							if (inserted && !this.options.dragoverBubble) {
+								break;
+							}
 						}
 
 						target = parent; // store last element
@@ -24731,37 +25422,42 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 					/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
+				dragEl.parentNode[expando]._computeIsAligned(touchEvt);
 
-				if (!supportCssPointerEvents) {
-					_css(ghostEl, 'display', '');
-				}
+				_unhideGhostForTarget();
 			}
 		},
 
 
-		_onTouchMove: function (/**TouchEvent*/evt) {
+		_onTouchMove: function (/**TouchEvent*/evt, forAutoScroll) {
 			if (tapEvt) {
 				var	options = this.options,
 					fallbackTolerance = options.fallbackTolerance,
 					fallbackOffset = options.fallbackOffset,
 					touch = evt.touches ? evt.touches[0] : evt,
-					dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
-					dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
+					matrix = ghostEl && _matrix(ghostEl),
+					scaleX = ghostEl && matrix && matrix.a,
+					scaleY = ghostEl && matrix && matrix.d,
+					relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && _getRelativeScrollOffset(ghostRelativeParent),
+					dx = ((touch.clientX - tapEvt.clientX)
+							+ fallbackOffset.x) / (scaleX || 1)
+							+ (relativeScrollOffset ? (relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0]) : 0) / (scaleX || 1),
+					dy = ((touch.clientY - tapEvt.clientY)
+							+ fallbackOffset.y) / (scaleY || 1)
+							+ (relativeScrollOffset ? (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1]) : 0) / (scaleY || 1),
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				// only set the status to dragging, when we are actually dragging
-				if (!Sortable.active) {
+				if (!Sortable.active && !awaitingDragStarted) {
 					if (fallbackTolerance &&
 						min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY)) < fallbackTolerance
 					) {
 						return;
 					}
-
-					this._dragStarted();
+					this._onDragStart(evt, true);
 				}
 
-				// as well as creating the ghost element on the document body
-				this._appendGhost();
+				!forAutoScroll && this._handleAutoScroll(touch, true);
 
 				moved = true;
 				touchEvt = touch;
@@ -24771,16 +25467,50 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
-				evt.preventDefault();
+				evt.cancelable && evt.preventDefault();
 			}
 		},
 
 		_appendGhost: function () {
+			// Bug if using scale(): https://stackoverflow.com/questions/2637058
+			// Not being adjusted for
 			if (!ghostEl) {
-				var rect = dragEl.getBoundingClientRect(),
+				var container = this.options.fallbackOnBody ? document.body : rootEl,
+					rect = _getRect(dragEl, true, container, !PositionGhostAbsolutely),
 					css = _css(dragEl),
-					options = this.options,
-					ghostRect;
+					options = this.options;
+
+				// Position absolutely
+				if (PositionGhostAbsolutely) {
+					// Get relatively positioned parent
+					ghostRelativeParent = container;
+
+					while (
+						_css(ghostRelativeParent, 'position') === 'static' &&
+						_css(ghostRelativeParent, 'transform') === 'none' &&
+						ghostRelativeParent !== document
+					) {
+						ghostRelativeParent = ghostRelativeParent.parentNode;
+					}
+
+					if (ghostRelativeParent !== document) {
+						var ghostRelativeParentRect = _getRect(ghostRelativeParent, true);
+
+						rect.top -= ghostRelativeParentRect.top;
+						rect.left -= ghostRelativeParentRect.left;
+					}
+
+					if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {
+						if (ghostRelativeParent === document) ghostRelativeParent = _getWindowScrollingElement();
+
+						rect.top += ghostRelativeParent.scrollTop;
+						rect.left += ghostRelativeParent.scrollLeft;
+					} else {
+						ghostRelativeParent = _getWindowScrollingElement();
+					}
+					ghostRelativeParentInitialScroll = _getRelativeScrollOffset(ghostRelativeParent);
+				}
+
 
 				ghostEl = dragEl.cloneNode(true);
 
@@ -24788,69 +25518,58 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				_toggleClass(ghostEl, options.fallbackClass, true);
 				_toggleClass(ghostEl, options.dragClass, true);
 
-				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
-				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
+				_css(ghostEl, 'box-sizing', 'border-box');
+				_css(ghostEl, 'margin', 0);
+				_css(ghostEl, 'top', rect.top);
+				_css(ghostEl, 'left', rect.left);
 				_css(ghostEl, 'width', rect.width);
 				_css(ghostEl, 'height', rect.height);
 				_css(ghostEl, 'opacity', '0.8');
-				_css(ghostEl, 'position', 'fixed');
+				_css(ghostEl, 'position', (PositionGhostAbsolutely ? 'absolute' : 'fixed'));
 				_css(ghostEl, 'zIndex', '100000');
 				_css(ghostEl, 'pointerEvents', 'none');
 
-				options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
-
-				// Fixing dimensions.
-				ghostRect = ghostEl.getBoundingClientRect();
-				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
-				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
+				container.appendChild(ghostEl);
 			}
 		},
 
-		_onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
+		_onDragStart: function (/**Event*/evt, /**boolean*/fallback) {
 			var _this = this;
 			var dataTransfer = evt.dataTransfer;
 			var options = _this.options;
 
-			_this._offUpEvents();
+			// Setup clone
+			cloneEl = _clone(dragEl);
 
-			if (activeGroup.checkPull(_this, _this, dragEl, evt)) {
-				cloneEl = _clone(dragEl);
+			cloneEl.draggable = false;
+			cloneEl.style['will-change'] = '';
 
-				cloneEl.draggable = false;
-				cloneEl.style['will-change'] = '';
+			this._hideClone();
 
-				_css(cloneEl, 'display', 'none');
-				_toggleClass(cloneEl, _this.options.chosenClass, false);
+			_toggleClass(cloneEl, _this.options.chosenClass, false);
 
-				// #1143: IFrame support workaround
-				_this._cloneId = _nextTick(function () {
+
+			// #1143: IFrame support workaround
+			_this._cloneId = _nextTick(function () {
+				if (!_this.options.removeCloneOnHide) {
 					rootEl.insertBefore(cloneEl, dragEl);
-					_dispatchEvent(_this, rootEl, 'clone', dragEl);
-				});
-			}
-
-			_toggleClass(dragEl, options.dragClass, true);
-
-			if (useFallback) {
-				if (useFallback === 'touch') {
-					// Bind touch events
-					_on(document, 'touchmove', _this._onTouchMove);
-					_on(document, 'touchend', _this._onDrop);
-					_on(document, 'touchcancel', _this._onDrop);
-
-					if (options.supportPointer) {
-						_on(document, 'pointermove', _this._onTouchMove);
-						_on(document, 'pointerup', _this._onDrop);
-					}
-				} else {
-					// Old brwoser
-					_on(document, 'mousemove', _this._onTouchMove);
-					_on(document, 'mouseup', _this._onDrop);
 				}
+				_dispatchEvent(_this, rootEl, 'clone', dragEl);
+			});
 
+
+			!fallback && _toggleClass(dragEl, options.dragClass, true);
+
+			// Set proper drop events
+			if (fallback) {
+				ignoreNextClick = true;
 				_this._loopId = setInterval(_this._emulateDragOver, 50);
-			}
-			else {
+			} else {
+				// Undo what was set in _prepareDragStart before drag started
+				_off(document, 'mouseup', _this._onDrop);
+				_off(document, 'touchend', _this._onDrop);
+				_off(document, 'touchcancel', _this._onDrop);
+
 				if (dataTransfer) {
 					dataTransfer.effectAllowed = 'move';
 					options.setData && options.setData.call(_this, dataTransfer, dragEl);
@@ -24858,18 +25577,24 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 				_on(document, 'drop', _this);
 
-				// #1143: Бывает элемент с IFrame внутри блокирует `drop`,
-				// поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
-				// Breaking Chrome 62+
-				// _on(document, 'mouseover', _this);
+				// #1276 fix:
+				_css(dragEl, 'transform', 'translateZ(0)');
+			}
 
-				_this._dragStartId = _nextTick(_this._dragStarted);
+			awaitingDragStarted = true;
+
+			_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt));
+			_on(document, 'selectstart', _this);
+			if (Safari) {
+				_css(document.body, 'user-select', 'none');
 			}
 		},
 
+
+		// Returns true - if no further action is needed (either inserted or another condition)
 		_onDragOver: function (/**Event*/evt) {
 			var el = this.el,
-				target,
+				target = evt.target,
 				dragRect,
 				targetRect,
 				revert,
@@ -24877,19 +25602,81 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				group = options.group,
 				activeSortable = Sortable.active,
 				isOwner = (activeGroup === group),
-				isMovingBetweenSortable = false,
-				canSort = options.sort;
+				canSort = options.sort,
+				_this = this;
 
-			if (evt.preventDefault !== void 0) {
-				evt.preventDefault();
-				!options.dragoverBubble && evt.stopPropagation();
-			}
+			if (_silent) return;
 
-			if (dragEl.animated) {
+			// IE event order fix
+			if (IE11OrLess && !evt.rootEl && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
 				return;
 			}
 
+			// Return invocation when dragEl is inserted (or completed)
+			function completed(insertion) {
+				if (insertion) {
+					if (isOwner) {
+						activeSortable._hideClone();
+					} else {
+						activeSortable._showClone(_this);
+					}
+
+					if (activeSortable) {
+						// Set ghost class to new sortable's ghost class
+						_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+						_toggleClass(dragEl, options.ghostClass, true);
+					}
+
+					if (putSortable !== _this && _this !== Sortable.active) {
+						putSortable = _this;
+					} else if (_this === Sortable.active) {
+						putSortable = null;
+					}
+
+					// Animation
+					dragRect && _this._animate(dragRect, dragEl);
+					target && targetRect && _this._animate(targetRect, target);
+				}
+
+
+				// Null lastTarget if it is not inside a previously swapped element
+				if ((target === dragEl && !dragEl.animated) || (target === el && !target.animated)) {
+					lastTarget = null;
+				}
+				// no bubbling and not fallback
+				if (!options.dragoverBubble && !evt.rootEl && target !== document) {
+					_this._handleAutoScroll(evt);
+					dragEl.parentNode[expando]._computeIsAligned(evt);
+				}
+
+				!options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();
+
+				return true;
+			}
+
+			// Call when dragEl has been inserted
+			function changed() {
+				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(dragEl, options.draggable), evt);
+			}
+
+
+			if (evt.preventDefault !== void 0) {
+				evt.cancelable && evt.preventDefault();
+			}
+
+
 			moved = true;
+
+			target = _closest(target, options.draggable, el, true);
+
+			// target is dragEl or target is animated
+			if (!!_closest(evt.target, null, dragEl, true) || target.animated) {
+				return completed(false);
+			}
+
+			if (target !== dragEl) {
+				ignoreNextClick = false;
+			}
 
 			if (activeSortable && !options.disabled &&
 				(isOwner
@@ -24897,106 +25684,111 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 					: (
 						putSortable === this ||
 						(
-							(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
+							(this.lastPutMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
 							group.checkPut(this, activeSortable, dragEl, evt)
 						)
 					)
-				) &&
-				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
+				)
 			) {
-				// Smart auto-scrolling
-				_autoScroll(evt, options, this.el);
+				var axis = this._getDirection(evt, target);
 
-				if (_silent) {
-					return;
-				}
-
-				target = _closest(evt.target, options.draggable, el);
-				dragRect = dragEl.getBoundingClientRect();
-
-				if (putSortable !== this) {
-					putSortable = this;
-					isMovingBetweenSortable = true;
-				}
+				dragRect = _getRect(dragEl);
 
 				if (revert) {
-					_cloneHide(activeSortable, true);
+					this._hideClone();
 					parentEl = rootEl; // actualization
 
-					if (cloneEl || nextEl) {
-						rootEl.insertBefore(dragEl, cloneEl || nextEl);
-					}
-					else if (!canSort) {
+					if (nextEl) {
+						rootEl.insertBefore(dragEl, nextEl);
+					} else {
 						rootEl.appendChild(dragEl);
 					}
 
-					return;
+					return completed(true);
 				}
 
+				var elLastChild = _lastChild(el);
 
-				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && (_ghostIsLast(el, evt))
-				) {
-					//assign target only if condition is true
-					if (el.children.length !== 0 && el.children[0] !== ghostEl && el === evt.target) {
-						target = el.lastElementChild;
+				if (!elLastChild || _ghostIsLast(evt, axis, el) && !elLastChild.animated) {
+					// assign target only if condition is true
+					if (elLastChild && el === evt.target) {
+						target = elLastChild;
 					}
 
 					if (target) {
-						if (target.animated) {
-							return;
-						}
-
-						targetRect = target.getBoundingClientRect();
+						targetRect = _getRect(target);
 					}
 
-					_cloneHide(activeSortable, isOwner);
+					if (isOwner) {
+						activeSortable._hideClone();
+					} else {
+						activeSortable._showClone(this);
+					}
 
-					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
-						if (!dragEl.contains(el)) {
-							el.appendChild(dragEl);
-							parentEl = el; // actualization
-						}
+					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
+						el.appendChild(dragEl);
+						parentEl = el; // actualization
+						realDragElRect = null;
 
-						this._animate(dragRect, dragEl);
-						target && this._animate(targetRect, target);
+						changed();
+						return completed(true);
 					}
 				}
-				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
-					if (lastEl !== target) {
-						lastEl = target;
-						lastCSS = _css(target);
-						lastParentCSS = _css(target.parentNode);
+				else if (target && target !== dragEl && target.parentNode === el) {
+					var direction = 0,
+						targetBeforeFirstSwap,
+						aligned = target.sortableMouseAligned,
+						differentLevel = dragEl.parentNode !== el,
+						side1 = axis === 'vertical' ? 'top' : 'left',
+						scrolledPastTop = _isScrolledPast(target, 'top') || _isScrolledPast(dragEl, 'top'),
+						scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
+
+
+					if (lastTarget !== target) {
+						lastMode = null;
+						targetBeforeFirstSwap = _getRect(target)[side1];
+						pastFirstInvertThresh = false;
 					}
 
-					targetRect = target.getBoundingClientRect();
-
-					var width = targetRect.right - targetRect.left,
-						height = targetRect.bottom - targetRect.top,
-						floating = R_FLOAT.test(lastCSS.cssFloat + lastCSS.display)
-							|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
-						isWide = (target.offsetWidth > dragEl.offsetWidth),
-						isLong = (target.offsetHeight > dragEl.offsetHeight),
-						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
-						nextSibling = target.nextElementSibling,
-						after = false
-					;
-
-					if (floating) {
-						var elTop = dragEl.offsetTop,
-							tgTop = target.offsetTop;
-
-						if (elTop === tgTop) {
-							after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
+					// Reference: https://www.lucidchart.com/documents/view/10fa0e93-e362-4126-aca2-b709ee56bd8b/0
+					if (
+						_isElInRowColumn(dragEl, target, axis) && aligned ||
+						differentLevel ||
+						scrolledPastTop ||
+						options.invertSwap ||
+						lastMode === 'insert' ||
+						// Needed, in the case that we are inside target and inserted because not aligned... aligned will stay false while inside
+						// and lastMode will change to 'insert', but we must swap
+						lastMode === 'swap'
+					) {
+						// New target that we will be inside
+						if (lastMode !== 'swap') {
+							isCircumstantialInvert = options.invertSwap || differentLevel;
 						}
-						else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
-							after = (evt.clientY - targetRect.top) / height > 0.5;
-						} else {
-							after = tgTop > elTop;
-						}
-						} else if (!isMovingBetweenSortable) {
-						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
+
+						direction = _getSwapDirection(evt, target, axis,
+							options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
+							isCircumstantialInvert,
+							lastTarget === target);
+						lastMode = 'swap';
+					} else {
+						// Insert at position
+						direction = _getInsertDirection(target);
+						lastMode = 'insert';
 					}
+					if (direction === 0) return completed(false);
+
+					realDragElRect = null;
+					lastTarget = target;
+
+					lastDirection = direction;
+
+					targetRect = _getRect(target);
+
+					var nextSibling = target.nextElementSibling,
+						after = false;
+
+					after = direction === 1;
 
 					var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
 
@@ -25008,47 +25800,81 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 						_silent = true;
 						setTimeout(_unsilent, 30);
 
-						_cloneHide(activeSortable, isOwner);
+						if (isOwner) {
+							activeSortable._hideClone();
+						} else {
+							activeSortable._showClone(this);
+						}
 
-						if (!dragEl.contains(el)) {
-							if (after && !nextSibling) {
-								el.appendChild(dragEl);
-							} else {
-								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
-							}
+						if (after && !nextSibling) {
+							el.appendChild(dragEl);
+						} else {
+							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+						}
+
+						// Undo chrome's scroll adjustment
+						if (scrolledPastTop) {
+							_scrollBy(scrolledPastTop, 0, scrollBefore - scrolledPastTop.scrollTop);
 						}
 
 						parentEl = dragEl.parentNode; // actualization
 
-						this._animate(dragRect, dragEl);
-						this._animate(targetRect, target);
+						// must be done before animation
+						if (targetBeforeFirstSwap !== undefined && !isCircumstantialInvert) {
+							targetMoveDistance = abs(targetBeforeFirstSwap - _getRect(target)[side1]);
+						}
+						changed();
+
+						return completed(true);
 					}
 				}
+
+				if (el.contains(dragEl)) {
+					return completed(false);
+				}
 			}
+
+			if (IE11OrLess && !evt.rootEl) {
+				_artificalBubble(el, evt, '_onDragOver');
+			}
+
+			return false;
 		},
 
 		_animate: function (prevRect, target) {
 			var ms = this.options.animation;
 
 			if (ms) {
-				var currentRect = target.getBoundingClientRect();
+				var currentRect = _getRect(target);
 
-				if (prevRect.nodeType === 1) {
-					prevRect = prevRect.getBoundingClientRect();
+				if (target === dragEl) {
+					realDragElRect = currentRect;
 				}
 
-				_css(target, 'transition', 'none');
-				_css(target, 'transform', 'translate3d('
-					+ (prevRect.left - currentRect.left) + 'px,'
-					+ (prevRect.top - currentRect.top) + 'px,0)'
-				);
+				if (prevRect.nodeType === 1) {
+					prevRect = _getRect(prevRect);
+				}
 
-				target.offsetWidth; // repaint
+				// Check if actually moving position
+				if ((prevRect.left + prevRect.width / 2) !== (currentRect.left + currentRect.width / 2)
+					|| (prevRect.top + prevRect.height / 2) !== (currentRect.top + currentRect.height / 2)
+				) {
+					var matrix = _matrix(this.el),
+						scaleX = matrix && matrix.a,
+						scaleY = matrix && matrix.d;
 
-				_css(target, 'transition', 'all ' + ms + 'ms');
-				_css(target, 'transform', 'translate3d(0,0,0)');
+					_css(target, 'transition', 'none');
+					_css(target, 'transform', 'translate3d('
+						+ (prevRect.left - currentRect.left) / (scaleX ? scaleX : 1) + 'px,'
+						+ (prevRect.top - currentRect.top) / (scaleY ? scaleY : 1) + 'px,0)'
+					);
 
-				clearTimeout(target.animated);
+					forRepaintDummy = target.offsetWidth; // repaint
+					_css(target, 'transition', 'transform ' + ms + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
+					_css(target, 'transform', 'translate3d(0,0,0)');
+				}
+
+				(typeof target.animated === 'number') && clearTimeout(target.animated);
 				target.animated = setTimeout(function () {
 					_css(target, 'transition', '');
 					_css(target, 'transform', '');
@@ -25066,41 +25892,54 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
-			_off(ownerDocument, 'pointercancel', this._onDrop);
-			_off(ownerDocument, 'selectstart', this);
+			_off(document, 'selectstart', this);
 		},
 
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
 				options = this.options;
+			awaitingDragStarted = false;
+			scrolling = false;
+			isCircumstantialInvert = false;
+			pastFirstInvertThresh = false;
 
 			clearInterval(this._loopId);
-			clearInterval(autoScroll.pid);
+
+			clearInterval(pointerElemChangedInterval);
+			_clearAutoScrolls();
+			_cancelThrottle();
+
 			clearTimeout(this._dragStartTimer);
 
 			_cancelNextTick(this._cloneId);
 			_cancelNextTick(this._dragStartId);
 
 			// Unbind events
-			_off(document, 'mouseover', this);
 			_off(document, 'mousemove', this._onTouchMove);
+
 
 			if (this.nativeDraggable) {
 				_off(document, 'drop', this);
 				_off(el, 'dragstart', this._onDragStart);
+				_off(document, 'dragover', this._handleAutoScroll);
+				_off(document, 'dragover', _checkAlignment);
+			}
+
+			if (Safari) {
+				_css(document.body, 'user-select', '');
 			}
 
 			this._offUpEvents();
 
 			if (evt) {
 				if (moved) {
-					evt.preventDefault();
+					evt.cancelable && evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
 				}
 
 				ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
 
-				if (rootEl === parentEl || Sortable.active.lastPullMode !== 'clone') {
+				if (rootEl === parentEl || (putSortable && putSortable.lastPutMode !== 'clone')) {
 					// Remove clone
 					cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);
 				}
@@ -25114,26 +25953,28 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 					dragEl.style['will-change'] = '';
 
 					// Remove class's
-					_toggleClass(dragEl, this.options.ghostClass, false);
+					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
 					// Drag stop event
-					_dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex);
+					_dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl, options.draggable);
 
 						if (newIndex >= 0) {
 							// Add event
-							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
 							// Remove event
-							_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
 							// drag from one list and drop into another
-							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 						}
+
+						putSortable && putSortable.save();
 					}
 					else {
 						if (dragEl.nextSibling !== nextEl) {
@@ -25142,8 +25983,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 							if (newIndex >= 0) {
 								// drag & drop within the same list
-								_dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex);
-								_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex);
+								_dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+								_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 							}
 						}
 					}
@@ -25153,8 +25994,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
-
-						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
 						// Save sorting
 						this.save();
@@ -25162,7 +26002,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				}
 
 			}
-
 			this._nulling();
 		},
 
@@ -25177,15 +26016,24 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 			scrollEl =
 			scrollParentEl =
+			autoScrolls.length =
+
+			pointerElemChangedInterval =
+			lastPointerElemX =
+			lastPointerElemY =
 
 			tapEvt =
 			touchEvt =
 
 			moved =
 			newIndex =
+			oldIndex =
 
-			lastEl =
-			lastCSS =
+			lastTarget =
+			lastDirection =
+
+			forRepaintDummy =
+			realDragElRect =
 
 			putSortable =
 			activeGroup =
@@ -25194,6 +26042,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			savedInputChecked.forEach(function (el) {
 				el.checked = true;
 			});
+
 			savedInputChecked.length = 0;
 		},
 
@@ -25204,16 +26053,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 					this._onDrop(evt);
 					break;
 
-				case 'dragover':
 				case 'dragenter':
+				case 'dragover':
 					if (dragEl) {
 						this._onDragOver(evt);
 						_globalDragOver(evt);
 					}
-					break;
-
-				case 'mouseover':
-					this._onDrop(evt);
 					break;
 
 				case 'selectstart':
@@ -25237,7 +26082,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 			for (; i < n; i++) {
 				el = children[i];
-				if (_closest(el, options.draggable, this.el)) {
+				if (_closest(el, options.draggable, this.el, false)) {
 					order.push(el.getAttribute(options.dataIdAttr) || _generateId(el));
 				}
 			}
@@ -25256,7 +26101,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			this.toArray().forEach(function (id, i) {
 				var el = rootEl.children[i];
 
-				if (_closest(el, this.options.draggable, rootEl)) {
+				if (_closest(el, this.options.draggable, rootEl, false)) {
 					items[id] = el;
 				}
 			}, this);
@@ -25275,7 +26120,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		 */
 		save: function () {
 			var store = this.options.store;
-			store && store.set(this);
+			store && store.set && store.set(this);
 		},
 
 
@@ -25286,7 +26131,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		 * @returns {HTMLElement|null}
 		 */
 		closest: function (el, selector) {
-			return _closest(el, selector || this.options.draggable, this.el);
+			return _closest(el, selector || this.options.draggable, this.el, false);
 		},
 
 
@@ -25327,53 +26172,70 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				_off(el, 'dragover', this);
 				_off(el, 'dragenter', this);
 			}
-
 			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
 				el.removeAttribute('draggable');
 			});
 
-			touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1);
-
 			this._onDrop();
 
+			sortables.splice(sortables.indexOf(this.el), 1);
+
 			this.el = el = null;
+		},
+
+		_hideClone: function() {
+			if (!cloneEl.cloneHidden) {
+				_css(cloneEl, 'display', 'none');
+				cloneEl.cloneHidden = true;
+				if (cloneEl.parentNode && this.options.removeCloneOnHide) {
+					cloneEl.parentNode.removeChild(cloneEl);
+				}
+			}
+		},
+
+		_showClone: function(putSortable) {
+			if (putSortable.lastPutMode !== 'clone') {
+				this._hideClone();
+				return;
+			}
+
+			if (cloneEl.cloneHidden) {
+				// show clone at dragEl or original position
+				if (rootEl.contains(dragEl) && !this.options.group.revertClone) {
+					rootEl.insertBefore(cloneEl, dragEl);
+				} else if (nextEl) {
+					rootEl.insertBefore(cloneEl, nextEl);
+				} else {
+					rootEl.appendChild(cloneEl);
+				}
+
+				if (this.options.group.revertClone) {
+					this._animate(dragEl, cloneEl);
+				}
+				_css(cloneEl, 'display', '');
+				cloneEl.cloneHidden = false;
+			}
 		}
 	};
 
-
-	function _cloneHide(sortable, state) {
-		if (sortable.lastPullMode !== 'clone') {
-			state = true;
-		}
-
-		if (cloneEl && (cloneEl.state !== state)) {
-			_css(cloneEl, 'display', state ? 'none' : '');
-
-			if (!state) {
-				if (cloneEl.state) {
-					if (sortable.options.group.revertClone) {
-						rootEl.insertBefore(cloneEl, nextEl);
-						sortable._animate(dragEl, cloneEl);
-					} else {
-						rootEl.insertBefore(cloneEl, dragEl);
-					}
-				}
-			}
-
-			cloneEl.state = state;
-		}
-	}
-
-
-	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
+	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, includeCTX) {
 		if (el) {
 			ctx = ctx || document;
 
 			do {
-				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector)) {
+				if (
+					selector != null &&
+					(
+						selector[0] === '>' && el.parentNode === ctx && _matches(el, selector.substring(1)) ||
+						_matches(el, selector)
+					) ||
+					includeCTX && el === ctx
+				) {
 					return el;
 				}
+
+				if (el === ctx) break;
 				/* jshint boss:true */
 			} while (el = _getParentOrHost(el));
 		}
@@ -25383,9 +26245,9 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 
 	function _getParentOrHost(el) {
-		var parent = el.host;
-
-		return (parent && parent.nodeType) ? parent : el.parentNode;
+		return (el.host && el !== document && el.host.nodeType)
+			? el.host
+			: el.parentNode;
 	}
 
 
@@ -25393,7 +26255,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		if (evt.dataTransfer) {
 			evt.dataTransfer.dropEffect = 'move';
 		}
-		evt.preventDefault();
+		evt.cancelable && evt.preventDefault();
 	}
 
 
@@ -25408,7 +26270,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 
 	function _toggleClass(el, name, state) {
-		if (el) {
+		if (el && name) {
 			if (el.classList) {
 				el.classList[state ? 'add' : 'remove'](name);
 			}
@@ -25435,12 +26297,32 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 				return prop === void 0 ? val : val[prop];
 			}
 			else {
-				if (!(prop in style)) {
+				if (!(prop in style) && prop.indexOf('webkit') === -1) {
 					prop = '-webkit-' + prop;
 				}
 
 				style[prop] = val + (typeof val === 'string' ? '' : 'px');
 			}
+		}
+	}
+
+	function _matrix(el) {
+		var appliedTransforms = '';
+		do {
+			var transform = _css(el, 'transform');
+
+			if (transform && transform !== 'none') {
+				appliedTransforms = transform + ' ' + appliedTransforms;
+			}
+			/* jshint boss:true */
+		} while (el = el.parentNode);
+
+		if (window.DOMMatrix) {
+			return new DOMMatrix(appliedTransforms);
+		} else if (window.WebKitCSSMatrix) {
+			return new WebKitCSSMatrix(appliedTransforms);
+		} else if (window.CSSMatrix) {
+			return new CSSMatrix(appliedTransforms);
 		}
 	}
 
@@ -25463,14 +26345,21 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 
 
-	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex) {
+	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
 		sortable = (sortable || rootEl[expando]);
-
-		var evt = document.createEvent('Event'),
+		var evt,
 			options = sortable.options,
 			onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
-
-		evt.initEvent(name, true, true);
+		// Support for new CustomEvent feature
+		if (window.CustomEvent && !IE11OrLess && !Edge) {
+			evt = new CustomEvent(name, {
+				bubbles: true,
+				cancelable: true
+			});
+		} else {
+			evt = document.createEvent('Event');
+			evt.initEvent(name, true, true);
+		}
 
 		evt.to = toEl || rootEl;
 		evt.from = fromEl || rootEl;
@@ -25480,7 +26369,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
 
-		rootEl.dispatchEvent(evt);
+		evt.originalEvent = originalEvt;
+		evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
+
+		if (rootEl) {
+			rootEl.dispatchEvent(evt);
+		}
 
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
@@ -25493,17 +26387,26 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 			sortable = fromEl[expando],
 			onMoveFn = sortable.options.onMove,
 			retVal;
-
-		evt = document.createEvent('Event');
-		evt.initEvent('move', true, true);
+		// Support for new CustomEvent feature
+		if (window.CustomEvent && !IE11OrLess && !Edge) {
+			evt = new CustomEvent('move', {
+				bubbles: true,
+				cancelable: true
+			});
+		} else {
+			evt = document.createEvent('Event');
+			evt.initEvent('move', true, true);
+		}
 
 		evt.to = toEl;
 		evt.from = fromEl;
 		evt.dragged = dragEl;
 		evt.draggedRect = dragRect;
 		evt.related = targetEl || toEl;
-		evt.relatedRect = targetRect || toEl.getBoundingClientRect();
+		evt.relatedRect = targetRect || _getRect(toEl);
 		evt.willInsertAfter = willInsertAfter;
+
+		evt.originalEvent = originalEvt;
 
 		fromEl.dispatchEvent(evt);
 
@@ -25514,26 +26417,166 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		return retVal;
 	}
 
-
 	function _disableDraggable(el) {
 		el.draggable = false;
 	}
-
 
 	function _unsilent() {
 		_silent = false;
 	}
 
+	/**
+	 * Gets nth child of el, ignoring hidden children, sortable's elements (does not ignore clone if it's visible)
+	 * and non-draggable elements
+	 * @param  {HTMLElement} el       The parent element
+	 * @param  {Number} childNum      The index of the child
+	 * @param  {Object} options       Parent Sortable's options
+	 * @return {HTMLElement}          The child at index childNum, or null if not found
+	 */
+	function _getChild(el, childNum, options) {
+		var currentChild = 0,
+			i = 0,
+			children = el.children;
 
-	/** @returns {HTMLElement|false} */
-	function _ghostIsLast(el, evt) {
-		var lastEl = el.lastElementChild,
-			rect = lastEl.getBoundingClientRect();
+		while (i < children.length) {
+			if (
+				children[i].style.display !== 'none' &&
+				children[i] !== ghostEl &&
+				children[i] !== dragEl &&
+				_closest(children[i], options.draggable, el, false)
+			) {
+				if (currentChild === childNum) {
+					return children[i];
+				}
+				currentChild++;
+			}
 
-		// 5 — min delta
-		// abs — нельзя добавлять, а то глюки при наведении сверху
-		return (evt.clientY - (rect.top + rect.height) > 5) ||
-			(evt.clientX - (rect.left + rect.width) > 5);
+			i++;
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
+	 * @param  {HTMLElement} el       Parent element
+	 * @return {HTMLElement}          The last child, ignoring ghostEl
+	 */
+	function _lastChild(el) {
+		var last = el.lastElementChild;
+
+		while (last && (last === ghostEl || last.style.display === 'none')) {
+			last = last.previousElementSibling;
+		}
+
+		return last || null;
+	}
+
+	function _ghostIsLast(evt, axis, el) {
+		var elRect = _getRect(_lastChild(el)),
+			mouseOnAxis = axis === 'vertical' ? evt.clientY : evt.clientX,
+			mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
+			targetS2 = axis === 'vertical' ? elRect.bottom : elRect.right,
+			targetS1Opp = axis === 'vertical' ? elRect.left : elRect.top,
+			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom,
+			spacer = 10;
+
+		return (
+			axis === 'vertical' ?
+				(mouseOnOppAxis > targetS2Opp + spacer || mouseOnOppAxis <= targetS2Opp && mouseOnAxis > targetS2 && mouseOnOppAxis >= targetS1Opp) :
+				(mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp || mouseOnAxis <= targetS2 && mouseOnOppAxis > targetS2Opp + spacer)
+		);
+	}
+
+	function _getSwapDirection(evt, target, axis, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
+		var targetRect = _getRect(target),
+			mouseOnAxis = axis === 'vertical' ? evt.clientY : evt.clientX,
+			targetLength = axis === 'vertical' ? targetRect.height : targetRect.width,
+			targetS1 = axis === 'vertical' ? targetRect.top : targetRect.left,
+			targetS2 = axis === 'vertical' ? targetRect.bottom : targetRect.right,
+			dragRect = _getRect(dragEl),
+			invert = false;
+
+
+		if (!invertSwap) {
+			// Never invert or create dragEl shadow when target movemenet causes mouse to move past the end of regular swapThreshold
+			if (isLastTarget && targetMoveDistance < targetLength * swapThreshold) { // multiplied only by swapThreshold because mouse will already be inside target by (1 - threshold) * targetLength / 2
+				// check if past first invert threshold on side opposite of lastDirection
+				if (!pastFirstInvertThresh &&
+					(lastDirection === 1 ?
+						(
+							mouseOnAxis > targetS1 + targetLength * invertedSwapThreshold / 2
+						) :
+						(
+							mouseOnAxis < targetS2 - targetLength * invertedSwapThreshold / 2
+						)
+					)
+				)
+				{
+					// past first invert threshold, do not restrict inverted threshold to dragEl shadow
+					pastFirstInvertThresh = true;
+				}
+
+				if (!pastFirstInvertThresh) {
+					var dragS1 = axis === 'vertical' ? dragRect.top : dragRect.left,
+						dragS2 = axis === 'vertical' ? dragRect.bottom : dragRect.right;
+					// dragEl shadow (target move distance shadow)
+					if (
+						lastDirection === 1 ?
+						(
+							mouseOnAxis < targetS1 + targetMoveDistance // over dragEl shadow
+						) :
+						(
+							mouseOnAxis > targetS2 - targetMoveDistance
+						)
+					)
+					{
+						return lastDirection * -1;
+					}
+				} else {
+					invert = true;
+				}
+			} else {
+				// Regular
+				if (
+					mouseOnAxis > targetS1 + (targetLength * (1 - swapThreshold) / 2) &&
+					mouseOnAxis < targetS2 - (targetLength * (1 - swapThreshold) / 2)
+				) {
+					return _getInsertDirection(target);
+				}
+			}
+		}
+
+		invert = invert || invertSwap;
+
+		if (invert) {
+			// Invert of regular
+			if (
+				mouseOnAxis < targetS1 + (targetLength * invertedSwapThreshold / 2) ||
+				mouseOnAxis > targetS2 - (targetLength * invertedSwapThreshold / 2)
+			)
+			{
+				return ((mouseOnAxis > targetS1 + targetLength / 2) ? 1 : -1);
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Gets the direction dragEl must be swapped relative to target in order to make it
+	 * seem that dragEl has been "inserted" into that element's position
+	 * @param  {HTMLElement} target       The target whose position dragEl is being inserted at
+	 * @return {Number}                   Direction dragEl must be swapped
+	 */
+	function _getInsertDirection(target) {
+		var dragElIndex = _index(dragEl),
+			targetIndex = _index(target);
+
+		if (dragElIndex < targetIndex) {
+			return 1;
+		} else {
+			return -1;
+		}
 	}
 
 
@@ -25570,7 +26613,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		}
 
 		while (el && (el = el.previousElementSibling)) {
-			if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && (selector === '>*' || _matches(el, selector))) {
+			if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== cloneEl) {
 				index++;
 			}
 		}
@@ -25580,39 +26623,45 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
 		if (el) {
-			selector = selector.split('.');
-
-			var tag = selector.shift().toUpperCase(),
-				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
-
-			return (
-				(tag === '' || el.nodeName.toUpperCase() == tag) &&
-				(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
-			);
+			try {
+				if (el.matches) {
+					return el.matches(selector);
+				} else if (el.msMatchesSelector) {
+					return el.msMatchesSelector(selector);
+				} else if (el.webkitMatchesSelector) {
+					return el.webkitMatchesSelector(selector);
+				}
+			} catch(_) {
+				return false;
+			}
 		}
 
 		return false;
 	}
 
+	var _throttleTimeout;
 	function _throttle(callback, ms) {
-		var args, _this;
-
 		return function () {
-			if (args === void 0) {
-				args = arguments;
-				_this = this;
+			if (!_throttleTimeout) {
+				var args = arguments,
+					_this = this;
 
-				setTimeout(function () {
+				_throttleTimeout = setTimeout(function () {
 					if (args.length === 1) {
 						callback.call(_this, args[0]);
 					} else {
 						callback.apply(_this, args);
 					}
 
-					args = void 0;
+					_throttleTimeout = void 0;
 				}, ms);
 			}
 		};
+	}
+
+	function _cancelThrottle() {
+		clearTimeout(_throttleTimeout);
+		_throttleTimeout = void 0;
 	}
 
 	function _extend(dst, src) {
@@ -25640,6 +26689,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 	}
 
 	function _saveInputCheckedState(root) {
+		savedInputChecked.length = 0;
+
 		var inputs = root.getElementsByTagName('input');
 		var idx = inputs.length;
 
@@ -25657,12 +26708,158 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		return clearTimeout(id);
 	}
 
+
+	/**
+	 * Returns the "bounding client rect" of given element
+	 * @param  {HTMLElement} el                The element whose boundingClientRect is wanted
+	 * @param  {[HTMLElement]} container       the parent the element will be placed in
+	 * @param  {[Boolean]} adjustForTransform  Whether the rect should compensate for parent's transform
+	 * @return {Object}                        The boundingClientRect of el
+	 */
+	function _getRect(el, adjustForTransform, container, adjustForFixed) {
+		if (!el.getBoundingClientRect && el !== win) return;
+
+		var elRect,
+			top,
+			left,
+			bottom,
+			right,
+			height,
+			width;
+
+		if (el !== win && el !== _getWindowScrollingElement()) {
+			elRect = el.getBoundingClientRect();
+			top = elRect.top;
+			left = elRect.left;
+			bottom = elRect.bottom;
+			right = elRect.right;
+			height = elRect.height;
+			width = elRect.width;
+		} else {
+			top = 0;
+			left = 0;
+			bottom = window.innerHeight;
+			right = window.innerWidth;
+			height = window.innerHeight;
+			width = window.innerWidth;
+		}
+
+		if (adjustForFixed && el !== win) {
+			// Adjust for translate()
+			container = container || el.parentNode;
+
+			// solves #1123 (see: https://stackoverflow.com/a/37953806/6088312)
+			// Not needed on <= IE11
+			if (!IE11OrLess) {
+				do {
+					if (container && container.getBoundingClientRect && _css(container, 'transform') !== 'none') {
+						var containerRect = container.getBoundingClientRect();
+
+						// Set relative to edges of padding box of container
+						top -= containerRect.top + parseInt(_css(container, 'border-top-width'));
+						left -= containerRect.left + parseInt(_css(container, 'border-left-width'));
+						bottom = top + elRect.height;
+						right = left + elRect.width;
+
+						break;
+					}
+					/* jshint boss:true */
+				} while (container = container.parentNode);
+			}
+		}
+
+		if (adjustForTransform && el !== win) {
+			// Adjust for scale()
+			var matrix = _matrix(container || el),
+				scaleX = matrix && matrix.a,
+				scaleY = matrix && matrix.d;
+
+			if (matrix) {
+				top /= scaleY;
+				left /= scaleX;
+
+				width /= scaleX;
+				height /= scaleY;
+
+				bottom = top + height;
+				right = left + width;
+			}
+		}
+
+		return {
+			top: top,
+			left: left,
+			bottom: bottom,
+			right: right,
+			width: width,
+			height: height
+		};
+	}
+
+
+	/**
+	 * Checks if a side of an element is scrolled past a side of it's parents
+	 * @param  {HTMLElement}  el       The element who's side being scrolled out of view is in question
+	 * @param  {String}       side     Side of the element in question ('top', 'left', 'right', 'bottom')
+	 * @return {HTMLElement}           The parent scroll element that the el's side is scrolled past, or null if there is no such element
+	 */
+	function _isScrolledPast(el, side) {
+		var parent = _getParentAutoScrollElement(el, true),
+			elSide = _getRect(el)[side];
+
+		/* jshint boss:true */
+		while (parent) {
+			var parentSide = _getRect(parent)[side],
+				visible;
+
+			if (side === 'top' || side === 'left') {
+				visible = elSide >= parentSide;
+			} else {
+				visible = elSide <= parentSide;
+			}
+
+			if (!visible) return parent;
+
+			if (parent === _getWindowScrollingElement()) break;
+
+			parent = _getParentAutoScrollElement(parent, false);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the scroll offset of the given element, added with all the scroll offsets of parent elements.
+	 * The value is returned in real pixels.
+	 * @param  {HTMLElement} el
+	 * @return {Array}             Offsets in the format of [left, top]
+	 */
+	function _getRelativeScrollOffset(el) {
+		var offsetLeft = 0,
+			offsetTop = 0,
+			winScroller = _getWindowScrollingElement();
+
+		if (el) {
+			do {
+				var matrix = _matrix(el),
+					scaleX = matrix.a,
+					scaleY = matrix.d;
+
+				offsetLeft += el.scrollLeft * scaleX;
+				offsetTop += el.scrollTop * scaleY;
+			} while (el !== winScroller && (el = el.parentNode));
+		}
+
+		return [offsetLeft, offsetTop];
+	}
+
 	// Fixed #973:
-	_on(document, 'touchmove', function (evt) {
-		if (Sortable.active) {
+	_on(document, 'touchmove', function(evt) {
+		if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
 			evt.preventDefault();
 		}
 	});
+
 
 	// Export utils
 	Sortable.utils = {
@@ -25671,7 +26868,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		css: _css,
 		find: _find,
 		is: function (el, selector) {
-			return !!_closest(el, selector, el);
+			return !!_closest(el, selector, el, false);
 		},
 		extend: _extend,
 		throttle: _throttle,
@@ -25680,7 +26877,9 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 		clone: _clone,
 		index: _index,
 		nextTick: _nextTick,
-		cancelNextTick: _cancelNextTick
+		cancelNextTick: _cancelNextTick,
+		detectDirection: _detectDirection,
+		getChild: _getChild
 	};
 
 
@@ -25695,7 +26894,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 
 
 	// Export
-	Sortable.version = '1.7.0';
+	Sortable.version = '1.8.4';
 	return Sortable;
 });
 
@@ -25705,8 +26904,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(17);
-__webpack_require__(82);
-module.exports = __webpack_require__(83);
+__webpack_require__(85);
+module.exports = __webpack_require__(86);
 
 
 /***/ }),
@@ -25771,6 +26970,8 @@ __webpack_require__(15);
 __webpack_require__(64);
 __webpack_require__(3);
 __webpack_require__(65);
+__webpack_require__(71);
+__webpack_require__(72);
 
 
 window.CodeMirror = __WEBPACK_IMPORTED_MODULE_1_codemirror___default.a;
@@ -25783,8 +26984,6 @@ window.toastr = __WEBPACK_IMPORTED_MODULE_2_toastr___default.a;
 
 window.Sortable = __WEBPACK_IMPORTED_MODULE_3_sortablejs___default.a;
 
-__webpack_require__(71);
-__webpack_require__(72);
 __webpack_require__(73);
 __webpack_require__(74);
 __webpack_require__(75);
@@ -25794,7 +26993,10 @@ __webpack_require__(78);
 __webpack_require__(79);
 __webpack_require__(80);
 __webpack_require__(81);
+__webpack_require__(82);
+__webpack_require__(83);
 window.omega = __webpack_require__(8);
+__webpack_require__(84);
 
 // No need of vue.js
 // But i keep it here if in the futur i want to use it
@@ -59495,7 +60697,8 @@ var options = {
     themePath: null,
     basePath: "",
     suffix: ".js",
-    $moduleUrls: {}
+    $moduleUrls: {},
+    loadWorkerFromBlob: true
 };
 
 exports.get = function(key) {
@@ -60389,6 +61592,7 @@ var BidiHandler = function(session) {
     this.EOL = "\xAC";
     this.showInvisibles = true;
     this.isRtlDir = false;
+    this.$isRtl = false;
     this.line = "";
     this.wrapIndent = 0;
     this.EOF = "\xB6";
@@ -60466,7 +61670,7 @@ var BidiHandler = function(session) {
 
         this.wrapIndent = 0;
         this.line = this.session.getLine(docRow);
-        this.isRtlDir = this.line.charAt(0) === this.RLE;
+        this.isRtlDir = this.$isRtl || this.line.charAt(0) === this.RLE;
         if (this.session.$useWrapMode) {
             var splits = this.session.$wrapData[docRow];
             if (splits) {
@@ -60499,7 +61703,7 @@ var BidiHandler = function(session) {
         });
 
         if (this.isRtlDir) {
-            this.fontMetrics.$main.innerHTML = (this.line.charAt(this.line.length - 1) == bidiUtil.DOT) ? this.line.substr(0, this.line.length - 1) : this.line;
+            this.fontMetrics.$main.textContent = (this.line.charAt(this.line.length - 1) == bidiUtil.DOT) ? this.line.substr(0, this.line.length - 1) : this.line;
             this.rtlLineOffset = this.contentWidth - this.fontMetrics.$main.getBoundingClientRect().width;
         }
     };
@@ -60545,6 +61749,7 @@ var BidiHandler = function(session) {
     };
 
     this.isRtlLine = function(row) {
+        if (this.$isRtl) return true;
         if (row != undefined)
             return (this.session.getLine(row).charAt(0) == this.RLE);
         else
@@ -62592,7 +63797,7 @@ var Mode = function() {
     };
 
     this.$delegator = function(method, args, defaultHandler) {
-        var state = args[0];
+        var state = args[0] || "start";
         if (typeof state != "string") {
             if (Array.isArray(state[2])) {
                 var language = state[2][state[2].length - 1];
@@ -62600,7 +63805,7 @@ var Mode = function() {
                 if (mode)
                     return mode[method].apply(mode, [state[1]].concat([].slice.call(args, 1)));
             }
-            state = state[0];
+            state = state[0] || "start";
         }
             
         for (var i = 0; i < this.$embeds.length; i++) {
@@ -64833,7 +66038,9 @@ function BracketMatch() {
         "]": "[",
         "[": "]",
         "{": "}",
-        "}": "{"
+        "}": "{",
+        "<": ">",
+        ">": "<"
     };
 
     this.$findOpeningBracket = function(bracket, position, typeRe) {
@@ -66642,6 +67849,7 @@ config.defineOptions(EditSession.prototype, "session", {
     useSoftTabs: {initialValue: true},
     tabSize: {
         set: function(tabSize) {
+            tabSize = parseInt(tabSize);
             if (isNaN(tabSize) || this.$tabSize === tabSize) return;
 
             this.$modified = true;
@@ -69022,7 +70230,8 @@ Editor.$uid = 0;
     this.removeToLineStart = function() {
         if (this.selection.isEmpty())
             this.selection.selectLineStart();
-
+        if (this.selection.isEmpty())
+            this.selection.selectLeft();
         this.session.remove(this.getSelectionRange());
         this.clearSelection();
     };
@@ -74407,41 +75616,23 @@ function $workerBlob(workerUrl) {
 function createWorker(workerUrl) {
     if (typeof Worker == "undefined")
         return { postMessage: function() {}, terminate: function() {} };
-    var blob = $workerBlob(workerUrl);
-    var URL = window.URL || window.webkitURL;
-    var blobURL = URL.createObjectURL(blob);
-    return new Worker(blobURL);
+    if (config.get("loadWorkerFromBlob")) {
+        var blob = $workerBlob(workerUrl);
+        var URL = window.URL || window.webkitURL;
+        var blobURL = URL.createObjectURL(blob);
+        return new Worker(blobURL);
+    }
+    return new Worker(workerUrl);
 }
 
-var WorkerClient = function(topLevelNamespaces, mod, classname, workerUrl, importScripts) {
+var WorkerClient = function(worker) {
+    if (!worker.postMessage)
+        worker = this.$createWorkerFromOldConfig.apply(this, arguments);
+
+    this.$worker = worker;
     this.$sendDeltaQueue = this.$sendDeltaQueue.bind(this);
     this.changeListener = this.changeListener.bind(this);
     this.onMessage = this.onMessage.bind(this);
-    if (require.nameToUrl && !require.toUrl)
-        require.toUrl = require.nameToUrl;
-    
-    if (config.get("packaged") || !require.toUrl) {
-        workerUrl = workerUrl || config.moduleUrl(mod, "worker");
-    } else {
-        var normalizePath = this.$normalizePath;
-        workerUrl = workerUrl || normalizePath(require.toUrl("ace/worker/worker.js", null, "_"));
-
-        var tlns = {};
-        topLevelNamespaces.forEach(function(ns) {
-            tlns[ns] = normalizePath(require.toUrl(ns, null, "_").replace(/(\.js)?(\?.*)?$/, ""));
-        });
-    }
-
-    this.$worker = createWorker(workerUrl);
-    if (importScripts) {
-        this.send("importScripts", importScripts);
-    }
-    this.$worker.postMessage({
-        init : true,
-        tlns : tlns,
-        module : mod,
-        classname : classname
-    });
 
     this.callbackId = 1;
     this.callbacks = {};
@@ -74452,6 +75643,35 @@ var WorkerClient = function(topLevelNamespaces, mod, classname, workerUrl, impor
 (function(){
 
     oop.implement(this, EventEmitter);
+
+    this.$createWorkerFromOldConfig = function(topLevelNamespaces, mod, classname, workerUrl, importScripts) {
+        if (require.nameToUrl && !require.toUrl)
+            require.toUrl = require.nameToUrl;
+
+        if (config.get("packaged") || !require.toUrl) {
+            workerUrl = workerUrl || config.moduleUrl(mod, "worker");
+        } else {
+            var normalizePath = this.$normalizePath;
+            workerUrl = workerUrl || normalizePath(require.toUrl("ace/worker/worker.js", null, "_"));
+
+            var tlns = {};
+            topLevelNamespaces.forEach(function(ns) {
+                tlns[ns] = normalizePath(require.toUrl(ns, null, "_").replace(/(\.js)?(\?.*)?$/, ""));
+            });
+        }
+
+        this.$worker = createWorker(workerUrl);
+        if (importScripts) {
+            this.send("importScripts", importScripts);
+        }
+        this.$worker.postMessage({
+            init : true,
+            tlns : tlns,
+            module : mod,
+            classname : classname
+        });
+        return this.$worker;
+    };
 
     this.onMessage = function(e) {
         var msg = e.data;
@@ -74551,32 +75771,28 @@ var WorkerClient = function(topLevelNamespaces, mod, classname, workerUrl, impor
 
 
 var UIWorkerClient = function(topLevelNamespaces, mod, classname) {
-    this.$sendDeltaQueue = this.$sendDeltaQueue.bind(this);
-    this.changeListener = this.changeListener.bind(this);
-    this.callbackId = 1;
-    this.callbacks = {};
-    this.messageBuffer = [];
-
     var main = null;
     var emitSync = false;
     var sender = Object.create(EventEmitter);
-    var _self = this;
 
-    this.$worker = {};
-    this.$worker.terminate = function() {};
-    this.$worker.postMessage = function(e) {
-        _self.messageBuffer.push(e);
-        if (main) {
+    var messageBuffer = [];
+    var workerClient = new WorkerClient({
+        messageBuffer: messageBuffer,
+        terminate: function() {},
+        postMessage: function(e) {
+            messageBuffer.push(e);
+            if (!main) return;
             if (emitSync)
                 setTimeout(processNext);
             else
                 processNext();
         }
-    };
-    this.setEmitSync = function(val) { emitSync = val; };
+    });
+
+    workerClient.setEmitSync = function(val) { emitSync = val; };
 
     var processNext = function() {
-        var msg = _self.messageBuffer.shift();
+        var msg = messageBuffer.shift();
         if (msg.command)
             main[msg.command].apply(main, msg.args);
         else if (msg.event)
@@ -74584,7 +75800,7 @@ var UIWorkerClient = function(topLevelNamespaces, mod, classname) {
     };
 
     sender.postMessage = function(msg) {
-        _self.onMessage({data: msg});
+        workerClient.onMessage({data: msg});
     };
     sender.callback = function(data, callbackId) {
         this.postMessage({type: "call", id: callbackId, data: data});
@@ -74595,12 +75811,12 @@ var UIWorkerClient = function(topLevelNamespaces, mod, classname) {
 
     config.loadModule(["worker", mod], function(Main) {
         main = new Main[classname](sender);
-        while (_self.messageBuffer.length)
+        while (messageBuffer.length)
             processNext();
     });
-};
 
-UIWorkerClient.prototype = WorkerClient.prototype;
+    return workerClient;
+};
 
 exports.UIWorkerClient = UIWorkerClient;
 exports.WorkerClient = WorkerClient;
@@ -76672,7 +77888,7 @@ exports.Editor = Editor;
 exports.EditSession = EditSession;
 exports.UndoManager = UndoManager;
 exports.VirtualRenderer = Renderer;
-exports.version = "1.4.2";
+exports.version = "1.4.3";
 });            (function() {
                 ace.require(["ace/ace"], function(a) {
                     if (a) {
@@ -76846,7 +78062,7 @@ exports.version = "1.4.2";
           return maybeBackup(stream, endTag, state.localMode.token(stream, state.localState));
         };
         state.localMode = mode;
-        state.localState = CodeMirror.startState(mode, htmlMode.indent(state.htmlState, ""));
+        state.localState = CodeMirror.startState(mode, htmlMode.indent(state.htmlState, "", ""));
       } else if (state.inTag) {
         state.inTag += stream.current()
         if (stream.eol()) state.inTag += " "
@@ -76876,7 +78092,7 @@ exports.version = "1.4.2";
 
       indent: function (state, textAfter, line) {
         if (!state.localMode || /^\s*<\//.test(textAfter))
-          return htmlMode.indent(state.htmlState, textAfter);
+          return htmlMode.indent(state.htmlState, textAfter, line);
         else if (state.localMode.indent)
           return state.localMode.indent(state.localState, textAfter, line);
         else
@@ -77672,7 +78888,10 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     }
     if (type == "function") return cont(functiondef);
     if (type == "for") return cont(pushlex("form"), forspec, statement, poplex);
-    if (type == "class" || (isTS && value == "interface")) { cx.marked = "keyword"; return cont(pushlex("form"), className, poplex); }
+    if (type == "class" || (isTS && value == "interface")) {
+      cx.marked = "keyword"
+      return cont(pushlex("form", type == "class" ? type : value), className, poplex)
+    }
     if (type == "variable") {
       if (isTS && value == "declare") {
         cx.marked = "keyword"
@@ -77680,11 +78899,11 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
       } else if (isTS && (value == "module" || value == "enum" || value == "type") && cx.stream.match(/^\s*\w/, false)) {
         cx.marked = "keyword"
         if (value == "enum") return cont(enumdef);
-        else if (value == "type") return cont(typeexpr, expect("operator"), typeexpr, expect(";"));
+        else if (value == "type") return cont(typename, expect("operator"), typeexpr, expect(";"));
         else return cont(pushlex("form"), pattern, expect("{"), pushlex("}"), block, poplex, poplex)
       } else if (isTS && value == "namespace") {
         cx.marked = "keyword"
-        return cont(pushlex("form"), expression, block, poplex)
+        return cont(pushlex("form"), expression, statement, poplex)
       } else if (isTS && value == "abstract") {
         cx.marked = "keyword"
         return cont(statement)
@@ -77859,6 +79078,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
         }, proceed);
       }
       if (type == end || value == end) return cont();
+      if (sep && sep.indexOf(";") > -1) return pass(what)
       return cont(expect(end));
     }
     return function(type, value) {
@@ -77877,7 +79097,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   }
   function maybetype(type, value) {
     if (isTS) {
-      if (type == ":") return cont(typeexpr);
+      if (type == ":" || value == "in") return cont(typeexpr);
       if (value == "?") return cont(maybetype);
     }
   }
@@ -77894,18 +79114,19 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     }
   }
   function typeexpr(type, value) {
-    if (value == "keyof" || value == "typeof") {
+    if (value == "keyof" || value == "typeof" || value == "infer") {
       cx.marked = "keyword"
-      return cont(value == "keyof" ? typeexpr : expressionNoComma)
+      return cont(value == "typeof" ? expressionNoComma : typeexpr)
     }
     if (type == "variable" || value == "void") {
       cx.marked = "type"
       return cont(afterType)
     }
+    if (value == "|" || value == "&") return cont(typeexpr)
     if (type == "string" || type == "number" || type == "atom") return cont(afterType);
     if (type == "[") return cont(pushlex("]"), commasep(typeexpr, "]", ","), poplex, afterType)
     if (type == "{") return cont(pushlex("}"), commasep(typeprop, "}", ",;"), poplex, afterType)
-    if (type == "(") return cont(commasep(typearg, ")"), maybeReturnType)
+    if (type == "(") return cont(commasep(typearg, ")"), maybeReturnType, afterType)
     if (type == "<") return cont(commasep(typeexpr, ">"), typeexpr)
   }
   function maybeReturnType(type) {
@@ -77915,24 +79136,28 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     if (type == "variable" || cx.style == "keyword") {
       cx.marked = "property"
       return cont(typeprop)
-    } else if (value == "?") {
+    } else if (value == "?" || type == "number" || type == "string") {
       return cont(typeprop)
     } else if (type == ":") {
       return cont(typeexpr)
     } else if (type == "[") {
-      return cont(expression, maybetype, expect("]"), typeprop)
+      return cont(expect("variable"), maybetype, expect("]"), typeprop)
+    } else if (type == "(") {
+      return pass(functiondecl, typeprop)
     }
   }
   function typearg(type, value) {
     if (type == "variable" && cx.stream.match(/^\s*[?:]/, false) || value == "?") return cont(typearg)
     if (type == ":") return cont(typeexpr)
+    if (type == "spread") return cont(typearg)
     return pass(typeexpr)
   }
   function afterType(type, value) {
     if (value == "<") return cont(pushlex(">"), commasep(typeexpr, ">"), poplex, afterType)
     if (value == "|" || type == "." || value == "&") return cont(typeexpr)
-    if (type == "[") return cont(expect("]"), afterType)
+    if (type == "[") return cont(typeexpr, expect("]"), afterType)
     if (value == "extends" || value == "implements") { cx.marked = "keyword"; return cont(typeexpr) }
+    if (value == "?") return cont(typeexpr, expect(":"), typeexpr)
   }
   function maybeTypeArgs(_, value) {
     if (value == "<") return cont(pushlex(">"), commasep(typeexpr, ">"), poplex, afterType)
@@ -77979,25 +79204,18 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   }
   function forspec(type, value) {
     if (value == "await") return cont(forspec);
-    if (type == "(") return cont(pushlex(")"), forspec1, expect(")"), poplex);
+    if (type == "(") return cont(pushlex(")"), forspec1, poplex);
   }
   function forspec1(type) {
-    if (type == "var") return cont(vardef, expect(";"), forspec2);
-    if (type == ";") return cont(forspec2);
-    if (type == "variable") return cont(formaybeinof);
-    return pass(expression, expect(";"), forspec2);
-  }
-  function formaybeinof(_type, value) {
-    if (value == "in" || value == "of") { cx.marked = "keyword"; return cont(expression); }
-    return cont(maybeoperatorComma, forspec2);
+    if (type == "var") return cont(vardef, forspec2);
+    if (type == "variable") return cont(forspec2);
+    return pass(forspec2)
   }
   function forspec2(type, value) {
-    if (type == ";") return cont(forspec3);
-    if (value == "in" || value == "of") { cx.marked = "keyword"; return cont(expression); }
-    return pass(expression, expect(";"), forspec3);
-  }
-  function forspec3(type) {
-    if (type != ")") cont(expression);
+    if (type == ")") return cont()
+    if (type == ";") return cont(forspec2)
+    if (value == "in" || value == "of") { cx.marked = "keyword"; return cont(expression, forspec2) }
+    return pass(expression, forspec2)
   }
   function functiondef(type, value) {
     if (value == "*") {cx.marked = "keyword"; return cont(functiondef);}
@@ -78005,10 +79223,25 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     if (type == "(") return cont(pushcontext, pushlex(")"), commasep(funarg, ")"), poplex, mayberettype, statement, popcontext);
     if (isTS && value == "<") return cont(pushlex(">"), commasep(typeparam, ">"), poplex, functiondef)
   }
+  function functiondecl(type, value) {
+    if (value == "*") {cx.marked = "keyword"; return cont(functiondecl);}
+    if (type == "variable") {register(value); return cont(functiondecl);}
+    if (type == "(") return cont(pushcontext, pushlex(")"), commasep(funarg, ")"), poplex, mayberettype, popcontext);
+    if (isTS && value == "<") return cont(pushlex(">"), commasep(typeparam, ">"), poplex, functiondecl)
+  }
+  function typename(type, value) {
+    if (type == "keyword" || type == "variable") {
+      cx.marked = "type"
+      return cont(typename)
+    } else if (value == "<") {
+      return cont(pushlex(">"), commasep(typeparam, ">"), poplex)
+    }
+  }
   function funarg(type, value) {
     if (value == "@") cont(expression, funarg)
     if (type == "spread") return cont(funarg);
     if (isTS && isModifier(value)) { cx.marked = "keyword"; return cont(funarg); }
+    if (isTS && type == "this") return cont(maybetype, maybeAssign)
     return pass(pattern, maybetype, maybeAssign);
   }
   function classExpression(type, value) {
@@ -78039,13 +79272,15 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
       cx.marked = "property";
       return cont(isTS ? classfield : functiondef, classBody);
     }
+    if (type == "number" || type == "string") return cont(isTS ? classfield : functiondef, classBody);
     if (type == "[")
       return cont(expression, maybetype, expect("]"), isTS ? classfield : functiondef, classBody)
     if (value == "*") {
       cx.marked = "keyword";
       return cont(classBody);
     }
-    if (type == ";") return cont(classBody);
+    if (isTS && type == "(") return pass(functiondecl, classBody)
+    if (type == ";" || type == ",") return cont(classBody);
     if (type == "}") return cont();
     if (value == "@") return cont(expression, classBody)
   }
@@ -78053,7 +79288,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     if (value == "?") return cont(classfield)
     if (type == ":") return cont(typeexpr, maybeAssign)
     if (value == "=") return cont(expressionNoComma)
-    return pass(functiondef)
+    var context = cx.state.lexical.prev, isInterface = context && context.info == "interface"
+    return pass(isInterface ? functiondecl : functiondef)
   }
   function afterExport(type, value) {
     if (value == "*") { cx.marked = "keyword"; return cont(maybeFrom, expect(";")); }
@@ -78290,12 +79526,11 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       return ret("qualifier", "qualifier");
     } else if (/[:;{}\[\]\(\)]/.test(ch)) {
       return ret(null, ch);
-    } else if (((ch == "u" || ch == "U") && stream.match(/rl(-prefix)?\(/i)) ||
-               ((ch == "d" || ch == "D") && stream.match("omain(", true, true)) ||
-               ((ch == "r" || ch == "R") && stream.match("egexp(", true, true))) {
-      stream.backUp(1);
-      state.tokenize = tokenParenthesized;
-      return ret("property", "word");
+    } else if (stream.match(/[\w-.]+(?=\()/)) {
+      if (/^(url(-prefix)?|domain|regexp)$/.test(stream.current().toLowerCase())) {
+        state.tokenize = tokenParenthesized;
+      }
+      return ret("variable callee", "variable");
     } else if (/[\w\\\-]/.test(ch)) {
       stream.eatWhile(/[\w\\\-]/);
       return ret("property", "word");
@@ -79105,7 +80340,7 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
             // Get the outer indent, making sure to handle CodeMirror.Pass
             var outerIndent = 0;
             if (outer.indent) {
-              var possibleOuterIndent = outer.indent(state.outer, "");
+              var possibleOuterIndent = outer.indent(state.outer, "", "");
               if (possibleOuterIndent !== CodeMirror.Pass) outerIndent = possibleOuterIndent;
             }
 
@@ -79147,10 +80382,10 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
       }
     },
 
-    indent: function(state, textAfter) {
+    indent: function(state, textAfter, line) {
       var mode = state.innerActive ? state.innerActive.mode : outer;
       if (!mode.indent) return CodeMirror.Pass;
-      return mode.indent(state.innerActive ? state.inner : state.outer, textAfter);
+      return mode.indent(state.innerActive ? state.inner : state.outer, textAfter, line);
     },
 
     blankLine: function(state) {
@@ -79163,7 +80398,7 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
           var other = others[i];
           if (other.open === "\n") {
             state.innerActive = other;
-            state.inner = CodeMirror.startState(other.mode, mode.indent ? mode.indent(state.outer, "") : 0);
+            state.inner = CodeMirror.startState(other.mode, mode.indent ? mode.indent(state.outer, "", "") : 0);
           }
         }
       } else if (state.innerActive.close === "\n") {
@@ -79184,6 +80419,1134 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
 
 /***/ }),
 /* 71 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
+/**
+ * Copyright 2012-2017 Craig Campbell
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Mousetrap is a simple keyboard shortcut library for Javascript with
+ * no external dependencies
+ *
+ * @version 1.6.3
+ * @url craig.is/killing/mice
+ */
+(function(window, document, undefined) {
+
+    // Check if mousetrap is used inside browser, if not, return
+    if (!window) {
+        return;
+    }
+
+    /**
+     * mapping of special keycodes to their corresponding keys
+     *
+     * everything in this dictionary cannot use keypress events
+     * so it has to be here to map to the correct keycodes for
+     * keyup/keydown events
+     *
+     * @type {Object}
+     */
+    var _MAP = {
+        8: 'backspace',
+        9: 'tab',
+        13: 'enter',
+        16: 'shift',
+        17: 'ctrl',
+        18: 'alt',
+        20: 'capslock',
+        27: 'esc',
+        32: 'space',
+        33: 'pageup',
+        34: 'pagedown',
+        35: 'end',
+        36: 'home',
+        37: 'left',
+        38: 'up',
+        39: 'right',
+        40: 'down',
+        45: 'ins',
+        46: 'del',
+        91: 'meta',
+        93: 'meta',
+        224: 'meta'
+    };
+
+    /**
+     * mapping for special characters so they can support
+     *
+     * this dictionary is only used incase you want to bind a
+     * keyup or keydown event to one of these keys
+     *
+     * @type {Object}
+     */
+    var _KEYCODE_MAP = {
+        106: '*',
+        107: '+',
+        109: '-',
+        110: '.',
+        111 : '/',
+        186: ';',
+        187: '=',
+        188: ',',
+        189: '-',
+        190: '.',
+        191: '/',
+        192: '`',
+        219: '[',
+        220: '\\',
+        221: ']',
+        222: '\''
+    };
+
+    /**
+     * this is a mapping of keys that require shift on a US keypad
+     * back to the non shift equivelents
+     *
+     * this is so you can use keyup events with these keys
+     *
+     * note that this will only work reliably on US keyboards
+     *
+     * @type {Object}
+     */
+    var _SHIFT_MAP = {
+        '~': '`',
+        '!': '1',
+        '@': '2',
+        '#': '3',
+        '$': '4',
+        '%': '5',
+        '^': '6',
+        '&': '7',
+        '*': '8',
+        '(': '9',
+        ')': '0',
+        '_': '-',
+        '+': '=',
+        ':': ';',
+        '\"': '\'',
+        '<': ',',
+        '>': '.',
+        '?': '/',
+        '|': '\\'
+    };
+
+    /**
+     * this is a list of special strings you can use to map
+     * to modifier keys when you specify your keyboard shortcuts
+     *
+     * @type {Object}
+     */
+    var _SPECIAL_ALIASES = {
+        'option': 'alt',
+        'command': 'meta',
+        'return': 'enter',
+        'escape': 'esc',
+        'plus': '+',
+        'mod': /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'meta' : 'ctrl'
+    };
+
+    /**
+     * variable to store the flipped version of _MAP from above
+     * needed to check if we should use keypress or not when no action
+     * is specified
+     *
+     * @type {Object|undefined}
+     */
+    var _REVERSE_MAP;
+
+    /**
+     * loop through the f keys, f1 to f19 and add them to the map
+     * programatically
+     */
+    for (var i = 1; i < 20; ++i) {
+        _MAP[111 + i] = 'f' + i;
+    }
+
+    /**
+     * loop through to map numbers on the numeric keypad
+     */
+    for (i = 0; i <= 9; ++i) {
+
+        // This needs to use a string cause otherwise since 0 is falsey
+        // mousetrap will never fire for numpad 0 pressed as part of a keydown
+        // event.
+        //
+        // @see https://github.com/ccampbell/mousetrap/pull/258
+        _MAP[i + 96] = i.toString();
+    }
+
+    /**
+     * cross browser add event method
+     *
+     * @param {Element|HTMLDocument} object
+     * @param {string} type
+     * @param {Function} callback
+     * @returns void
+     */
+    function _addEvent(object, type, callback) {
+        if (object.addEventListener) {
+            object.addEventListener(type, callback, false);
+            return;
+        }
+
+        object.attachEvent('on' + type, callback);
+    }
+
+    /**
+     * takes the event and returns the key character
+     *
+     * @param {Event} e
+     * @return {string}
+     */
+    function _characterFromEvent(e) {
+
+        // for keypress events we should return the character as is
+        if (e.type == 'keypress') {
+            var character = String.fromCharCode(e.which);
+
+            // if the shift key is not pressed then it is safe to assume
+            // that we want the character to be lowercase.  this means if
+            // you accidentally have caps lock on then your key bindings
+            // will continue to work
+            //
+            // the only side effect that might not be desired is if you
+            // bind something like 'A' cause you want to trigger an
+            // event when capital A is pressed caps lock will no longer
+            // trigger the event.  shift+a will though.
+            if (!e.shiftKey) {
+                character = character.toLowerCase();
+            }
+
+            return character;
+        }
+
+        // for non keypress events the special maps are needed
+        if (_MAP[e.which]) {
+            return _MAP[e.which];
+        }
+
+        if (_KEYCODE_MAP[e.which]) {
+            return _KEYCODE_MAP[e.which];
+        }
+
+        // if it is not in the special map
+
+        // with keydown and keyup events the character seems to always
+        // come in as an uppercase character whether you are pressing shift
+        // or not.  we should make sure it is always lowercase for comparisons
+        return String.fromCharCode(e.which).toLowerCase();
+    }
+
+    /**
+     * checks if two arrays are equal
+     *
+     * @param {Array} modifiers1
+     * @param {Array} modifiers2
+     * @returns {boolean}
+     */
+    function _modifiersMatch(modifiers1, modifiers2) {
+        return modifiers1.sort().join(',') === modifiers2.sort().join(',');
+    }
+
+    /**
+     * takes a key event and figures out what the modifiers are
+     *
+     * @param {Event} e
+     * @returns {Array}
+     */
+    function _eventModifiers(e) {
+        var modifiers = [];
+
+        if (e.shiftKey) {
+            modifiers.push('shift');
+        }
+
+        if (e.altKey) {
+            modifiers.push('alt');
+        }
+
+        if (e.ctrlKey) {
+            modifiers.push('ctrl');
+        }
+
+        if (e.metaKey) {
+            modifiers.push('meta');
+        }
+
+        return modifiers;
+    }
+
+    /**
+     * prevents default for this event
+     *
+     * @param {Event} e
+     * @returns void
+     */
+    function _preventDefault(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+            return;
+        }
+
+        e.returnValue = false;
+    }
+
+    /**
+     * stops propogation for this event
+     *
+     * @param {Event} e
+     * @returns void
+     */
+    function _stopPropagation(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+            return;
+        }
+
+        e.cancelBubble = true;
+    }
+
+    /**
+     * determines if the keycode specified is a modifier key or not
+     *
+     * @param {string} key
+     * @returns {boolean}
+     */
+    function _isModifier(key) {
+        return key == 'shift' || key == 'ctrl' || key == 'alt' || key == 'meta';
+    }
+
+    /**
+     * reverses the map lookup so that we can look for specific keys
+     * to see what can and can't use keypress
+     *
+     * @return {Object}
+     */
+    function _getReverseMap() {
+        if (!_REVERSE_MAP) {
+            _REVERSE_MAP = {};
+            for (var key in _MAP) {
+
+                // pull out the numeric keypad from here cause keypress should
+                // be able to detect the keys from the character
+                if (key > 95 && key < 112) {
+                    continue;
+                }
+
+                if (_MAP.hasOwnProperty(key)) {
+                    _REVERSE_MAP[_MAP[key]] = key;
+                }
+            }
+        }
+        return _REVERSE_MAP;
+    }
+
+    /**
+     * picks the best action based on the key combination
+     *
+     * @param {string} key - character for key
+     * @param {Array} modifiers
+     * @param {string=} action passed in
+     */
+    function _pickBestAction(key, modifiers, action) {
+
+        // if no action was picked in we should try to pick the one
+        // that we think would work best for this key
+        if (!action) {
+            action = _getReverseMap()[key] ? 'keydown' : 'keypress';
+        }
+
+        // modifier keys don't work as expected with keypress,
+        // switch to keydown
+        if (action == 'keypress' && modifiers.length) {
+            action = 'keydown';
+        }
+
+        return action;
+    }
+
+    /**
+     * Converts from a string key combination to an array
+     *
+     * @param  {string} combination like "command+shift+l"
+     * @return {Array}
+     */
+    function _keysFromString(combination) {
+        if (combination === '+') {
+            return ['+'];
+        }
+
+        combination = combination.replace(/\+{2}/g, '+plus');
+        return combination.split('+');
+    }
+
+    /**
+     * Gets info for a specific key combination
+     *
+     * @param  {string} combination key combination ("command+s" or "a" or "*")
+     * @param  {string=} action
+     * @returns {Object}
+     */
+    function _getKeyInfo(combination, action) {
+        var keys;
+        var key;
+        var i;
+        var modifiers = [];
+
+        // take the keys from this pattern and figure out what the actual
+        // pattern is all about
+        keys = _keysFromString(combination);
+
+        for (i = 0; i < keys.length; ++i) {
+            key = keys[i];
+
+            // normalize key names
+            if (_SPECIAL_ALIASES[key]) {
+                key = _SPECIAL_ALIASES[key];
+            }
+
+            // if this is not a keypress event then we should
+            // be smart about using shift keys
+            // this will only work for US keyboards however
+            if (action && action != 'keypress' && _SHIFT_MAP[key]) {
+                key = _SHIFT_MAP[key];
+                modifiers.push('shift');
+            }
+
+            // if this key is a modifier then add it to the list of modifiers
+            if (_isModifier(key)) {
+                modifiers.push(key);
+            }
+        }
+
+        // depending on what the key combination is
+        // we will try to pick the best event for it
+        action = _pickBestAction(key, modifiers, action);
+
+        return {
+            key: key,
+            modifiers: modifiers,
+            action: action
+        };
+    }
+
+    function _belongsTo(element, ancestor) {
+        if (element === null || element === document) {
+            return false;
+        }
+
+        if (element === ancestor) {
+            return true;
+        }
+
+        return _belongsTo(element.parentNode, ancestor);
+    }
+
+    function Mousetrap(targetElement) {
+        var self = this;
+
+        targetElement = targetElement || document;
+
+        if (!(self instanceof Mousetrap)) {
+            return new Mousetrap(targetElement);
+        }
+
+        /**
+         * element to attach key events to
+         *
+         * @type {Element}
+         */
+        self.target = targetElement;
+
+        /**
+         * a list of all the callbacks setup via Mousetrap.bind()
+         *
+         * @type {Object}
+         */
+        self._callbacks = {};
+
+        /**
+         * direct map of string combinations to callbacks used for trigger()
+         *
+         * @type {Object}
+         */
+        self._directMap = {};
+
+        /**
+         * keeps track of what level each sequence is at since multiple
+         * sequences can start out with the same sequence
+         *
+         * @type {Object}
+         */
+        var _sequenceLevels = {};
+
+        /**
+         * variable to store the setTimeout call
+         *
+         * @type {null|number}
+         */
+        var _resetTimer;
+
+        /**
+         * temporary state where we will ignore the next keyup
+         *
+         * @type {boolean|string}
+         */
+        var _ignoreNextKeyup = false;
+
+        /**
+         * temporary state where we will ignore the next keypress
+         *
+         * @type {boolean}
+         */
+        var _ignoreNextKeypress = false;
+
+        /**
+         * are we currently inside of a sequence?
+         * type of action ("keyup" or "keydown" or "keypress") or false
+         *
+         * @type {boolean|string}
+         */
+        var _nextExpectedAction = false;
+
+        /**
+         * resets all sequence counters except for the ones passed in
+         *
+         * @param {Object} doNotReset
+         * @returns void
+         */
+        function _resetSequences(doNotReset) {
+            doNotReset = doNotReset || {};
+
+            var activeSequences = false,
+                key;
+
+            for (key in _sequenceLevels) {
+                if (doNotReset[key]) {
+                    activeSequences = true;
+                    continue;
+                }
+                _sequenceLevels[key] = 0;
+            }
+
+            if (!activeSequences) {
+                _nextExpectedAction = false;
+            }
+        }
+
+        /**
+         * finds all callbacks that match based on the keycode, modifiers,
+         * and action
+         *
+         * @param {string} character
+         * @param {Array} modifiers
+         * @param {Event|Object} e
+         * @param {string=} sequenceName - name of the sequence we are looking for
+         * @param {string=} combination
+         * @param {number=} level
+         * @returns {Array}
+         */
+        function _getMatches(character, modifiers, e, sequenceName, combination, level) {
+            var i;
+            var callback;
+            var matches = [];
+            var action = e.type;
+
+            // if there are no events related to this keycode
+            if (!self._callbacks[character]) {
+                return [];
+            }
+
+            // if a modifier key is coming up on its own we should allow it
+            if (action == 'keyup' && _isModifier(character)) {
+                modifiers = [character];
+            }
+
+            // loop through all callbacks for the key that was pressed
+            // and see if any of them match
+            for (i = 0; i < self._callbacks[character].length; ++i) {
+                callback = self._callbacks[character][i];
+
+                // if a sequence name is not specified, but this is a sequence at
+                // the wrong level then move onto the next match
+                if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] != callback.level) {
+                    continue;
+                }
+
+                // if the action we are looking for doesn't match the action we got
+                // then we should keep going
+                if (action != callback.action) {
+                    continue;
+                }
+
+                // if this is a keypress event and the meta key and control key
+                // are not pressed that means that we need to only look at the
+                // character, otherwise check the modifiers as well
+                //
+                // chrome will not fire a keypress if meta or control is down
+                // safari will fire a keypress if meta or meta+shift is down
+                // firefox will fire a keypress if meta or control is down
+                if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
+
+                    // when you bind a combination or sequence a second time it
+                    // should overwrite the first one.  if a sequenceName or
+                    // combination is specified in this call it does just that
+                    //
+                    // @todo make deleting its own method?
+                    var deleteCombo = !sequenceName && callback.combo == combination;
+                    var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
+                    if (deleteCombo || deleteSequence) {
+                        self._callbacks[character].splice(i, 1);
+                    }
+
+                    matches.push(callback);
+                }
+            }
+
+            return matches;
+        }
+
+        /**
+         * actually calls the callback function
+         *
+         * if your callback function returns false this will use the jquery
+         * convention - prevent default and stop propogation on the event
+         *
+         * @param {Function} callback
+         * @param {Event} e
+         * @returns void
+         */
+        function _fireCallback(callback, e, combo, sequence) {
+
+            // if this event should not happen stop here
+            if (self.stopCallback(e, e.target || e.srcElement, combo, sequence)) {
+                return;
+            }
+
+            if (callback(e, combo) === false) {
+                _preventDefault(e);
+                _stopPropagation(e);
+            }
+        }
+
+        /**
+         * handles a character key event
+         *
+         * @param {string} character
+         * @param {Array} modifiers
+         * @param {Event} e
+         * @returns void
+         */
+        self._handleKey = function(character, modifiers, e) {
+            var callbacks = _getMatches(character, modifiers, e);
+            var i;
+            var doNotReset = {};
+            var maxLevel = 0;
+            var processedSequenceCallback = false;
+
+            // Calculate the maxLevel for sequences so we can only execute the longest callback sequence
+            for (i = 0; i < callbacks.length; ++i) {
+                if (callbacks[i].seq) {
+                    maxLevel = Math.max(maxLevel, callbacks[i].level);
+                }
+            }
+
+            // loop through matching callbacks for this key event
+            for (i = 0; i < callbacks.length; ++i) {
+
+                // fire for all sequence callbacks
+                // this is because if for example you have multiple sequences
+                // bound such as "g i" and "g t" they both need to fire the
+                // callback for matching g cause otherwise you can only ever
+                // match the first one
+                if (callbacks[i].seq) {
+
+                    // only fire callbacks for the maxLevel to prevent
+                    // subsequences from also firing
+                    //
+                    // for example 'a option b' should not cause 'option b' to fire
+                    // even though 'option b' is part of the other sequence
+                    //
+                    // any sequences that do not match here will be discarded
+                    // below by the _resetSequences call
+                    if (callbacks[i].level != maxLevel) {
+                        continue;
+                    }
+
+                    processedSequenceCallback = true;
+
+                    // keep a list of which sequences were matches for later
+                    doNotReset[callbacks[i].seq] = 1;
+                    _fireCallback(callbacks[i].callback, e, callbacks[i].combo, callbacks[i].seq);
+                    continue;
+                }
+
+                // if there were no sequence matches but we are still here
+                // that means this is a regular match so we should fire that
+                if (!processedSequenceCallback) {
+                    _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
+                }
+            }
+
+            // if the key you pressed matches the type of sequence without
+            // being a modifier (ie "keyup" or "keypress") then we should
+            // reset all sequences that were not matched by this event
+            //
+            // this is so, for example, if you have the sequence "h a t" and you
+            // type "h e a r t" it does not match.  in this case the "e" will
+            // cause the sequence to reset
+            //
+            // modifier keys are ignored because you can have a sequence
+            // that contains modifiers such as "enter ctrl+space" and in most
+            // cases the modifier key will be pressed before the next key
+            //
+            // also if you have a sequence such as "ctrl+b a" then pressing the
+            // "b" key will trigger a "keypress" and a "keydown"
+            //
+            // the "keydown" is expected when there is a modifier, but the
+            // "keypress" ends up matching the _nextExpectedAction since it occurs
+            // after and that causes the sequence to reset
+            //
+            // we ignore keypresses in a sequence that directly follow a keydown
+            // for the same character
+            var ignoreThisKeypress = e.type == 'keypress' && _ignoreNextKeypress;
+            if (e.type == _nextExpectedAction && !_isModifier(character) && !ignoreThisKeypress) {
+                _resetSequences(doNotReset);
+            }
+
+            _ignoreNextKeypress = processedSequenceCallback && e.type == 'keydown';
+        };
+
+        /**
+         * handles a keydown event
+         *
+         * @param {Event} e
+         * @returns void
+         */
+        function _handleKeyEvent(e) {
+
+            // normalize e.which for key events
+            // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
+            if (typeof e.which !== 'number') {
+                e.which = e.keyCode;
+            }
+
+            var character = _characterFromEvent(e);
+
+            // no character found then stop
+            if (!character) {
+                return;
+            }
+
+            // need to use === for the character check because the character can be 0
+            if (e.type == 'keyup' && _ignoreNextKeyup === character) {
+                _ignoreNextKeyup = false;
+                return;
+            }
+
+            self.handleKey(character, _eventModifiers(e), e);
+        }
+
+        /**
+         * called to set a 1 second timeout on the specified sequence
+         *
+         * this is so after each key press in the sequence you have 1 second
+         * to press the next key before you have to start over
+         *
+         * @returns void
+         */
+        function _resetSequenceTimer() {
+            clearTimeout(_resetTimer);
+            _resetTimer = setTimeout(_resetSequences, 1000);
+        }
+
+        /**
+         * binds a key sequence to an event
+         *
+         * @param {string} combo - combo specified in bind call
+         * @param {Array} keys
+         * @param {Function} callback
+         * @param {string=} action
+         * @returns void
+         */
+        function _bindSequence(combo, keys, callback, action) {
+
+            // start off by adding a sequence level record for this combination
+            // and setting the level to 0
+            _sequenceLevels[combo] = 0;
+
+            /**
+             * callback to increase the sequence level for this sequence and reset
+             * all other sequences that were active
+             *
+             * @param {string} nextAction
+             * @returns {Function}
+             */
+            function _increaseSequence(nextAction) {
+                return function() {
+                    _nextExpectedAction = nextAction;
+                    ++_sequenceLevels[combo];
+                    _resetSequenceTimer();
+                };
+            }
+
+            /**
+             * wraps the specified callback inside of another function in order
+             * to reset all sequence counters as soon as this sequence is done
+             *
+             * @param {Event} e
+             * @returns void
+             */
+            function _callbackAndReset(e) {
+                _fireCallback(callback, e, combo);
+
+                // we should ignore the next key up if the action is key down
+                // or keypress.  this is so if you finish a sequence and
+                // release the key the final key will not trigger a keyup
+                if (action !== 'keyup') {
+                    _ignoreNextKeyup = _characterFromEvent(e);
+                }
+
+                // weird race condition if a sequence ends with the key
+                // another sequence begins with
+                setTimeout(_resetSequences, 10);
+            }
+
+            // loop through keys one at a time and bind the appropriate callback
+            // function.  for any key leading up to the final one it should
+            // increase the sequence. after the final, it should reset all sequences
+            //
+            // if an action is specified in the original bind call then that will
+            // be used throughout.  otherwise we will pass the action that the
+            // next key in the sequence should match.  this allows a sequence
+            // to mix and match keypress and keydown events depending on which
+            // ones are better suited to the key provided
+            for (var i = 0; i < keys.length; ++i) {
+                var isFinal = i + 1 === keys.length;
+                var wrappedCallback = isFinal ? _callbackAndReset : _increaseSequence(action || _getKeyInfo(keys[i + 1]).action);
+                _bindSingle(keys[i], wrappedCallback, action, combo, i);
+            }
+        }
+
+        /**
+         * binds a single keyboard combination
+         *
+         * @param {string} combination
+         * @param {Function} callback
+         * @param {string=} action
+         * @param {string=} sequenceName - name of sequence if part of sequence
+         * @param {number=} level - what part of the sequence the command is
+         * @returns void
+         */
+        function _bindSingle(combination, callback, action, sequenceName, level) {
+
+            // store a direct mapped reference for use with Mousetrap.trigger
+            self._directMap[combination + ':' + action] = callback;
+
+            // make sure multiple spaces in a row become a single space
+            combination = combination.replace(/\s+/g, ' ');
+
+            var sequence = combination.split(' ');
+            var info;
+
+            // if this pattern is a sequence of keys then run through this method
+            // to reprocess each pattern one key at a time
+            if (sequence.length > 1) {
+                _bindSequence(combination, sequence, callback, action);
+                return;
+            }
+
+            info = _getKeyInfo(combination, action);
+
+            // make sure to initialize array if this is the first time
+            // a callback is added for this key
+            self._callbacks[info.key] = self._callbacks[info.key] || [];
+
+            // remove an existing match if there is one
+            _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level);
+
+            // add this call back to the array
+            // if it is a sequence put it at the beginning
+            // if not put it at the end
+            //
+            // this is important because the way these are processed expects
+            // the sequence ones to come first
+            self._callbacks[info.key][sequenceName ? 'unshift' : 'push']({
+                callback: callback,
+                modifiers: info.modifiers,
+                action: info.action,
+                seq: sequenceName,
+                level: level,
+                combo: combination
+            });
+        }
+
+        /**
+         * binds multiple combinations to the same callback
+         *
+         * @param {Array} combinations
+         * @param {Function} callback
+         * @param {string|undefined} action
+         * @returns void
+         */
+        self._bindMultiple = function(combinations, callback, action) {
+            for (var i = 0; i < combinations.length; ++i) {
+                _bindSingle(combinations[i], callback, action);
+            }
+        };
+
+        // start!
+        _addEvent(targetElement, 'keypress', _handleKeyEvent);
+        _addEvent(targetElement, 'keydown', _handleKeyEvent);
+        _addEvent(targetElement, 'keyup', _handleKeyEvent);
+    }
+
+    /**
+     * binds an event to mousetrap
+     *
+     * can be a single key, a combination of keys separated with +,
+     * an array of keys, or a sequence of keys separated by spaces
+     *
+     * be sure to list the modifier keys first to make sure that the
+     * correct key ends up getting bound (the last key in the pattern)
+     *
+     * @param {string|Array} keys
+     * @param {Function} callback
+     * @param {string=} action - 'keypress', 'keydown', or 'keyup'
+     * @returns void
+     */
+    Mousetrap.prototype.bind = function(keys, callback, action) {
+        var self = this;
+        keys = keys instanceof Array ? keys : [keys];
+        self._bindMultiple.call(self, keys, callback, action);
+        return self;
+    };
+
+    /**
+     * unbinds an event to mousetrap
+     *
+     * the unbinding sets the callback function of the specified key combo
+     * to an empty function and deletes the corresponding key in the
+     * _directMap dict.
+     *
+     * TODO: actually remove this from the _callbacks dictionary instead
+     * of binding an empty function
+     *
+     * the keycombo+action has to be exactly the same as
+     * it was defined in the bind method
+     *
+     * @param {string|Array} keys
+     * @param {string} action
+     * @returns void
+     */
+    Mousetrap.prototype.unbind = function(keys, action) {
+        var self = this;
+        return self.bind.call(self, keys, function() {}, action);
+    };
+
+    /**
+     * triggers an event that has already been bound
+     *
+     * @param {string} keys
+     * @param {string=} action
+     * @returns void
+     */
+    Mousetrap.prototype.trigger = function(keys, action) {
+        var self = this;
+        if (self._directMap[keys + ':' + action]) {
+            self._directMap[keys + ':' + action]({}, keys);
+        }
+        return self;
+    };
+
+    /**
+     * resets the library back to its initial state.  this is useful
+     * if you want to clear out the current keyboard shortcuts and bind
+     * new ones - for example if you switch to another page
+     *
+     * @returns void
+     */
+    Mousetrap.prototype.reset = function() {
+        var self = this;
+        self._callbacks = {};
+        self._directMap = {};
+        return self;
+    };
+
+    /**
+     * should we stop this event before firing off callbacks
+     *
+     * @param {Event} e
+     * @param {Element} element
+     * @return {boolean}
+     */
+    Mousetrap.prototype.stopCallback = function(e, element) {
+        var self = this;
+
+        // if the element has the class "mousetrap" then no need to stop
+        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+            return false;
+        }
+
+        if (_belongsTo(element, self.target)) {
+            return false;
+        }
+
+        // Events originating from a shadow DOM are re-targetted and `e.target` is the shadow host,
+        // not the initial event target in the shadow tree. Note that not all events cross the
+        // shadow boundary.
+        // For shadow trees with `mode: 'open'`, the initial event target is the first element in
+        // the event’s composed path. For shadow trees with `mode: 'closed'`, the initial event
+        // target cannot be obtained.
+        if ('composedPath' in e && typeof e.composedPath === 'function') {
+            // For open shadow trees, update `element` so that the following check works.
+            var initialEventTarget = e.composedPath()[0];
+            if (initialEventTarget !== e.target) {
+                element = initialEventTarget;
+            }
+        }
+
+        // stop for input, select, and textarea
+        return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
+    };
+
+    /**
+     * exposes _handleKey publicly so it can be overwritten by extensions
+     */
+    Mousetrap.prototype.handleKey = function() {
+        var self = this;
+        return self._handleKey.apply(self, arguments);
+    };
+
+    /**
+     * allow custom key mappings
+     */
+    Mousetrap.addKeycodes = function(object) {
+        for (var key in object) {
+            if (object.hasOwnProperty(key)) {
+                _MAP[key] = object[key];
+            }
+        }
+        _REVERSE_MAP = null;
+    };
+
+    /**
+     * Init the global mousetrap functions
+     *
+     * This method is needed to allow the global mousetrap functions to work
+     * now that mousetrap is a constructor function.
+     */
+    Mousetrap.init = function() {
+        var documentMousetrap = Mousetrap(document);
+        for (var method in documentMousetrap) {
+            if (method.charAt(0) !== '_') {
+                Mousetrap[method] = (function(method) {
+                    return function() {
+                        return documentMousetrap[method].apply(documentMousetrap, arguments);
+                    };
+                } (method));
+            }
+        }
+    };
+
+    Mousetrap.init();
+
+    // expose mousetrap to the global object
+    window.Mousetrap = Mousetrap;
+
+    // expose as a common js module
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = Mousetrap;
+    }
+
+    // expose mousetrap as an AMD module
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+            return Mousetrap;
+        }).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    }
+}) (typeof window !== 'undefined' ? window : null, typeof  window !== 'undefined' ? document : null);
+
+
+/***/ }),
+/* 72 */
+/***/ (function(module, exports) {
+
+/**
+ * adds a bindGlobal method to Mousetrap that allows you to
+ * bind specific keyboard shortcuts that will still work
+ * inside a text input field
+ *
+ * usage:
+ * Mousetrap.bindGlobal('ctrl+s', _saveChanges);
+ */
+/* global Mousetrap:true */
+(function(Mousetrap) {
+    var _globalCallbacks = {};
+    var _originalStopCallback = Mousetrap.prototype.stopCallback;
+
+    Mousetrap.prototype.stopCallback = function(e, element, combo, sequence) {
+        var self = this;
+
+        if (self.paused) {
+            return true;
+        }
+
+        if (_globalCallbacks[combo] || _globalCallbacks[sequence]) {
+            return false;
+        }
+
+        return _originalStopCallback.call(self, e, element, combo);
+    };
+
+    Mousetrap.prototype.bindGlobal = function(keys, callback, action) {
+        var self = this;
+        self.bind(keys, callback, action);
+
+        if (keys instanceof Array) {
+            for (var i = 0; i < keys.length; i++) {
+                _globalCallbacks[keys[i]] = true;
+            }
+            return;
+        }
+
+        _globalCallbacks[keys] = true;
+    };
+	
+	Mousetrap.prototype.unbindGlobal = function(keys, action) {
+		var self = this;
+		self.unbind(keys, action);
+
+		if (keys instanceof Array) {
+			for (var i = 0; i < keys.length; i++) {
+				_globalCallbacks[keys[i]] = false;
+			}
+			return;
+		}
+
+		_globalCallbacks[keys] = false;
+	};
+
+    Mousetrap.init();
+}) (Mousetrap);
+
+
+/***/ }),
+/* 73 */
 /***/ (function(module, exports) {
 
 /*
@@ -79220,7 +81583,7 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
 }(jQuery, window, document);
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, exports) {
 
 /*!
@@ -79242,7 +81605,7 @@ $(function () {
 });
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -79764,7 +82127,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 })(window.jQuery || window.Zepto, window, document);
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports) {
 
 $(function () {
@@ -79884,7 +82247,7 @@ $(function () {
 });
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -80348,7 +82711,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -80505,7 +82868,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 }(jQuery);
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports) {
 
 /**
@@ -80630,7 +82993,7 @@ Word_Entity_Scrubber.scrub = function (input_string) {
 }; //end Word_Entity_Scrubber.scrub
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports) {
 
 //-------------------------------------------------------------------------------------
@@ -80686,7 +83049,7 @@ $(function () {
 });
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports) {
 
 var rsExplorerInstance = 0;
@@ -81328,7 +83691,7 @@ var rsExplorerInstance = 0;
 })(jQuery);
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports) {
 
 var mediaChooserInstance = 0;
@@ -81495,7 +83858,7 @@ var mediaChooserInstance = 0;
 })(jQuery);
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports) {
 
 (function ($) {
@@ -81641,13 +84004,30 @@ var mediaChooserInstance = 0;
 })(jQuery);
 
 /***/ }),
-/* 82 */
+/* 84 */
+/***/ (function(module, exports) {
+
+Mousetrap.bindGlobal('mod+s', function (e) {
+    e.preventDefault();
+
+    var save = document.getElementById("omega-modal-button-1");
+    if (save) save.click();
+
+    var edit = document.getElementById("edit");
+    if (edit) edit.click();
+
+    var form = document.getElementsByClassName("main-form")[0];
+    if (form) form.submit();
+});
+
+/***/ }),
+/* 85 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

@@ -2,7 +2,7 @@
 
 @section('content')
     <br /><br />
-    {{ Form::open(['url' => route('member.createmembergroup'), 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route('member.createmembergroup'), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
 
         <div class="panel panel-default">
             <div class="panel-heading">

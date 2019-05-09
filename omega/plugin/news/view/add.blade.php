@@ -3,7 +3,7 @@
 @section('plugin_content')
   {!! $menu !!}
 
-  {{ Form::open(['url' => route_plugin('news', 'create'), 'method' => 'post', 'class' => 'form-horizontal']) }}
+  {{ Form::open(['url' => route_plugin('news', 'create'), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
 
 
     <div class="form-group">

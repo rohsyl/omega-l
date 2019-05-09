@@ -9,7 +9,7 @@
     <br />
     <br />
 
-    {{ Form::open(['route' => ['admin.pages.create'], 'method' => 'POST']) }}
+    {{ Form::open(['route' => ['admin.pages.create'], 'method' => 'POST', 'class' => 'main-form']) }}
         <div class="row">
             <div class="col-sm-6 col-sm-offset-3">
                 <div class="panel panel-default">

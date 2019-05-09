@@ -7,7 +7,7 @@
 @section('content')
     <h1 class="page-header">{{ __('Settings') }}</h1>
     @include('settings.menu')
-    {{ Form::open(['route' => 'admin.settings.flang.save', 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['route' => 'admin.settings.flang.save', 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
 
 
         <div class="form-group">
