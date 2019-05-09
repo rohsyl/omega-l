@@ -32,8 +32,6 @@ class OmegaUpgrader
             }
         }
 
-        print_r($results);
-
         return true;
     }
 

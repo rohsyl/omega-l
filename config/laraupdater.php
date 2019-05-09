@@ -55,14 +55,14 @@ return [
         /**
          * Set which policy to check permissions
          * You can create your own by implementing the
-         * pcinaglia\laraupdater\Policies\ILaraUpdaterPolicy interface
+         * rohsyl\laraupdater\Policies\ILaraUpdaterPolicy interface
          * and registering it here
          */
-        'policy' => rohsyl\laraupdater\Policies\AllowUserIdLaraUpdaterPolicy::class,
+        'policy' => Omega\Utils\Upgrade\Policies\OmegaPermissionLaraUpdaterPolicy::class,
         'parameters' => [
             /*
              * This entry is related to the policy :
-             * pcinaglia\laraupdater\Policies\AllowUserIdLaraUpdaterPolicy
+             * rohsyl\laraupdater\Policies\AllowUserIdLaraUpdaterPolicy
              *
              * If you are not using this policy, you can remove it.
              *
@@ -70,7 +70,19 @@ return [
              * This parameter accepts: ARRAY(user_id) ,or FALSE => for example: [1]  OR  [1,3,0]  OR  false
              * Generally, ADMIN have user_id=1; set FALSE to disable this check (not recommended)
              */
-            'allow_users_id' => false,
+            //'allow_users_id' => false,
+
+
+            /*
+             * This entry is related to the policy:
+             * Omega\Utils\Upgrade\Policies\OmegaPermissionLaraUpdaterPolicy
+             *
+             * If you are not using this policiy, you can remove it.
+             *
+             * Set which ability is needed to perform an update
+             * This parameter accepts: null, or String(ability_name).
+             */
+            'ability' => 'update_cms'
         ]
     ],
 ];
