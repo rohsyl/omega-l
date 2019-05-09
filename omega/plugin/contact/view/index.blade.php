@@ -2,7 +2,7 @@
 
 @section('plugin_content')
 
-    {{ Form::open(['url' => route_plugin('contact', 'save'), 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route_plugin('contact', 'save'), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
 
 
     <div>

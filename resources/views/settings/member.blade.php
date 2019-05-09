@@ -4,7 +4,7 @@
     <h1 class="page-header">{{ __('Settings') }}</h1>
     @include('settings.menu')
 
-    {{ Form::open(['route' => 'admin.settings.member.save', 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['route' => 'admin.settings.member.save', 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-5">
                 <div class="checkbox">

@@ -37,6 +37,7 @@
         ],
         "psr-4": {
             "Omega\\": "app/",
+            "Omega\\Update\\": "update/",
             "OmegaPlugin\\": "omega/plugin/"
         }
     },

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    {{ Form::open(['url' => route('member.updatemembergroup', ['id' => $membergroup->id, 'class' => 'form-horizontal'])]) }}
+    {{ Form::open(['url' => route('member.updatemembergroup', ['id' => $membergroup->id, 'class' => 'form-horizontal main-form'])]) }}
         <div class="page-header">
             <h1>{{ __('Edit member group') }}
                 <div class="toolbar">

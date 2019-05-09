@@ -8,7 +8,7 @@
 @section('content')
 
     <div class="page-edit-form" data-page-id="{{ $page->id }}">
-        {{ Form::open(['url' => route('admin.pages.update', ['id' => $page->id])]) }}
+        {{ Form::open(['url' => route('admin.pages.update', ['id' => $page->id]), 'class' => 'main-form']) }}
 
         {{ Form::hidden('tab', $tab, ['id' => 'tab']) }}
 

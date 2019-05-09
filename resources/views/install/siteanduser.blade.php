@@ -11,7 +11,7 @@
     </div>
 
     <hr />
-    {{ Form::open(['route' => 'install.step2', 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['route' => 'install.step2', 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
         <div class="form-group">
             {{ Form::label('title', __('Site title :'), ['class' => 'control-label col-sm-3']) }}
             <div class="col-sm-5">

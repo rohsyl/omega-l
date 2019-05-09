@@ -168,6 +168,9 @@ return [
 
         //Omega utils service provider
         Omega\Providers\UtilsServiceProvider::class,
+
+        // Laravel self updater
+        pcinaglia\laraupdater\LaraUpdaterServiceProvider::class,
     ],
 
     /*
@@ -182,7 +185,6 @@ return [
     */
 
     'aliases' => [
-
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,

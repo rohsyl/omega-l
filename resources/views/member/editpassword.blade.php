@@ -2,7 +2,7 @@
 
 @section('content')
     <h1 class="page-header">{{ __('Edit password') }}</h1>
-    {{ Form::open(['url' => route('member.editmember.updatepassword', ['id' => $id]), 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route('member.editmember.updatepassword', ['id' => $id]), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
     <div class="panel panel-default">
         <div class="panel-heading">
             {{ __('Password') }}

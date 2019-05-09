@@ -47,6 +47,8 @@
     "codemirror": "^5.42.2",
     "font-awesome": "^4.7.0",
     "jquery-ui": "^1.12.1",
+    "mousetrap": "^1.6.3",
+    "mousetrap-global-bind": "^1.1.0",
     "sortablejs": "^1.7.0",
     "summernote": "^0.8.11",
     "toastr": "^2.1.4"

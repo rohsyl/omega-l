@@ -2,7 +2,7 @@
 
 @section('content')
 
-{{ Form::open(['url' => route('group.create'), 'class' => 'form-horizontale']) }}
+{{ Form::open(['url' => route('group.create'), 'class' => 'form-horizontal main-form']) }}
     <div class="page-header">
         <h1>{{ __('Add group') }}
             <div class="toolbar">
