@@ -42,6 +42,10 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
 
             Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
 
+            Route::prefix('update')->group(function() {
+
+                Route::get('check', 'UpdateController@check')->name('admin.update.check');
+            });
 
             Route::prefix('settings')->group(function(){
                 // Settings > General Routes
