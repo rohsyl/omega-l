@@ -57,8 +57,7 @@
                         </div>
                         <div class="col-xs-9 text-right">
                             <p style="font-size : 10px; padding-right : 5px; margin-top : 22px;" class="text-right">
-                                {{ __('CMS version') }} : <br />
-                                {{ __('Database version') }} :
+                                {{ __('CMS version') }} : <span id="current_version"></span>
                             </p>
                         </div>
                     </div>
@@ -161,9 +160,23 @@
             <div class="panel panel-default">
                 <div class="panel-heading"><i class="fa fa-cog"></i> {{ __('Update') }}</div>
                 <div class="panel-body">
-                    <a href="">{{ __('Check for update') }}</a>
+                    <a href="{{ route('admin.update.check') }}">{{ __('Check for update') }}</a>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script language="JavaScript">
+        $(function() {
+           var $current_version = $('#current_version');
+
+           let url = route('laraupdater.current');
+
+           omega.ajax.query(url, {}, omega.ajax.GET, function(data) {
+              $current_version.html(data);
+           });
+        });
+    </script>
+@endpush
