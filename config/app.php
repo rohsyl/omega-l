@@ -170,7 +170,7 @@ return [
         Omega\Providers\UtilsServiceProvider::class,
 
         // Laravel self updater
-        pcinaglia\laraupdater\LaraUpdaterServiceProvider::class,
+        rohsyl\laraupdater\LaraUpdaterServiceProvider::class,
     ],
 
     /*
