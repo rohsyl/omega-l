@@ -48,6 +48,9 @@ require('sortablejs');
 require('ace-builds');
 require('codemirror');
 require('codemirror/mode/htmlembedded/htmlembedded');
+require('mousetrap');
+require('mousetrap-global-bind');
+
 
 import CodeMirror from 'codemirror';
 window.CodeMirror = CodeMirror;
@@ -59,6 +62,7 @@ window.toastr = toastr;
 // make Sortable gobally available
 import Sortable from 'sortablejs';
 window.Sortable = Sortable;
+
 
 
 require('./assets/metisMenu.min');
@@ -73,6 +77,7 @@ require('./omega/jquery.rsExplorer');
 require('./omega/jquery.rsMediaChooser');
 require('./omega/jquery.rsModuleChooser');
 window.omega = require('./omega/app/omega');
+require('./omega/admin/settings/shortcuts');
 
 
 

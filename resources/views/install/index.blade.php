@@ -9,7 +9,7 @@
     <p class="text-center">
         Welcome to the very hardcore <strong>Omega CMS</strong> installation. Click below to start the installation...
     </p>
-    {{ Form::open(['route' => 'install.step1', 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['route' => 'install.step1', 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
 
         <p class="text-center ">
             Please select the language...

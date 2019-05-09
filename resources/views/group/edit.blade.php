@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-{{ Form::open(['url' => route('group.edit', ['id' => $group->id]), 'class' => 'form-horizontale']) }}
+{{ Form::open(['url' => route('group.edit', ['id' => $group->id]), 'class' => 'form-horizontal main-form']) }}
     <div class="page-header">
         <h1>{{ __('Group edit') }}
             @if(!$group->isEnabled)

@@ -3,7 +3,7 @@
 @section('content')
     <h1 class="page-header">{{ __('Settings') }}</h1>
     @include('settings.menu')
-    {{ Form::open(['route' => 'admin.settings.general.save', 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['route' => 'admin.settings.general.save', 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
 
         <div class="form-group">
             {{ Form::label('title', __('Title'), ['class' => 'control-label col-sm-3']) }}

@@ -1,7 +1,7 @@
 @extends('layouts.plugin')
 
 @section('plugin_content')
-    {{ Form::open(['url' => route_plugin('social_logo', 'save'), 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route_plugin('social_logo', 'save'), 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
 
         <div class="form-group">
             {{ Form::label('title', __('Title'), ['class' => 'control-label col-sm-3']) }}

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    {{ Form::open(['url' => route('user.update.passwd', ['id' => $user->id]), 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route('user.update.passwd', ['id' => $user->id]), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
 
 
     <div class="page-header">

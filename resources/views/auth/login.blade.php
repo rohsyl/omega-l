@@ -1,7 +1,7 @@
 @extends('layouts.login')
 
 @section('content')
-    <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}">
+    <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}" class="main-form">
         @csrf
 
         <div class="form-group row">
