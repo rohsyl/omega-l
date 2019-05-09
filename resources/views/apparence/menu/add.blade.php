@@ -9,7 +9,7 @@
 --}}
 
 @section('content')
-{{ Form::open(['url' => route('menu.create'), 'method' => 'POST']) }}
+{{ Form::open(['url' => route('menu.create'), 'method' => 'POST', 'class' => 'main-form']) }}
     <br />
     <br />
 

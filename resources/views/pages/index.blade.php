@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-sm-6">
             @if($enabledLang)
-                {{ Form::open(['route' => ['admin.pages.chooselang'], 'method' => 'POST', 'class' => 'form-inline']) }}
+                {{ Form::open(['route' => ['admin.pages.chooselang'], 'method' => 'POST', 'class' => 'form-inline main-form']) }}
                 <div class="form-group" >
                     {{ Form::label('lang', __('Filter by language') . ' :') }}
                     {{ Form::select('lang', $langs, $currentLang, ['id' => 'choose-lang', 'class' => 'form-control', 'onchange' => 'this.form.submit()']) }}

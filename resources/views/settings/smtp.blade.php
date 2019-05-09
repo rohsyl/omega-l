@@ -4,7 +4,7 @@
     <h1 class="page-header">{{ __('Settings') }}</h1>
     @include('settings.menu')
 
-    {{ Form::open(['route' => 'admin.settings.smtp.save', 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['route' => 'admin.settings.smtp.save', 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
         <div class="form-group">
             {{ Form::label('smtpHost', __('IP or Address'), ['class' => 'control-label col-sm-3']) }}
             <div class="col-sm-5">

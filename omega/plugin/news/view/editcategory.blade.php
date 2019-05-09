@@ -3,7 +3,7 @@
 @section('plugin_content')
     {!! $menu !!}
 
-    {{ Form::open(['url' => route_plugin('news', 'savecategory', ['id' => $category->id]), 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route_plugin('news', 'savecategory', ['id' => $category->id]), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
 
     <!-- Text input-->
     <div class="form-group">

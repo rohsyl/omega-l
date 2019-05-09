@@ -3,7 +3,7 @@
 @section('content')
     <br />
     <br />
-    {{ Form::open(['url' => route('member.createmember'), 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route('member.createmember'), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
         <div class="panel panel-default">
             <div class="panel-heading">
                 {{ __('Add member') }}

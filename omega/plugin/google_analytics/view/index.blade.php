@@ -1,7 +1,7 @@
 @extends('layouts.plugin')
 
 @section('plugin_content')
-    {{ Form::open(['url' => route_plugin('google_analytics', 'save'), 'method' => 'POST', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route_plugin('google_analytics', 'save'), 'method' => 'POST', 'class' => 'form-horizontal main-form']) }}
 
         <div class="form-group">
             <div class="col-md-4 col-md-offset-4">

@@ -1,5 +1,5 @@
 
-{{ Form::open(['id' => 'editMediaForm', 'data-enable-lang' => $langEnabled]) }}
+{{ Form::open(['id' => 'editMediaForm', 'data-enable-lang' => $langEnabled, 'class' => 'main-form']) }}
     <div>
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">

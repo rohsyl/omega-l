@@ -2,7 +2,7 @@
 
 @section('content')
     <h1 class="page-header">{{ __('Edit member') }}</h1>
-    {{ Form::open(['url' => route('member.updatemember', ['id' => $member->id]), 'method' => 'post', 'class' => 'form-horizontal']) }}
+    {{ Form::open(['url' => route('member.updatemember', ['id' => $member->id]), 'method' => 'post', 'class' => 'form-horizontal main-form']) }}
     <div class="row">
         <div class="col-md-8">
             <div class="panel panel-default">

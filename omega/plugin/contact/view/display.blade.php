@@ -7,7 +7,7 @@
         </div>
     @endif
 
-    {{ Form::open(['url' => url()->current(), 'method' => 'post', 'class' => 'form'])  }}
+    {{ Form::open(['url' => url()->current(), 'method' => 'post', 'class' => 'form main-form'])  }}
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
