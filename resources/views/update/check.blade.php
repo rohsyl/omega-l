@@ -45,7 +45,7 @@
         function update() {
 
             $ouput.show();
-            $('#update_now').disable();
+            $('#update_now').attr("disabled", true);
 
             xhr = new XMLHttpRequest();
             xhr.open("GET", route('laraupdater.update'), true);
