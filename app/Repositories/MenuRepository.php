@@ -59,6 +59,7 @@ class MenuRepository
         $menu->isEnabled = true;
         $menu->isMain = $inputs['isMain'];
         $menu->fkMemberGroup = $inputs['membergroup'];
+        $menu->json = '[]';
         $menu->lang = $inputs['lang'];
         $menu->save();
         return $menu;

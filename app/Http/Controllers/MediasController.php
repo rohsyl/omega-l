@@ -83,6 +83,10 @@ class MediasController extends AdminController
             $multiupload = false;
         }
         $maxUploadFileSize = humanReadableBytes(getMaximumFileUploadSize());
+        // if the media directory does not exists, then create it
+        if (!is_dir(media_path())) {
+            mkdir(media_path(), 0770);
+        }
         $isWritable = Directory::isWritable(media_path());
         return view(Request::ajax() ? 'media.uploader' : 'media.framed.uploader')->with([
             'isModal' => Request::ajax(),
