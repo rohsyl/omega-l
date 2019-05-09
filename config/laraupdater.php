@@ -58,7 +58,7 @@ return [
          * pcinaglia\laraupdater\Policies\ILaraUpdaterPolicy interface
          * and registering it here
          */
-        'policy' => pcinaglia\laraupdater\Policies\AllowUserIdLaraUpdaterPolicy::class,
+        'policy' => rohsyl\laraupdater\Policies\AllowUserIdLaraUpdaterPolicy::class,
         'parameters' => [
             /*
              * This entry is related to the policy :
