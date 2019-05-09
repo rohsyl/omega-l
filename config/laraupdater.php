@@ -41,6 +41,16 @@ return [
     */
     'middleware' => ['web', 'auth'],
 
+    /*
+     * Set of directory that will be ignored and not overwrited.
+     */
+    'blacklist_directory' => [
+        /*
+         * The config directory could be different in every instance of the app. That's why we ignore it
+         */
+        'config'
+    ],
+
     'permissions' => [
         /**
          * Set which policy to check permissions
