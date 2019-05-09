@@ -50,7 +50,7 @@
             xhr = new XMLHttpRequest();
             xhr.open("GET", route('laraupdater.update'), true);
             xhr.onprogress = function(e) {
-                $ouput.append(e.currentTarget.responseText);
+                $ouput.html(e.currentTarget.responseText);
                 scrollToBottom();
             };
             xhr.onreadystatechange = function() {

@@ -23,6 +23,7 @@ class OmegaUpgrader
         foreach ($scripts as $script) {
             $upgrader = include($script);
             if(version_compare($currentVersion, $upgrader->getVersion(), '<')) {
+                $upgrader->println('Post upgrade script ' . $upgrader->getVersion());
                 $result = $upgrader->run();
                 $results[] = $result;
                 if ($result->hasFailed()) {
@@ -76,5 +77,14 @@ class OmegaUpgrader
     protected function run() {
         $r = new ScriptResult();
         return call_user_func($this->postUpgradeFunction, $r);
+    }
+
+    private function print($text) {
+        echo $text;
+        flush();
+        ob_flush();
+    }
+    private function println($text) {
+        $this->print($text . '<br />');
     }
 }
