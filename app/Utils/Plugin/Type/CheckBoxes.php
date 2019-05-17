@@ -60,8 +60,10 @@ class CheckBoxes extends ATypeEntry {
 
         $values = array();
         if(isset($param['model'])){
-            foreach($this->getPost($this->getUniqId()) as $item){
-                $values[$item] = true;
+            if($this->existsPost($this->getUniqId())) {
+                foreach($this->getPost($this->getUniqId()) as $item){
+                    $values[$item] = true;
+                }
             }
         }
         else{
