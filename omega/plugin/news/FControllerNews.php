@@ -29,7 +29,7 @@ class FControllerNews extends  FController {
 
         $count = isset($data['count']) && !empty($data['count']) ? $data['count'] : null;
         $page = isset($data['page']) && !empty($data['page']) ? $data['page'] : null;
-        $categories = $data['categories'];
+        $categories = isset($data['categories']) ? $data['categories'] : [];
         $categories = array_keys($categories);
 
         $placement = isset($param['placement']) ? $param['placement'] : 'content';
