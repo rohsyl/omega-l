@@ -48,3 +48,4 @@ CALL `om_CreateForm`('news', 'news', 1, 1, 'News');
 -- Create form entry
 CALL `om_CreateFormEntry`('news', 'count', 1, 'Omega\\Utils\\Plugin\\Type\\TextSimple', '{}', 'Number of post displayed', 'By default all posts are displayed', 0);
 CALL `om_CreateFormEntry`('news', 'categories', 2, 'Omega\\Utils\\Plugin\\Type\\CheckBoxes', '{"model":"OmegaPlugin\\\\News\\\\Model\\\\CheckBoxesCategoriesModel"}', 'Categories', '', 0);
+CALL `om_CreateFormEntry`('news', 'page', 3, 'Omega\\Utils\\Plugin\\Type\\DropDown', '{"model":"OmegaPlugin\\\\News\\\\Type\\\\Models\\\\DropDownPage"}', 'Page', 'The page used to display one item. Be carefull, it must be a child of this page.', 0);

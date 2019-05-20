@@ -28,6 +28,7 @@ class FControllerNews extends  FController {
     public function display($param, $data) {
 
         $count = isset($data['count']) && !empty($data['count']) ? $data['count'] : null;
+        $page = isset($data['page']) && !empty($data['page']) ? $data['page'] : null;
         $categories = $data['categories'];
         $categories = array_keys($categories);
 
@@ -54,6 +55,7 @@ class FControllerNews extends  FController {
 
         $m['posts'] = $posts;
         $m['placement'] = $placement;
+        $m['page'] = $page;
 
         return $this->view('display_list')->with($m);
     }
