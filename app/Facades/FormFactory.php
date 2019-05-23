@@ -14,6 +14,7 @@ use Omega\Models\Form;
 /**
  * @method static Form newForm(string $formName, string $pluginName, bool $isModule, bool $isComponent, string $title)
  * @method static void newFormEntry($formName, string $entryName, int $order, string $type, array $param, string $title, string $description, bool $mandatory)
+ * @method static int deleteForm(string $formName)
  *
  * @see \Omega\Utils\Plugin\Form\FormFactory
  */

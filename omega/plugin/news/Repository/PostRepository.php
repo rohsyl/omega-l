@@ -27,31 +27,32 @@ class PostRepository
 
     private function _allWithCategoriesAndPublishedAndNotArchived($categories){
         return $this->post
-            ->join('news_post_category', 'news_post_category.fkPost', '=', 'news_post.id')
-            ->join('news_category', 'news_post_category.fkCategory', '=', 'news_category.id')
-            ->whereIn('news_category.id', $categories)
+            ->join('news_post_category', 'news_post_category.post_id', '=', 'news_posts.id')
+            ->join('news_categories', 'news_post_category.category_id', '=', 'news_categories.id')
+            ->whereIn('news_categories.id', $categories)
             ->whereDate('published_at', '<=', Carbon::today()->toDateString())
             ->where('archived', 0);
     }
 
     public function allWithCategoriesAndPublishedAndNotArchived($categories, $limit){
         return $this->_allWithCategoriesAndPublishedAndNotArchived($categories)
-            ->select('news_post.*')
+            ->select('news_posts.*')
             ->limit($limit)
             ->orderBy('published_at', 'DESC')
             ->get();
     }
 
     public function getNext($post, $categories){
+
         return $this->_allWithCategoriesAndPublishedAndNotArchived($categories)
             ->where('published_at', '>', function($q) use ($post)
             {
-                $q->from('news_post')
+                $q->from('news_posts')
                     ->select('published_at')
                     ->where('id', $post->id);
             })
             ->orderBy('published_at', 'ASC')
-            ->select('news_post.*')
+            ->select('news_posts.*')
             ->limit(1)
             ->first();
     }
@@ -60,12 +61,12 @@ class PostRepository
         return $this->_allWithCategoriesAndPublishedAndNotArchived($categories)
             ->where('published_at', '<', function($q) use ($post)
             {
-                $q->from('news_post')
+                $q->from('news_posts')
                     ->select('published_at')
                     ->where('id', $post->id);
             })
             ->orderBy('published_at', 'ASC')
-            ->select('news_post.*')
+            ->select('news_posts.*')
             ->limit(1)
             ->first();
     }
@@ -74,10 +75,16 @@ class PostRepository
         return $this->post->find($id);
     }
 
+
+    public function getBySlug($slug){
+        return $this->post->where('slug', $slug)->first();
+    }
+
     public function create($inputs){
         $post = new $this->post;
         $post->title = $inputs['title'];
-        $post->fkUser = Auth::id();
+        $post->slug = unique_slug($post, str_slug($post->title));
+        $post->user_id = Auth::id();
         $post->save();
         return $post->id;
     }
@@ -86,7 +93,7 @@ class PostRepository
         $post->title = $inputs['title'];
         $post->brief = $inputs['brief'];
         $post->text = $inputs['text'];
-        $post->fkMedia = $inputs['image'];
+        $post->media_id = $inputs['image'];
         $post->published_at = $inputs['published_at'];
 
         $post->categories()->detach();

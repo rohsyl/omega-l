@@ -15,6 +15,10 @@ class Page extends Model
         return $this->belongsTo('Omega\Models\User', 'fkUser', 'id');
     }
 
+    public function parent(){
+        return $this->belongsTo('Omega\Models\Page', 'fkPageParent', 'id');
+    }
+
     public function children(){
         return $this->hasMany('Omega\Models\Page', 'fkPageParent', 'id');
     }

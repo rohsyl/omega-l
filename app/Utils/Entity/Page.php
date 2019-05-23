@@ -41,6 +41,8 @@ class Page{
     public $securityType;
     public $securityData;
 
+    private $overridedAttributes = [];
+
     public $content;
 
     private $needRedirect = false;
@@ -77,9 +79,23 @@ class Page{
         }
     }
 
+    public function set($attribute, $value){
+        $this->overridedAttributes[$attribute] = $value;
+    }
 
     public function __get($name){
+        if(isset($this->overridedAttributes[$name])) {
+            return $this->overridedAttributes[$name];
+        }
         return $this->page->$name;
+    }
+
+    public function __call($name, $arguments)
+    {
+        if(isset($this->page) && method_exists($this->page, $name)) {
+            return call_user_func_array([$this->page, $name], $arguments);
+        }
+        return null;
     }
 
     public function render()

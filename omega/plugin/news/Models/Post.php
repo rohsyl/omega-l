@@ -17,7 +17,7 @@ class Post extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'news_post';
+    protected $table = 'news_posts';
 
     protected $dates = [
         'created_at',
@@ -27,11 +27,11 @@ class Post extends Model
     ];
 
     public function categories(){
-        return $this->belongsToMany('OmegaPlugin\News\Models\Category', 'news_post_category', 'fkPost', 'fkCategory');
+        return $this->belongsToMany('OmegaPlugin\News\Models\Category', 'news_post_category', 'post_id', 'category_id');
     }
 
     public function author(){
-        return $this->belongsTo('Omega\Models\User', 'fkUser');
+        return $this->belongsTo('Omega\Models\User', 'user_id');
     }
 
     public function publishedAtFormatted(){
@@ -40,9 +40,9 @@ class Post extends Model
     }
 
     public function image(){
-        if(!isset($this->fkMedia)){
+        if(!isset($this->media_id)){
             return null;
         }
-        return Media::Get($this->fkMedia);
+        return Media::Get($this->media_id);
     }
 }

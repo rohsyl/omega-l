@@ -39,25 +39,25 @@ class BControllerNews extends  BController {
     }
 
     public function install() {
-        parent::runSql($this->root.'/sql/install.sql');
+        $this->migrate();
         return true;
     }
 
     public function uninstall() {
-        parent::runSql($this->root.'/sql/uninstall.sql');
+        $this->reset();
         return true;
     }
 
     public function index() {
-        return $this->view('index')->with([
-            'menu' => $this->view('menu')->render(),
+        return $this->view('b.index')->with([
+            'menu' => $this->view('b.menu')->render(),
             'posts' => $this->postRepository->all()
         ]);
     }
 
     public function add() {
-        return $this->view('add')->with([
-            'menu' => $this->view('menu')->render(),
+        return $this->view('b.add')->with([
+            'menu' => $this->view('b.menu')->render(),
         ]);
     }
 
@@ -85,8 +85,8 @@ class BControllerNews extends  BController {
         $post = $this->postRepository->get($id);
         $categories = $this->categoryRepository->all();
 
-        return $this->view('edit')->with([
-            'menu' => $this->view('menu')->render(),
+        return $this->view('b.edit')->with([
+            'menu' => $this->view('b.menu')->render(),
             'item' => $post,
             'categories' => $categories,
         ]);
@@ -118,20 +118,20 @@ class BControllerNews extends  BController {
         $this->postRepository->delete($id);
 
         toast()->success(__('Post deleted'));
-        return $this->redirect('edit', ['id' => $id]);
+        return $this->redirect('index');
     }
 
     public function categories(){
-        return $this->view('categories')->with([
-            'menu' => $this->view('menu')->render(),
+        return $this->view('b.categories')->with([
+            'menu' => $this->view('b.menu')->render(),
             'categories' => $this->categoryRepository->all()
         ]);
     }
 
     public function addcategory(){
 
-        return $this->view('addcategory')->with([
-            'menu' => $this->view('menu')->render(),
+        return $this->view('b.addcategory')->with([
+            'menu' => $this->view('b.menu')->render(),
         ]);
     }
 
@@ -158,8 +158,8 @@ class BControllerNews extends  BController {
 
         $category = $this->categoryRepository->get($id);
 
-        return $this->view('editcategory')->with([
-            'menu' => $this->view('menu')->render(),
+        return $this->view('b.editcategory')->with([
+            'menu' => $this->view('b.menu')->render(),
             'category' => $category
         ]);
     }

@@ -1,4 +1,6 @@
-
+@php
+    $url = isset($page) ? \Omega\Utils\Entity\Page::GetUrl($page['value']) : '';
+@endphp
 <div class="plugin-news-container" data-plugin-placement="{{ $placement }}">
     @if($posts->count() == 0)
         <p class="text-center">Aucun article</p>
@@ -6,7 +8,7 @@
 	@foreach($posts as $post)
         <div class="news-post">
             <header class="news-post-header">
-                <h3><a href="?post={{ $post->id }}">{{ $post->title }}</a>
+                <h3><a href="{{ $url }}?post={{ $post->slug }}">{{ $post->title }}</a>
                     <br />
                 <small>
                     <i class="fa fa-clock-o"></i> {{ date('d.m.Y', strtotime($post->published_at)) }}
@@ -16,7 +18,7 @@
             </header>
             <div class="news-post-text">
                 <div class="row">
-                    @if(isset($post->fkMedia) && $post->fkMedia != 0)
+                    @if($post->image() != null)
 
                         <div class="col-sm-3">
                             <!-- Preview Image -->
@@ -25,14 +27,14 @@
                         <div class="col-sm-9">
                             <!-- Post Content -->
                             {!! $post->brief !!}
-                            <a href="?post={{ $post->id }}" class="btn btn-default pull-right" ><i class="fa fa-chevron-right"></i> {{ __('Read more...') }}</a>
+                            <a href="{{ $url }}?post={{ $post->slug }}" class="btn btn-default pull-right" ><i class="fa fa-chevron-right"></i> {{ __('Read more...') }}</a>
                         </div>
 
                     @else
                         <div class="col-sm-12">
                             <!-- Post Content -->
                             {!! $post->brief !!}
-                            <a href="?post={{ $post->id }}" class="btn btn-default pull-right"><i class="fa fa-chevron-right"></i> {{ __('Read more...') }}</a>
+                            <a href="{{ $url }}?post={{ $post->slug }}" class="btn btn-default pull-right"><i class="fa fa-chevron-right"></i> {{ __('Read more...') }}</a>
                         </div>
                     @endif
                 </div>

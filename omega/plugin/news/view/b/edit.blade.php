@@ -50,7 +50,7 @@
             <div class="text-muted">{{ __('When the post will be publised') }}</div>
 
             {{ Form::label('image', __('Image'), ['class' => 'control-label']) }}
-            {{ Form::omMediaChooser('image', __('Image'), $item->fkMedia) }}
+            {{ Form::omMediaChooser('image', __('Image'), $item->media_id) }}
             @if($errors->has('image'))
                 <span class="text-danger">
                 {{ $errors->first('image') }}

@@ -7,15 +7,15 @@
             <ul class="pager">
                 @if(isset($previous))
                 <li class="previous">
-                    <a href="{{ $url }}?post={{ $previous->id }}">&larr; {{ __('Previous') }}</a>
+                    <a href="{{ $url }}?post={{ $previous->slug }}">&larr; {{ __('Previous') }}</a>
                 </li>
                 @else
                 <li class="previous disabled"><a>&larr; {{ __('Previous') }}</a></li>
                 @endif
-                <li><a href="{{ $url }}" data-toggle="tooltip" data-placement="bottom" title="{{ __('Back to list') }}"><i class="fa fa-list"></i></a></li>
+                <li><a href="{{ \Omega\Utils\Entity\Page::GetUrl(\Omega\Facades\Entity::Page()->fkPageParent)  }}" data-toggle="tooltip" data-placement="bottom" title="{{ __('Back to list') }}"><i class="fa fa-list"></i></a></li>
                 @if($next != null)
                 <li class="next">
-                    <a href="{{ $url }}?post={{ $next->id }}">{{ __('Next') }} &rarr;</a>
+                    <a href="{{ $url }}?post={{ $next->slug }}">{{ __('Next') }} &rarr;</a>
                 </li>
                 @else
                     <li class="next disabled"><a>{{ __('Next') }} &rarr;</a></li>
@@ -38,7 +38,7 @@
 
             <hr>
             <div class="row">
-                @if(isset($post->fkMedia) && $post->fkMedia != 0)
+                @if($post->image() != null)
 
                     <div class="col-sm-3">
                         <!-- Preview Image -->
@@ -57,7 +57,7 @@
         @else
             <p class="text-center">
                 This post does not exists...<br /><br />
-                <a href="{{ $url }}" class="btn btn-default btn-lg">{{ __('Back to list') }}</a>
+                <a href="{{ \Omega\Utils\Entity\Page::GetUrl(\Omega\Facades\Entity::Page()->fkPageParent) }}" class="btn btn-default btn-lg">{{ __('Back to list') }}</a>
             </p>
         @endif
     </div>

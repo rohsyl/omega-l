@@ -90,4 +90,8 @@ class FormFactory
         return $formEntry;
     }
 
+
+    public function deleteForm(string $formName) {
+        return Form::where('name', $formName)->delete();
+    }
 }

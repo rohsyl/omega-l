@@ -6,8 +6,7 @@
  * Time: 17:38
  */
 
-namespace OmegaPlugin\News\Model;
-
+namespace OmegaPlugin\News\Type\Models;
 
 use Omega\Utils\Plugin\Type\CheckBoxes\ACheckBoxesModel;
 use OmegaPlugin\News\Models\Category;

@@ -16,9 +16,9 @@ class Category extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'news_category';
+    protected $table = 'news_categories';
 
     public function posts(){
-        return $this->belongsToMany('OmegaPlugin\News\Models\Post', 'news_post_category', 'fkCategory', 'fkPost');
+        return $this->belongsToMany('OmegaPlugin\News\Models\Post', 'news_post_category', 'category_id', 'post_id');
     }
 }
