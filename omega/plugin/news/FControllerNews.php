@@ -51,6 +51,14 @@ class FControllerNews extends  FController {
                 break;
 
             case self::DISPLAY_GRID:
+                $posts = $this->postRepository->allWithCategoriesAndPublishedAndNotArchived($categories, $count);
+
+                return $this->view('display_grid')->with([
+                    'posts' => $posts,
+                    'placement' => $placement,
+                    'page' => $page
+                ]);
+                break;
                 break;
 
             case self::DISPLAY_DETAIL:
