@@ -21,6 +21,8 @@ use Omega\Repositories\ModuleRepository;
 use Omega\Repositories\PageRepository;
 use Omega\Repositories\PositionRepository;
 use Omega\Repositories\ThemeRepository;
+use Omega\Utils\Plugin\BController;
+use Omega\Utils\Plugin\Plugin;
 use Omega\Utils\Plugin\PluginMeta;
 use Omega\Utils\Plugin\Type;
 use Omega\Utils\Entity\Page as PageHelper;
@@ -312,9 +314,12 @@ class PagesController extends AdminController
         $components = array();
 
         foreach ($cs as $c) {
+
+            $formRenderer = Plugin::Call($c->plugin->name, 'getFormRendererComponent');
+
             $item['id'] = $c->id;
             $item['pluginMeta'] = new PluginMeta($c->plugin->name);
-            $item['html'] = Type::FormRender($c->fkPlugin, $c->id, $pageId);
+            $item['html'] = Type::FormRender($c->fkPlugin, $c->id, $pageId, $formRenderer);
             $item['args'] = json_decode($c->param, true);
             $components[] = $item;
         }

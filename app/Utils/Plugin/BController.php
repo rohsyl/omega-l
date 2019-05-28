@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Omega\Repositories\PluginRepository;
 use Omega\Models\Plugin as PluginModel;
 use Omega\Utils\Path;
+use Omega\Utils\Plugin\Form\Renderer\AFormRenderer;
 
 class BController extends AbstractController{
 
@@ -45,6 +46,10 @@ class BController extends AbstractController{
      * @var null|integer The id of the current component. Null if we are not in a component context
      */
 	public $idCurrentComponent = null;
+
+	private $formRendererComponent = null;
+
+	private $formRendererModule = null;
 
     /**
      * BController constructor.
@@ -265,6 +270,40 @@ class BController extends AbstractController{
         return $exitCode;
     }
 
+
+    /**
+     * Set the form renderer for components
+     *
+     * @param AFormRenderer|null $formRenderer
+     */
+    protected function setComponentFormRenderer($formRenderer = null) {
+        $this->formRendererComponent = $formRenderer;
+    }
+
+    /**
+     * Set the form renderer for modules
+     *
+     * @param AFormRenderer|null $formRenderer
+     */
+    protected function setModuleFormRenderer($formRenderer = null) {
+        $this->formRendererModule = $formRenderer;
+    }
+
+    /**
+     * @return AFormRenderer|null
+     */
+    public function getFormRendererComponent()
+    {
+        return $this->formRendererComponent;
+    }
+
+    /**
+     * @return AFormRenderer|null
+     */
+    public function getFormRendererModule()
+    {
+        return $this->formRendererModule;
+    }
 
     /**
      * Get the class name of the BController of the given plugin name

@@ -8,6 +8,8 @@
 namespace Omega\Utils\Plugin;
 
 use Omega\Repositories\FormRepository;
+use Omega\Utils\Plugin\Form\Renderer\AFormRenderer;
+use Omega\Utils\Plugin\Form\Renderer\BasicFormRenderer;
 
 define('ATYPEENTRY', 'Omega\\Utils\\Plugin\\ATypeEntry');
 
@@ -43,37 +45,72 @@ class Type{
         return self::GetRepository()->formExistsForComponent($idPlugin);
     }
 
-    public static function FormRender($idPlugin, $idModule, $idPage)
+    /**
+     * Render a form for the given plugin, the given module id and the given page id
+     * The rendering can be customized by giving a formRenderer in parameter
+     *
+     * @param $idPlugin int The id of the plugin
+     * @param $idModule int The id of the module
+     * @param $idPage int|null The id of the page
+     * @param AFormRenderer|null $formRenderer
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
+    public static function FormRender($idPlugin, $idModule, $idPage, $formRenderer = null)
     {
+        if(!isset($formRenderer)) {
+            $formRenderer = new BasicFormRenderer();
+        }
         $idForm = self::Get($idPlugin);
         if(isset($idForm)){
-            $entries = self::GetFormEntries($idForm);
-            $html = '';
-            foreach($entries as $entry){
-                $e = new FormEntry($entry, $idModule, $idPage);
-                $html .= $e->getHtml();
-            }
-            return $html;
+            $formRenderer->setEntries(
+                self::EntriesToArrayWithKeyName(
+                    self::GetFormEntries($idForm),
+                    $idModule, $idPage
+                )
+            );
+            return $formRenderer->render();
         }
         else{
             return view('form.formtype_notexists');
         }
     }
 
-    public static function FormRenderByname($formName, $idModule, $idPage){
+    /**
+     * Render a form by is name.
+     *
+     * @param $formName string The name of the form
+     * @param $idModule int The id of the module
+     * @param $idPage int|null The id of the page
+     * @param AFormRenderer|null $formRenderer
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
+    public static function FormRenderByname($formName, $idModule, $idPage, $formRenderer = null){
+        if(!isset($formRenderer)) {
+            $formRenderer = new BasicFormRenderer();
+        }
         $idForm = self::GetByName($formName);
         if(isset($idForm)){
-            $entries = self::GetFormEntries($idForm);
-            $html = '';
-            foreach($entries as $entry){
-                $e = new FormEntry($entry, $idModule, $idPage);
-                $html .= $e->getHtml();
-            }
-            return $html;
+            $formRenderer->setEntries(
+                self::EntriesToArrayWithKeyName(
+                    self::GetFormEntries($idForm),
+                    $idModule, $idPage
+                )
+            );
+            return $formRenderer->render();
         }
         else{
             return view('form.formtype_notexists');
         }
+    }
+
+
+    private static function EntriesToArrayWithKeyName($entries, $idModule, $idPage) {
+        $new = [];
+        foreach($entries as $entry){
+            $e = new FormEntry($entry, $idModule, $idPage);
+            $new[$e->getName()] = $e;
+        }
+        return $new;
     }
 
     public static function FormSave($idPlugin, $idModule, $idPage){

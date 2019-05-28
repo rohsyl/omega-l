@@ -12,7 +12,6 @@ namespace Omega\Utils\Plugin;
 use Illuminate\Support\Facades\View;
 use Omega\Utils\Path;
 use ReflectionClass;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 
 /**
  * Class ATypeEntry is used to implement TypeEntry for Form
