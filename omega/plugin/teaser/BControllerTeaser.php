@@ -2,12 +2,15 @@
 namespace OmegaPlugin\Teaser;
 
 use Omega\Utils\Plugin\BController;
+use OmegaPlugin\Teaser\FormRenderer\TeaserFormRenderer;
 
 class BControllerTeaser extends  BController {
 
 
     public function __construct() {
         parent::__construct('teaser');
+        $this->setModuleFormRenderer(new TeaserFormRenderer());
+        $this->setComponentFormRenderer(new TeaserFormRenderer());
     }
 
     public function install() {

@@ -547,10 +547,14 @@ class PagesController extends AdminController
             return OmegaGate::accessDeniedView();
 
         $comp = $this->moduleRepository->get($id);
+
+
+        $formRenderer = Plugin::Call($comp->plugin->name, 'getFormRendererComponent');
+
         $item = array(
             'id' => $comp->id,
             'pluginMeta' => new PluginMeta($comp->plugin->name),
-            'html' => Type::FormRender($comp->fkPlugin, $id, $comp->fkPage),
+            'html' => Type::FormRender($comp->fkPlugin, $id, $comp->fkPage, $formRenderer),
             'args' => json_decode($comp->param, true)
         );
         $components[] = $item;
@@ -820,8 +824,9 @@ class PagesController extends AdminController
             return OmegaGate::accessDeniedView();
 
         $module = $this->moduleRepository->get($moduleId);
+        $formRenderer = Plugin::Call($module->plugin->name, 'getFormRendererComponent');
         $pluginId = $module->fkPlugin;
-        return Type::FormRender($pluginId, $moduleId, $pageId);
+        return Type::FormRender($pluginId, $moduleId, $pageId, $formRenderer);
     }
 
     /**
