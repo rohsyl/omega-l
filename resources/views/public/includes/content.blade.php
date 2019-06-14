@@ -1,0 +1,1 @@
+{!! Entity::Page()->content !!}
