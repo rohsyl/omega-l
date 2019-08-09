@@ -36,6 +36,6 @@ Entity::Menu()->setMenuHtmlStruct(array(
 </section>
 
 
-<?php echo Entity::Page()->content ?>
+@content()
 
 <?php include(Entity::Site()->php_template_path . DS . 'footer.php'); ?>

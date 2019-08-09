@@ -15,6 +15,7 @@
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "~5.0",
         "rohsyl/laraupdater": "1.2.0",
+        "rohsyl/omega-plugin-menu": "dev-features-plugin-as-package",
         "tightenco/ziggy": "v0.6.8.1"
     },
     "require-dev": {
@@ -71,5 +72,11 @@
         "optimize-autoloader": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./omega/plugin/menu"
+        }
+    ]
 }

@@ -40,7 +40,7 @@
 
 
 <!-- Content -->
-{!! Entity::Page()->content !!}
+@content()
 
 <!-- Footer -->
 @include('theme::footer')

@@ -171,6 +171,12 @@ return [
 
         // Laravel self updater
         rohsyl\laraupdater\LaraUpdaterServiceProvider::class,
+
+
+
+
+        // Omega Plugins service Provider
+        rohsyl\OmegaPlugin\Menu\PluginServiceProvider::class,
     ],
 
     /*

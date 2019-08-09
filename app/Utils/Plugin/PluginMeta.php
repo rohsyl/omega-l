@@ -14,13 +14,18 @@ class PluginMeta {
 	
 	private $metadata;
 	
-	public function __construct($name) {
-		
-		$this->name = $name;
-		$path = Path::Combine(plugin_path(), $this->name);
-		
-		$this->metadata = json_decode(file_get_contents($path.'/plugin.json'), true);
-		
+	public function __construct($name, $isPath = false) {
+
+		if(!$isPath) {
+            $path = Path::Combine(plugin_path(), $name, 'plugin.json');
+        }
+		else {
+            $path = $name;
+        }
+
+		$this->metadata = json_decode(file_get_contents($path), true);
+
+		$this->name = $this->metadata['pluginName'];
 		$this->title = $this->metadata['pluginTitle'];
 		$this->version = $this->metadata['pluginVersion'];
 		$this->author = $this->metadata['author'];

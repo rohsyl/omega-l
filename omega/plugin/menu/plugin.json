@@ -1,0 +1,13 @@
+{
+	"pluginName" : "menu",
+	"pluginTitle" : "Menu",
+	"pluginVersion" : "1.0.0",
+	"author" : "OmegaCMS",
+	"authorMail" : "support@omega-cms.org",
+	"authorWebsite" : "http://omega-cms.org",
+	"description" : "",
+	"options" : {
+		"displayInMenu" : 1
+	},
+	"isPackage": true
+}

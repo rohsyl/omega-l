@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea4b26d0ffc4486fc62c135269bfdf62",
+    "content-hash": "cafa94cae98b916ff1e93f0d053b9458",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2027,6 +2027,36 @@
                 "update-installer"
             ],
             "time": "2019-05-09T11:48:05+00:00"
+        },
+        {
+            "name": "rohsyl/omega-plugin-menu",
+            "version": "dev-features-plugin-as-package",
+            "dist": {
+                "type": "path",
+                "url": "./omega/plugin/menu",
+                "reference": "b2efc941376c565ebbebad3de8135aaff8b343e1",
+                "shasum": null
+            },
+            "type": "plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "rohsyl\\OmegaPlugin\\Menu\\PluginServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "rohsyl\\OmegaPlugin\\Menu\\": "src/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Sylvain Roh",
+                    "email": "syzin12@gmail.com"
+                }
+            ],
+            "description": "A menu plugin for OmegaL"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -5152,7 +5182,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "rohsyl/omega-plugin-menu": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

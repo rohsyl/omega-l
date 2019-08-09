@@ -26,8 +26,11 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->defineHtmlCollectiveComponents();
+
         $this->defineViewNamespaces();
+
         $this->definePublishes();
+
         $this->defineIncludeAliases();
     }
 

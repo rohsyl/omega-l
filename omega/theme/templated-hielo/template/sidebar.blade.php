@@ -42,10 +42,10 @@
 
 <div class="row">
     <div class="col-md-9">
-        {!! Entity::Page()->content !!}
+        @content()
     </div>
     <div class="col-md-3">
-        {!! ModuleArea::Display(Entity::Page(), 'sidebar', 'templated-hielo') !!}
+        @modulearea(['area_name' => 'sidebar', 'theme_name' => 'templated-hielo'])
     </div>
 </div>
 <!-- Content -->

@@ -2,7 +2,7 @@
 <!-- Footer -->
 <footer id="footer">
     <div class="container">
-        {!! ModuleArea::Display(Entity::Page(), 'footer', 'templated-hielo') !!}
+        @modulearea(['area_name' => 'footer', 'theme_name' => 'templated-hielo'])
     </div>
     <div class="copyright">
         &copy; Sylvain Roh. Powered by OmegaCMS.

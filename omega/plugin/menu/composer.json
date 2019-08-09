@@ -1,0 +1,26 @@
+{
+    "name": "rohsyl/omega-plugin-menu",
+    "description": "A menu plugin for OmegaL",
+    "type": "plugin",
+    "authors": [
+        {
+            "name": "Sylvain Roh",
+            "email": "syzin12@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "rohsyl\\OmegaPlugin\\Menu\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "rohsyl\\OmegaPlugin\\Menu\\PluginServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {}
+}
