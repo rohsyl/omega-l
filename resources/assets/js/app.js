@@ -82,9 +82,14 @@ require('./omega/admin/settings/shortcuts');
 
 
 
-// No need of vue.js
-// But i keep it here if in the futur i want to use it
-//window.Vue = require('vue');
+window.Vue = require('vue');
+
+
+let api_token = document.head.querySelector('meta[name="api-token"]');
+if(api_token != null) {
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + api_token.content;
+    axios.defaults.headers.common['Accept'] = 'application/json';
+}
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

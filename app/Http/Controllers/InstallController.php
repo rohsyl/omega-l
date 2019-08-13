@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Omega\Http\Requests\Install\LangRequest;
 use Omega\Http\Requests\Install\SiteAndUserRequest;
 use Omega\Models\User;
@@ -97,6 +98,7 @@ class InstallController extends Controller
         // create the admin user
         $admin = new User();
         $admin->username = session('install.username');
+        $admin->api_token = Str::random(60);
         $admin->email = session('install.email');
         $admin->password = session('install.password');
         $admin->fullname = 'Administrator';

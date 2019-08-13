@@ -152,6 +152,7 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
                 Route::post('isComponentsTemplateUpToDate', 'PagesController@isComponentsTemplateUpToDate')->name('admin.pages.isComponentsTemplateUpToDate');
 
                 Route::post('create', 'PagesController@create')->name('admin.pages.create');
+                Route::get('edit/{id}/v2', 'PagesController@edit_vue')->name('admin.pages.editv2');
                 Route::get('edit/{id}/{tab?}', 'PagesController@edit')->name('admin.pages.edit');
                 Route::post('update/{id}', 'PagesController@update')->name('admin.pages.update');
                 Route::get('delete/{id}/{confirm?}', 'PagesController@delete')->name('admin.pages.delete');

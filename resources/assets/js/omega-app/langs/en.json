@@ -1,0 +1,12 @@
+{
+  "action": {
+    "save": "Save",
+    "view": "View",
+    "delete": "Delete",
+    "enable": "Enable",
+    "disable": "Disable"
+  },
+  "page_edition": "Page edition",
+  "content": "Content",
+  "language": "Language"
+}

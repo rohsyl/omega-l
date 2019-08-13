@@ -10,6 +10,9 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @if(Auth::check())
+        <meta name="api-token" content="{{ Auth::user()->api_token }}">
+    @endif
     <meta name="absurl" content="{{ route('admin.home')  }}">
 
     <title>{{ 'OmegaCMS' }} - {{ __('administration') }}</title>

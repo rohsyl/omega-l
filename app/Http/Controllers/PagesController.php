@@ -283,6 +283,14 @@ class PagesController extends AdminController
         ]);
     }
 
+    public function edit_vue(int $id) {
+
+        if (OmegaGate::denies('page_update'))
+            return OmegaGate::accessDeniedView();
+
+        return view('pages.editvue', compact('id'));
+    }
+
     /**
      * Get all modulearea for the given page
      * @param $pageId int The id of the page

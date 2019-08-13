@@ -2,6 +2,7 @@
 namespace Omega\Repositories;
 
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Omega\Models\User;
 
 class UserRepository{
@@ -40,6 +41,7 @@ class UserRepository{
     public function create($inputs){
         $user = new User();
         $user->username = $inputs['username'];
+        $user->api_token = Str::random(60);
         $user->email = $inputs['email'];
         $user->fullname = $inputs['fullname'];
         $user->password = Hash::make($inputs['password']);

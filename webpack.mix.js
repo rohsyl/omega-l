@@ -27,3 +27,5 @@ mix.copyDirectory('resources/assets/js/omega/admin', 'public/js/omega/admin');
 mix.copyDirectory('resources/assets/img', 'public/images');
 
 
+mix.config.vue.esModule = true;
+mix.js('resources/assets/js/omega-app/apps/page/page-edit-app.js', 'public/js/app/');
