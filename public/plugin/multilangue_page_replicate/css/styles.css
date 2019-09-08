@@ -1,0 +1,21 @@
+.plugin-sociallogo .logo {
+	text-decoration: none;
+	-moz-user-select: none;
+	height: 50px;
+	width: 50px;
+	border-radius: 50px;
+	display: inline-block;
+	margin: 0px 3px 6px;
+	font-weight: normal;
+	text-align: center;
+	vertical-align: middle;
+	background-image: none;
+	white-space: nowrap;
+	padding: 14px;
+	line-height: 22px;
+	display: inline-block;
+}
+.plugin-sociallogo .logo span{
+	font-size : 22px;
+	color : #fff;
+}

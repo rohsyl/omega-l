@@ -13,13 +13,25 @@
             <NavTabs>
                 <NavTab :id="1" :active="tab_active(1)" @click="tab_click">{{ $t('content') }}</NavTab>
                 <NavTab :id="2" :active="tab_active(2)" @click="tab_click">{{ $t('language') }}</NavTab>
+                <NavTab :id="3" :active="tab_active(3)" @click="tab_click">{{ $t('parameters') }}</NavTab>
+                <NavTab :id="4" :active="tab_active(4)" @click="tab_click">{{ $t('modulearea') }}</NavTab>
+                <NavTab :id="5" :active="tab_active(5)" @click="tab_click">{{ $t('security') }}</NavTab>
             </NavTabs>
             <TabContent>
                 <TabPane :active="tab_active(1)">
-                    Hello
+                    <PageComponent v-for="component in page.components" :key="component.id" :component="component"></PageComponent>
                 </TabPane>
-                <TabPane :active="tab_active(2)">
-                    Yeeess
+                <TabPane :active="tab_active(2)" v-if="page.config.languageEnabled">
+                    <PageLanguage :page="page" :languages="languages"></PageLanguage>
+                </TabPane>
+                <TabPane :active="tab_active(3)">
+                    <PageParameters :page="page"></PageParameters>
+                </TabPane>
+                <TabPane :active="tab_active(4)">
+                    Modulearea
+                </TabPane>
+                <TabPane :active="tab_active(5)">
+                    Security
                 </TabPane>
             </TabContent>
         </div>
@@ -34,24 +46,37 @@
     import TabContent from '../../../components/tabs/TabContent'
     import Loading from '../../../components/Loading'
     import Toolbar from './Toolbar'
+    import PageComponent from "./PageComponent";
+    import PageLanguage from "./PageLanguage";
+    import PageParameters from "./PageParameters";
 
     export default {
         el: "#page-edit-app",
 
         components: {
+            PageParameters,
+            PageLanguage,
+            PageComponent,
             Loading, Toolbar, NavTabs, NavTab, TabPane, TabContent
         },
 
         data: {
             page_id: undefined,
             page: undefined,
+            languages: [],
 
             currentTab: 1
         },
         methods: {
             init: function() {
+                let id = parseInt(window.location.hash.substr(1));
+                if(!isNaN(id)) {
+                    this.currentTab = id
+                }
+
                 this.get_page_id();
-                this.load_page()
+                this.load_page();
+                this.load_languages()
             },
 
             get_page_id: function() {
@@ -60,11 +85,21 @@
                 this.page_id = page_id
             },
 
+            load_languages: function() {
+                let self = this;
+                axios.get(route('api.languages.index'))
+                    .then(function (response) {
+                        self.languages = response.data.data
+                    })
+                    .catch(function (error) {
+                        console.log(error.response.data)
+                    });
+            },
+
             load_page: function() {
                 let self = this;
                 axios.get(route('api.pages.get', {'id' : this.page_id}))
                     .then(function (response) {
-                        console.log(response.data);
                         self.page = response.data.data
                     })
                     .catch(function (error) {
@@ -84,6 +119,11 @@
             tab_click: function(id) {
                 this.currentTab = id;
                 console.log(id)
+            },
+
+            getIDfromURL: function(){
+                console.log();
+                return window.location.pathname.split('#')[1]
             }
         },
         mounted: function() {

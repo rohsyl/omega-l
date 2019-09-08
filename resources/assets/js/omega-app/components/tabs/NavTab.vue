@@ -1,6 +1,6 @@
 <template>
     <li :class="classActive">
-        <a @click="click">
+        <a @click="click" href="#">
             <slot></slot>
         </a>
     </li>
@@ -25,7 +25,8 @@
             }
         },
         methods: {
-            click: function () {
+            click: function (e) {
+                e.preventDefault();
                 this.$emit('click', this.id)
             }
         }

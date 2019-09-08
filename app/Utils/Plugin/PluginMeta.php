@@ -37,4 +37,6 @@ class PluginMeta {
 	public function get($key) { return $this->metadata[$key]; }
 
 	public function getOption($key){ return isset($this->options[$key]) ? $this->options[$key] : null; }
+
+	public function getOptions() { return $this->options; }
 }

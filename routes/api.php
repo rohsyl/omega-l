@@ -20,4 +20,6 @@ Route::middleware('auth:api')->group(function() {
 
         Route::get('get/{id}', 'Api\Pages\PagesController@get')->name('api.pages.get');
     });
+
+    Route::get('languages', 'Api\LanguageController@index')->name('api.languages.index');
 });

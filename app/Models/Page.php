@@ -4,6 +4,7 @@ namespace Omega\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Omega\Utils\Entity\Page as PageHelper;
 
 class Page extends Model
 {
@@ -37,5 +38,32 @@ class Page extends Model
 
     public function security(){
         return $this->hasOne('Omega\Models\PageSecurity', 'fkPage', 'id');
+    }
+
+    public function getCorrespondingPagesAttribute() {
+        $corr = array();
+        foreach (Lang::all() as $l){
+            if($l->slug != $this->lang){
+                $corr[$l->slug] = PageHelper::GetCorrespondingInLang($this->id, $l->slug);
+            }
+        }
+        return $corr;
+    }
+
+    public function getCorrespondingParentsAttribute() {
+        $corr = array();
+        foreach (Lang::all() as $l){
+            if($l->slug != $this->lang){
+                $query = Page::where('lang', $l->slug);
+                if($this->fkPageParent == null || $this->fkPageParent == 0){
+                    $query = $query->whereNull('fkPageParent');
+                }
+                else{
+                    $query = $query->where('fkPageParent', $this->fkPageParent);
+                }
+                $corr[$l->slug] = $query->orderBy('order')->get();
+            }
+        }
+        return $corr;
     }
 }

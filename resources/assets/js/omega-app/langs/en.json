@@ -6,7 +6,18 @@
     "enable": "Enable",
     "disable": "Disable"
   },
+  "label": {
+    "language_help": "Set the language of this page",
+    "corresponding_page": "Corresponding page",
+    "corresponding_page_help": "Link this page with the corresponding ones in other languages",
+    "none": "None"
+  },
   "page_edition": "Page edition",
+  "page": "Page",
   "content": "Content",
-  "language": "Language"
+  "language": "Language",
+  "languages": "Language",
+  "parameters": "Parameters",
+  "modulearea": "Modulearea",
+  "security":  "Security"
 }
