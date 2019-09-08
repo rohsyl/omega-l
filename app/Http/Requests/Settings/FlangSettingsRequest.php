@@ -3,6 +3,7 @@
 namespace Omega\Http\Requests\Settings;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Omega\Policies\OmegaGate;
 
 class FlangSettingsRequest extends FormRequest
 {
