@@ -2,6 +2,7 @@
 
 namespace Omega\Http\Controllers;
 
+use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -72,7 +73,7 @@ class InstallController extends Controller
         try {
             DB::connection()->getPdo();
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             die("Could not connect to the database.  Please check your configuration.");
 
             //return an error
@@ -81,6 +82,12 @@ class InstallController extends Controller
         // create migrations table if not exists
         if(!Schema::hasTable('migrations')){
             Artisan::call('migrate:install');
+        }
+
+
+        // create migrations table if not exists
+        if(!Schema::hasTable('migrations_plugins')){
+            Artisan::call('omega:plugin:migrate:install');
         }
 
         // create omega tables and fill with data
