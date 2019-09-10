@@ -14,6 +14,7 @@ use Omega\Models\Page as PageModel;
 use Omega\Utils\Path;
 use Omega\Utils\Plugin\Plugin;
 use Omega\Utils\Plugin\Type;
+use Omega\Utils\Theme\ComponentView;
 
 class Page{
 
@@ -243,9 +244,23 @@ class Page{
 
             $args = json_decode($component->param, true);
 
+
+            $defaultComponentView = new ComponentView(
+                $component->plugin->name,
+                'display',
+                '*',
+                Path::Combine($component->plugin->name, 'default'),
+                'Theme Default'
+            );
+            $defaultComponentView->setThemeName(\Omega\Facades\Entity::Site()->template_name);
+
+            // force using an other view defined in the settings of the component
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
                 $ct = theme_decode_components_template($args['settings']['pluginTemplate']);
                 $instance->forceView($ct->getViewName(), $ct->buildPath());
+            }
+            else if(file_exists($defaultComponentView->buildPath())) {
+                $instance->forceView($defaultComponentView->getViewName(), $defaultComponentView->buildPath());
             }
 
             $isHidden = isset($args['settings']['isHidden']) ? $args['settings']['isHidden'] : false;
@@ -296,10 +311,23 @@ class Page{
 
             $args = json_decode($component->param, true);
 
+
+            $defaultComponentView = new ComponentView(
+                $component->plugin->name,
+                'display',
+                '*',
+                Path::Combine($component->plugin->name, 'default'),
+                'Theme Default'
+            );
+            $defaultComponentView->setThemeName(\Omega\Facades\Entity::Site()->template_name);
+
             // force using an other view defined in the settings of the component
             if(isset($args['settings']['pluginTemplate']) && $args['settings']['pluginTemplate'] != 'null'){
                 $ct = theme_decode_components_template($args['settings']['pluginTemplate']);
                 $instance->forceView($ct->getViewName(), $ct->buildPath());
+            }
+            else if(file_exists($defaultComponentView->buildPath())) {
+                $instance->forceView($defaultComponentView->getViewName(), $defaultComponentView->buildPath());
             }
 
             $isHidden = isset($args['settings']['isHidden']) ? $args['settings']['isHidden'] : false;
