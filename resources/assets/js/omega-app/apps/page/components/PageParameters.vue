@@ -52,7 +52,8 @@
             <label class="control-label col-sm-3" for="parent">{{ $t('label.parent') }}</label>
             <div class="col-sm-5">
                 <select id="parent" v-model="page.fkPageParent" class="form-control">
-                    <option></option>
+                    <option :value="null">{{ $t('label.none') }}</option>
+                    <option v-for="page in page.config.parents" :value="page.id">{{ page.name }}</option>
                 </select>
                 <span class="text-danger" role="alert">
                 </span>

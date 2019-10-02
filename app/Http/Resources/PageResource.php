@@ -15,35 +15,6 @@ class PageResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'id' => $this->id,
-            'fkMenu' => $this->fkMenu,
-            'fkPageParent' => $this->fkPageParent,
-            'fkUser' => $this->fkUser,
-            'lang' => $this->lang,
-            'slug' => $this->slug,
-            'name' => $this->name,
-            'subtitle' => $this->subtitle,
-            'showName' => $this->showName,
-            'showSubtitle' => $this->showSubtitle,
-            'isEnabled' => $this->isEnabled,
-            'cssTheme' => $this->cssTheme,
-            'keyWords' => $this->keyWords,
-            'model' => $this->model,
-            'order' => $this->order,
-            'corresponding_pages' => $this->corresponding_pages,
-            'corresponding_parents' => $this->corresponding_parents,
-
-            'components' => ComponentFormResource::collection($this->components),
-            'modules' => ModuleResource::collection($this->modulesonly),
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
-
-            'config' => [
-                'languageEnabled' => om_config('om_enable_front_langauge')
-            ]
-        ];
+        return parent::toArray($request);
     }
 }

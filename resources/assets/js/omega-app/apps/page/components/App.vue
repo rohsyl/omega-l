@@ -98,7 +98,7 @@
 
             load_page: function() {
                 let self = this;
-                axios.get(route('api.pages.get', {'id' : this.page_id}))
+                axios.get(route('api.pages.edit', {'id' : this.page_id}))
                     .then(function (response) {
                         self.page = response.data.data
                     })

@@ -16,9 +16,10 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->group(function() {
 
 
-    Route::prefix('pages')->group(function(){
+    Route::prefix('page')->group(function(){
 
-        Route::get('get/{id}', 'Api\Pages\PagesController@get')->name('api.pages.get');
+        Route::get('/{ignore?}', 'Api\Page\PageController@index')->name('api.pages.index');
+        Route::get('/edit/{id}', 'Api\Page\PageController@edit')->name('api.pages.edit');
     });
 
     Route::get('languages', 'Api\LanguageController@index')->name('api.languages.index');

@@ -1,6 +1,6 @@
 <?php
 
-namespace Omega\Http\Controllers\Api\Pages;
+namespace Omega\Http\Controllers\Api\Page;
 
 use Illuminate\Http\Request;
 use Omega\Http\Controllers\Controller;
