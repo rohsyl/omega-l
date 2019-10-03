@@ -64,24 +64,11 @@
         </div>
 
         <div class="form-group">
-            <label class="control-label col-sm-3" for="model">{{ $t('label.model') }}</label>
-            <div class="col-sm-5">
-                <select id="model" v-model="page.model" class="form-control">
-                    <option></option>
-                </select>
-                <span class="text-danger" role="alert">
-                </span>
-                <span class="help-block">
-                    {{ $t('label.model_help') }}
-                </span>
-            </div>
-        </div>
-
-        <div class="form-group">
             <label class="control-label col-sm-3" for="menu">{{ $t('label.menu') }}</label>
             <div class="col-sm-5">
-                <select id="menu" v-model="page.menu" class="form-control">
-                    <option></option>
+                <select id="menu" v-model="page.fkMenu" class="form-control">
+                    <option :value="null">{{ $t('label.default') }}</option>
+                    <option v-for="menu in page.config.menus" :value="menu.id">{{ menu.name }}</option>
                 </select>
                 <span class="text-danger" role="alert">
                 </span>
@@ -92,10 +79,27 @@
         </div>
 
         <div class="form-group">
+            <label class="control-label col-sm-3" for="model">{{ $t('label.model') }}</label>
+            <div class="col-sm-5">
+                <select id="model" v-model="page.model" class="form-control">
+                    <option value="default">{{ $t('label.default') }}</option>
+                    <option v-for="template in page.config.templates" :value="template">{{ template }}</option>
+                </select>
+                <span class="text-danger" role="alert">
+                </span>
+                <span class="help-block">
+                    {{ $t('label.model_help') }}
+                </span>
+            </div>
+        </div>
+
+
+        <div class="form-group">
             <label class="control-label col-sm-3" for="cssTheme">{{ $t('label.cssTheme') }}</label>
             <div class="col-sm-5">
                 <select id="cssTheme" v-model="page.cssTheme" class="form-control">
-                    <option></option>
+                    <option value="none">{{ $t('label.none') }}</option>
+                    <option v-for="style in page.config.styles" :value="style">{{ style }}</option>
                 </select>
                 <span class="text-danger" role="alert">
                 </span>
@@ -108,7 +112,7 @@
         <div class="form-group">
             <label class="control-label col-sm-3" for="keyword">{{ $t('label.keyword') }}</label>
             <div class="col-sm-5">
-                <textarea if="keyword" class="form-control" v-model="page.keyWords"></textarea>
+                <textarea id="keyword" class="form-control" v-model="page.keyWords"></textarea>
                 <span class="text-danger" role="alert">
                 </span>
                 <span class="help-block">

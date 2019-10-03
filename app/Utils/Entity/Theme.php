@@ -68,7 +68,7 @@ class Theme
                 if($element != '.' && $element != '..' && $element != 'register.php')
                 {
                     if (!is_dir(Path::Combine($directory_path, $element)))
-                        $files[] = $element;
+                        $files[] = without_ext(without_ext($element));
                 }
             }
             sort($files);
@@ -86,7 +86,7 @@ class Theme
             while($element = readdir($dir)) {
                 if($element != '.' && $element != '..') {
                     if (!is_dir(Path::Combine($directory_path, $element))) {
-                        $file[] = $element;
+                        $file[] = without_ext($element);
                     }
                 }
             }

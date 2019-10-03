@@ -13540,6 +13540,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["a"] = ({
     name: "PageParameters",
@@ -13548,29 +13552,6 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
             required: true,
             type: Object
         }
-    },
-    data: function data() {
-        return {
-            pages: undefined
-        };
-    },
-
-    methods: {
-        init: function init() {
-            this.load_pages();
-        },
-
-        load_pages: function load_pages() {
-            var self = this;
-            axios.get(route('api.pages.index', { ignore: this.page.id })).then(function (response) {
-                self.pages = response.data.data;
-            }).catch(function (error) {
-                console.log(error.response.data);
-            });
-        }
-    },
-    mounted: function mounted() {
-        this.init();
     }
 });
 
@@ -15222,7 +15203,7 @@ exports = module.exports = __webpack_require__(5)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -15533,6 +15514,71 @@ var render = function() {
     _c("div", { staticClass: "form-group" }, [
       _c(
         "label",
+        { staticClass: "control-label col-sm-3", attrs: { for: "menu" } },
+        [_vm._v(_vm._s(_vm.$t("label.menu")))]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-5" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.page.fkMenu,
+                expression: "page.fkMenu"
+              }
+            ],
+            staticClass: "form-control",
+            attrs: { id: "menu" },
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value;
+                    return val
+                  });
+                _vm.$set(
+                  _vm.page,
+                  "fkMenu",
+                  $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                )
+              }
+            }
+          },
+          [
+            _c("option", { domProps: { value: null } }, [
+              _vm._v(_vm._s(_vm.$t("label.default")))
+            ]),
+            _vm._v(" "),
+            _vm._l(_vm.page.config.menus, function(menu) {
+              return _c("option", { domProps: { value: menu.id } }, [
+                _vm._v(_vm._s(menu.name))
+              ])
+            })
+          ],
+          2
+        ),
+        _vm._v(" "),
+        _c("span", { staticClass: "text-danger", attrs: { role: "alert" } }),
+        _vm._v(" "),
+        _c("span", { staticClass: "help-block" }, [
+          _vm._v(
+            "\n                " +
+              _vm._s(_vm.$t("label.menu_help")) +
+              "\n            "
+          )
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "form-group" }, [
+      _c(
+        "label",
         { staticClass: "control-label col-sm-3", attrs: { for: "model" } },
         [_vm._v(_vm._s(_vm.$t("label.model")))]
       ),
@@ -15569,7 +15615,18 @@ var render = function() {
               }
             }
           },
-          [_c("option")]
+          [
+            _c("option", { attrs: { value: "default" } }, [
+              _vm._v(_vm._s(_vm.$t("label.default")))
+            ]),
+            _vm._v(" "),
+            _vm._l(_vm.page.config.templates, function(template) {
+              return _c("option", { domProps: { value: template } }, [
+                _vm._v(_vm._s(template))
+              ])
+            })
+          ],
+          2
         ),
         _vm._v(" "),
         _c("span", { staticClass: "text-danger", attrs: { role: "alert" } }),
@@ -15578,60 +15635,6 @@ var render = function() {
           _vm._v(
             "\n                " +
               _vm._s(_vm.$t("label.model_help")) +
-              "\n            "
-          )
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "form-group" }, [
-      _c(
-        "label",
-        { staticClass: "control-label col-sm-3", attrs: { for: "menu" } },
-        [_vm._v(_vm._s(_vm.$t("label.menu")))]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-5" }, [
-        _c(
-          "select",
-          {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.page.menu,
-                expression: "page.menu"
-              }
-            ],
-            staticClass: "form-control",
-            attrs: { id: "menu" },
-            on: {
-              change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value;
-                    return val
-                  });
-                _vm.$set(
-                  _vm.page,
-                  "menu",
-                  $event.target.multiple ? $$selectedVal : $$selectedVal[0]
-                )
-              }
-            }
-          },
-          [_c("option")]
-        ),
-        _vm._v(" "),
-        _c("span", { staticClass: "text-danger", attrs: { role: "alert" } }),
-        _vm._v(" "),
-        _c("span", { staticClass: "help-block" }, [
-          _vm._v(
-            "\n                " +
-              _vm._s(_vm.$t("label.menu_help")) +
               "\n            "
           )
         ])
@@ -15677,7 +15680,18 @@ var render = function() {
               }
             }
           },
-          [_c("option")]
+          [
+            _c("option", { attrs: { value: "none" } }, [
+              _vm._v(_vm._s(_vm.$t("label.none")))
+            ]),
+            _vm._v(" "),
+            _vm._l(_vm.page.config.styles, function(style) {
+              return _c("option", { domProps: { value: style } }, [
+                _vm._v(_vm._s(style))
+              ])
+            })
+          ],
+          2
         ),
         _vm._v(" "),
         _c("span", { staticClass: "text-danger", attrs: { role: "alert" } }),
@@ -15710,7 +15724,7 @@ var render = function() {
             }
           ],
           staticClass: "form-control",
-          attrs: { if: "keyword" },
+          attrs: { id: "keyword" },
           domProps: { value: _vm.page.keyWords },
           on: {
             input: function($event) {

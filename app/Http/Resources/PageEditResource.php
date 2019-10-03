@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Omega\Facades\Theme;
 use Omega\Models\Page;
+use Omega\Models\Menu;
 
 class PageEditResource extends JsonResource
 {
@@ -47,8 +48,11 @@ class PageEditResource extends JsonResource
                 'languageEnabled' => om_config('om_enable_front_langauge'),
                 'parents' => Page::where('id', '!=', $this->id)->get(),
 
+                'menus' => Menu::where('lang', $this->lang)->get(),
+
                 'templates' => Theme::templates(),
                 'styles' => Theme::styles(),
+
             ]
         ];
     }
