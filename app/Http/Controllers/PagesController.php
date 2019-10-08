@@ -767,42 +767,4 @@ class PagesController extends AdminController
     #endregion
 
 
-    #region trash
-    /**
-     * Get the page that display the content of the trash
-     * @return Factory|View
-     */
-    public function trash()
-    {
-        return view('pages.trash')->with([
-            'pages' => $this->pageRepository->deleted_paginate(),
-        ]);
-    }
-
-    /**
-     * Restore a page by id
-     * @param $id int The id of the page
-     * @return RedirectResponse
-     */
-    public function restore($id)
-    {
-        $this->pageRepository->restore($id);
-
-        toast()->success(__('Page restored succesfully!'));
-        return redirect()->route('admin.pages.edit', ['id' => $id]);
-    }
-
-    /**
-     * Delete permanently a page by id
-     * @param $id int The id of the page
-     * @return RedirectResponse
-     */
-    public function forcedelete($id)
-    {
-        $this->pageRepository->forcedelete($id);
-
-        toast()->success(__('Page deleted permanently!'));
-        return redirect()->route('admin.pages.trash');
-    }
-    #endregion
 }

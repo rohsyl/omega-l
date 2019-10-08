@@ -116,10 +116,6 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
                 Route::get('getPagesLevelZeroBylang/{lang?}', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
 
 
-                Route::get('table/{lang?}', 'Page\PageIndexController@table')->name('admin.pages.index.table');
-                Route::get('{lang?}', 'Page\PageIndexController@index')->name('admin.pages');
-                Route::post('chooselang', 'Page\PageIndexController@chooseLang')->name('admin.pages.chooselang');
-                Route::post('sort', 'Page\PageIndexController@sort')->name('admin.pages.sort');
 
 
                 Route::get('getAllPageByParentAndLang/{pid}/{lang}/{idParent?}', 'PagesController@getAllPageByParentAndLang')->name('admin.pages.getbyparentandlang');
@@ -165,9 +161,16 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
                 Route::get('enable/{id}/{enable}', 'PagesController@enable')->name('admin.pages.enable');
 
 
-                Route::get('trash', 'PagesController@trash')->name('admin.pages.trash');
-                Route::get('restore/{id}', 'PagesController@restore')->name('admin.pages.restore');
-                Route::get('forcedelete/{id}', 'PagesController@forcedelete')->name('admin.pages.forcedelete');
+                // Page trash
+                Route::get('trash', 'Page\PageTrashController@trash')->name('admin.pages.trash');
+                Route::get('restore/{id}', 'Page\PageTrashController@restore')->name('admin.pages.restore');
+                Route::get('forcedelete/{id}', 'Page\PageTrashController@forcedelete')->name('admin.pages.forcedelete');
+
+                // Page index
+                Route::get('table/{lang?}', 'Page\PageIndexController@table')->name('admin.pages.index.table');
+                Route::get('{lang?}', 'Page\PageIndexController@index')->name('admin.pages');
+                Route::post('chooselang', 'Page\PageIndexController@chooseLang')->name('admin.pages.chooselang');
+                Route::post('sort', 'Page\PageIndexController@sort')->name('admin.pages.sort');
 
             });
 

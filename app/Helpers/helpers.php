@@ -439,3 +439,15 @@ if(!function_exists('has_any_rights')){
         return false;
     }
 }
+
+if(!function_exists('lang_enabled')) {
+    function lang_enabled() {
+        return om_config('om_enable_front_langauge');
+    }
+}
+
+if(!function_exists('lang_default')) {
+    function lang_default() {
+        return om_config('om_default_front_langauge');
+    }
+}

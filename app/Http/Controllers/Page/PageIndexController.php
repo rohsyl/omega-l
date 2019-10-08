@@ -17,7 +17,6 @@ class PageIndexController extends Controller
 {
 
     #region index
-
     /**
      * The list of pages
      * @param null $lang If not null, filter by lang
@@ -28,8 +27,8 @@ class PageIndexController extends Controller
         if (OmegaGate::denies('page_read'))
             return OmegaGate::accessDeniedView();
 
-        $enabledLang = om_config('om_enable_front_langauge');
-        $defaultLang = om_config('om_default_front_langauge');
+        $enabledLang = lang_enabled();
+        $defaultLang = lang_default();
 
         $currentLang = null;
         if ($enabledLang) {
@@ -44,7 +43,7 @@ class PageIndexController extends Controller
             'enabledLang' => $enabledLang,
             'defaultLang' => $defaultLang,
             'currentLang' => $currentLang,
-            'langs' => to_select(Lang::where('isEnabled', true)->get(), 'name', 'slug', [null => __('None')]),
+            'langs' => to_select(Lang::enabled()->get(), 'name', 'slug', [null => __('None')]),
         ];
         return view('pages.index')->with($viewBag);
     }
@@ -92,15 +91,16 @@ class PageIndexController extends Controller
         if (OmegaGate::denies('page_read'))
             return OmegaGate::accessDeniedView();
 
-        $enabledLang = om_config('om_enable_front_langauge');
+        $enabledLang = lang_enabled();
 
-        $pages = (
-            !$enabledLang ?
-                Page::noParent() :
-                Page::noParent()->lang($lang)
-            )->ordered()->paginate(config('omega.page.paginate'));
-
-        $pages->withPath(route('admin.pages'));
+        $query = Page::noParent();
+        if($enabledLang) {
+            $query->lang($lang);
+        }
+        $pages =$query
+            ->ordered()
+            ->paginate(config('omega.page.paginate'))
+            ->withPath(route('admin.pages'));
 
         return view('pages.indextable')->with([
             'enabledLang' => $enabledLang,

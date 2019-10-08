@@ -11,4 +11,8 @@ class Lang extends Model
     public function media(){
         return $this->belongsTo('Omega\Models\Media', 'fkMediaFlag');
     }
+
+    public function scopeEnabled($query) {
+        return $query->where('isEnabled', true);
+    }
 }
