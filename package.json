@@ -53,6 +53,7 @@
     "sortablejs": "^1.10.1",
     "summernote": "^0.8.12",
     "toastr": "^2.1.4",
-    "vue-i18n": "^8.14.1"
+    "vue-i18n": "^8.14.1",
+    "vuedraggable": "^2.23.2"
   }
 }

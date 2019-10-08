@@ -19,7 +19,22 @@
             </NavTabs>
             <TabContent>
                 <TabPane :active="tab_active(1)">
-                    <PageComponent v-for="component in page.components" :key="component.id" :component="component"></PageComponent>
+
+                    <div class="row">
+                        <div class="col-md-10">
+                            <draggable v-model="page.components" group="component">
+                                <PageComponent v-for="component in page.components" :key="component.id" :component="component"></PageComponent>
+                            </draggable>
+                        </div>
+                        <div class="col-md-2">
+                            <h4>Available component</h4>
+                            <p>Drag and drop component to the left to insert them in the page</p>
+                            <draggable v-model="components_creatable" group="component">
+                                <PageComponentCreate v-for="component in components_creatable" :component="component"></PageComponentCreate>
+                            </draggable>
+                        </div>
+                    </div>
+
                 </TabPane>
                 <TabPane :active="tab_active(2)" v-if="page.config.languageEnabled">
                     <PageLanguage :page="page" :languages="languages"></PageLanguage>
@@ -28,7 +43,7 @@
                     <PageParameters :page="page"></PageParameters>
                 </TabPane>
                 <TabPane :active="tab_active(4)">
-                    Modulearea
+                    <PageModulearea :page="page"></PageModulearea>
                 </TabPane>
                 <TabPane :active="tab_active(5)">
                     Security
@@ -49,21 +64,27 @@
     import PageComponent from "./PageComponent";
     import PageLanguage from "./PageLanguage";
     import PageParameters from "./PageParameters";
+    import PageModulearea from "./PageModulearea";
+    import PageComponentCreate from "./PageComponentCreate";
+    import draggable from 'vuedraggable'
 
     export default {
         el: "#page-edit-app",
 
         components: {
+            PageComponentCreate,
+            PageModulearea,
             PageParameters,
             PageLanguage,
             PageComponent,
-            Loading, Toolbar, NavTabs, NavTab, TabPane, TabContent
+            Loading, Toolbar, NavTabs, NavTab, TabPane, TabContent, draggable
         },
 
         data: {
             page_id: undefined,
             page: undefined,
             languages: [],
+            components_creatable: {},
 
             currentTab: 1
         },
@@ -76,7 +97,8 @@
 
                 this.get_page_id();
                 this.load_page();
-                this.load_languages()
+                this.load_languages();
+                this.load_components_creatable()
             },
 
             get_page_id: function() {
@@ -101,6 +123,17 @@
                 axios.get(route('api.pages.edit', {'id' : this.page_id}))
                     .then(function (response) {
                         self.page = response.data.data
+                    })
+                    .catch(function (error) {
+                        console.log(error.response.data)
+                    });
+            },
+
+            load_components_creatable: function() {
+                let self = this;
+                axios.get(route('api.component.creatable'))
+                    .then(function (response) {
+                        self.components_creatable = response.data.data
                     })
                     .catch(function (error) {
                         console.log(error.response.data)

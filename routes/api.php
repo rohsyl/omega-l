@@ -22,5 +22,7 @@ Route::middleware('auth:api')->group(function() {
         Route::get('/edit/{id}', 'Api\Page\PageController@edit')->name('api.pages.edit');
     });
 
+    Route::get('components/creatable', 'Api\Component\ComponentCreateController@index')->name('api.component.creatable');
+
     Route::get('languages', 'Api\LanguageController@index')->name('api.languages.index');
 });

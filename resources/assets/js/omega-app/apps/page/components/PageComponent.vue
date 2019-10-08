@@ -3,8 +3,8 @@
         <div class="component-item-top">
             <ul>
                 <li>
-                    <span :class="'component-item-bgcolor ' + component_background_class"
-                          :style="component_background_style"></span>
+            <span :class="'component-item-bgcolor ' + component_background_class"
+                  :style="component_background_style"></span>
                     {{ component.pluginMeta.title }}
                 </li>
                 <li v-if="component_is_hidden"><i class="fa fa-eye-slash"></i></li>

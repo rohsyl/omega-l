@@ -12,6 +12,7 @@ use Illuminate\Support\ServiceProvider;
 use Omega\Utils\Entity\ModuleArea;
 use Omega\Utils\Entity\Entity;
 use Omega\Utils\Entity\OmegaConfig;
+use Omega\Utils\Entity\Plugin;
 use Omega\Utils\Entity\Theme;
 use Omega\Utils\OmegaUtils;
 use Omega\Utils\Plugin\Form\FormFactory;
@@ -42,6 +43,9 @@ class UtilsServiceProvider  extends ServiceProvider
 
         $this->app->bind('omega:theme', function () {
             return new Theme();
+        });
+        $this->app->bind('omega:plugin', function () {
+            return new Plugin();
         });
     }
 }
