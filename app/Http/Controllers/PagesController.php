@@ -2,7 +2,11 @@
 
 namespace Omega\Http\Controllers;
 
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Omega\Http\Requests\Page\Component\SaveSettingsRequest;
 use Omega\Http\Requests\Page\Module\CreateModuleRequest;
 use Omega\Http\Requests\Page\SortRequest;
@@ -77,104 +81,11 @@ class PagesController extends AdminController
         $this->pluginRepository = $pluginRepository;
     }
 
-    #region index
-
-    /**
-     * The list of pages
-     * @param null $lang If not null, filter by lang
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index($lang = null)
-    {
-        if (OmegaGate::denies('page_read'))
-            return OmegaGate::accessDeniedView();
-
-        $enabledLang = om_config('om_enable_front_langauge');
-        $defaultLang = om_config('om_default_front_langauge');
-
-        $currentLang = null;
-        if ($enabledLang) {
-            $currentLang = isset($lang) ? $lang : null;
-            // if the lang is not given in the URL, then get the value from the session if it exists
-            if (!isset($currentLang) && session()->has('backoffice_lang_pages')) {
-                $currentLang = session('backoffice_lang_pages');
-            }
-        }
-
-        $viewBag = [
-            'enabledLang' => $enabledLang,
-            'defaultLang' => $defaultLang,
-            'currentLang' => $currentLang,
-            'langs' => to_select($this->langRepository->allEnabled(), 'name', 'slug', [null => __('None')]),
-        ];
-        return view('pages.index')->with($viewBag);
-    }
-
-    /**
-     * Change the selected lang
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function chooseLang(Request $request)
-    {
-        // set the chosen lang in a session variable
-        session(['backoffice_lang_pages' => $request->input('lang')]);
-        // redirect back to the list of pages
-        return redirect()->route('admin.pages', ['lang' => $request->input('lang')]);
-    }
-
-    /**
-     * Sort the pages
-     * @param SortRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function sort(SortRequest $request)
-    {
-        $orders = $request->input('order');
-        foreach ($orders as $p) {
-            $page = $this->pageRepository->get($p['id']);
-            $page->order = $p['order'];
-            $result = $page->save();
-            if (!$result)
-                break;
-        }
-        return response()->json([
-            'result' => $result,
-        ]);
-    }
-
-    /**
-     * Get the table with all the page filtered by lang
-     * @param null|string $lang
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function getTable($lang = null)
-    {
-        if (OmegaGate::denies('page_read'))
-            return OmegaGate::accessDeniedView();
-
-        $enabledLang = om_config('om_enable_front_langauge');
-
-        $pages = !$enabledLang ?
-            $this->pageRepository->paginatePagesWithParent(null) :
-            $this->pageRepository->paginatePageWithParentAndLang($lang, null);
-
-        $pages->withPath(route('admin.pages'));
-
-        return view('pages.indextable')->with([
-            'enabledLang' => $enabledLang,
-            'currentLang' => $lang,
-            'pages' => $pages,
-        ]);
-    }
-    #endregion
-
-
     #region add
     /**
      * Display the form to add a new page
      * @param null $lang If not null, set by default the given lang
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function add($lang = null)
     {
@@ -200,7 +111,7 @@ class PagesController extends AdminController
     /**
      * Get the list of page that can be a parent of a newly created page.
      * @param null $lang
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getPagesLevelZeroBylang($lang = null)
     {
@@ -217,7 +128,7 @@ class PagesController extends AdminController
     /**
      * Create a new page
      * @param CreatePageRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function create(CreatePageRequest $request)
     {
@@ -239,7 +150,7 @@ class PagesController extends AdminController
      * Display the form to edit a page
      * @param $id int The id of the page
      * @param string $tab The selected tab
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function edit($id, $tab = 'content')
     {
@@ -294,7 +205,7 @@ class PagesController extends AdminController
     /**
      * Get all modulearea for the given page
      * @param $pageId int The id of the page
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function moduleareaList($pageId)
     {
@@ -311,7 +222,7 @@ class PagesController extends AdminController
     /**
      * Get all component for the given page
      * @param $pageId int The id of the page
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function componentList($pageId)
     {
@@ -340,7 +251,7 @@ class PagesController extends AdminController
     /**
      * Get all modules for the given page
      * @param $pageId
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function moduleList($pageId)
     {
@@ -358,7 +269,7 @@ class PagesController extends AdminController
      * Update the given page
      * @param UpdateRequest $request
      * @param $id int The id of the page
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(UpdateRequest $request, $id)
     {
@@ -473,7 +384,7 @@ class PagesController extends AdminController
      * @param $pid int The id of the current page
      * @param $lang string The selected lang
      * @param null $idParent The id of the page parent
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     function getAllPageByParentAndLang($pid, $lang, $idParent = null)
     {
@@ -490,7 +401,7 @@ class PagesController extends AdminController
      * Soft-Delete a page by id after confirmation
      * @param $id int The id of the page
      * @param bool $confirm
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @return Factory|RedirectResponse|View
      */
     public function delete($id, $confirm = false)
     {
@@ -514,7 +425,7 @@ class PagesController extends AdminController
      * Enable or disable the given page
      * @param $id int The id of the page
      * @param $enable boolean
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function enable($id, $enable)
     {
@@ -532,7 +443,7 @@ class PagesController extends AdminController
     #region component
     /**
      * Get the form to create a component
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getCreateFormForComponent()
     {
@@ -547,7 +458,7 @@ class PagesController extends AdminController
     /**
      * Get the form to edit a component
      * @param $id int The id of the component
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getComponentForm($id)
     {
@@ -576,7 +487,7 @@ class PagesController extends AdminController
      * Create a component
      * @param $pageId int The id of the page on which the component must be created
      * @param $pluginId int The id of the plugin
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     function createComponent($pageId, $pluginId)
     {
@@ -593,7 +504,7 @@ class PagesController extends AdminController
     /**
      * Delete a component
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     function deleteComponent($id)
     {
@@ -609,7 +520,7 @@ class PagesController extends AdminController
     /**
      * Get a form to manage the settings of a component
      * @param $compId int The id of the component
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getFormComponentSettings($compId)
     {
@@ -689,7 +600,7 @@ class PagesController extends AdminController
     /**
      * Check if the component template is up to date
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function isComponentsTemplateUpToDate(Request $request)
     {
@@ -706,7 +617,7 @@ class PagesController extends AdminController
      * Save settings of a component
      * @param SaveSettingsRequest $request
      * @param $compId int The id of the component
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function saveSettings(SaveSettingsRequest $request, $compId)
     {
@@ -749,7 +660,7 @@ class PagesController extends AdminController
      * Change the order of a component
      * @param $compId int The id of the component
      * @param $position string The way of moving the component (upper, up, downer, down)
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function orderComponent($compId, $position)
     {
@@ -788,7 +699,7 @@ class PagesController extends AdminController
     #region module
     /**
      * Get the form to create a module
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getCreateFormForModule()
     {
@@ -803,7 +714,7 @@ class PagesController extends AdminController
     /**
      * Create a module
      * @param CreateModuleRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function createModule(CreateModuleRequest $request)
     {
@@ -824,7 +735,7 @@ class PagesController extends AdminController
      * Get a form to edit a module
      * @param $moduleId int The id of the module
      * @param $pageId int The id of the page
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     * @return Factory|View|string
      */
     public function getEditFormForModule($moduleId, $pageId)
     {
@@ -840,7 +751,7 @@ class PagesController extends AdminController
     /**
      * Save the module
      * @param $moduleId int The id of the module
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function saveModule($moduleId)
     {
@@ -859,7 +770,7 @@ class PagesController extends AdminController
     #region trash
     /**
      * Get the page that display the content of the trash
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function trash()
     {
@@ -871,7 +782,7 @@ class PagesController extends AdminController
     /**
      * Restore a page by id
      * @param $id int The id of the page
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function restore($id)
     {
@@ -884,7 +795,7 @@ class PagesController extends AdminController
     /**
      * Delete permanently a page by id
      * @param $id int The id of the page
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function forcedelete($id)
     {

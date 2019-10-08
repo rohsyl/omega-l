@@ -40,6 +40,27 @@ class Page extends Model
         return $this->hasOne('Omega\Models\PageSecurity', 'fkPage', 'id');
     }
 
+    public function scopeParent($query, $page_id) {
+        if(!isset($page_id)) {
+            return $query->whereNull('fkPageParent');
+        }
+        else {
+            return $query->where('fkPageParent', $page_id);
+        }
+    }
+
+    public function scopeNoParent($query) {
+        return $this->scopeParent($query, null);
+    }
+
+    public function scopeOrdered($query) {
+        return $query->orderBy('order');
+    }
+
+    public function scopeLang($query, $lang) {
+        return $query->where('lang', $lang);
+    }
+
     public function getCorrespondingPagesAttribute() {
         $corr = array();
         foreach (Lang::all() as $l){

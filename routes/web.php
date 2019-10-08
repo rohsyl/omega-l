@@ -114,10 +114,16 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
             Route::prefix('pages')->group(function(){
 
                 Route::get('getPagesLevelZeroBylang/{lang?}', 'PagesController@getPagesLevelZeroBylang')->name('admin.pages.getPagesLevelZeroBylang');
-                Route::get('getTable/{lang?}', 'PagesController@getTable')->name('admin.pages.index.table');
+
+
+                Route::get('table/{lang?}', 'Page\PageIndexController@table')->name('admin.pages.index.table');
+                Route::get('{lang?}', 'Page\PageIndexController@index')->name('admin.pages');
+                Route::post('chooselang', 'Page\PageIndexController@chooseLang')->name('admin.pages.chooselang');
+                Route::post('sort', 'Page\PageIndexController@sort')->name('admin.pages.sort');
+
+
                 Route::get('getAllPageByParentAndLang/{pid}/{lang}/{idParent?}', 'PagesController@getAllPageByParentAndLang')->name('admin.pages.getbyparentandlang');
                 Route::get('add/{lang?}', 'PagesController@add')->name('admin.pages.add');
-                Route::post('sort', 'PagesController@sort')->name('admin.pages.sort');
                 Route::get('delete/{id}/{confirm?}', 'PagesController@delete')->name('admin.pages.delete');
                 Route::get('enable/{id}/{enable}', 'PagesController@enable')->name('admin.pages.enable');
                 Route::get('moduleareaList/{pageId}', 'PagesController@moduleareaList')->name('admin.pages.moduleareaList');
@@ -163,8 +169,6 @@ Route::middleware(['om_not_installed', 'om_load_config'])->group(function() {
                 Route::get('restore/{id}', 'PagesController@restore')->name('admin.pages.restore');
                 Route::get('forcedelete/{id}', 'PagesController@forcedelete')->name('admin.pages.forcedelete');
 
-                Route::get('{lang?}', 'PagesController@index')->name('admin.pages');
-                Route::post('chooselang', 'PagesController@chooseLang')->name('admin.pages.chooselang');
             });
 
             Route::get('media/library', 'MediasController@library')->name('media.library');
