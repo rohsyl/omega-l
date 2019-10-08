@@ -30,29 +30,29 @@
     }
   },
   "devDependencies": {
-    "axios": "^0.18",
-    "cross-env": "^5.1",
+    "axios": "^0.18.1",
+    "cross-env": "^5.2.1",
     "jquery": "^3.4.1",
     "laravel-mix": "^2.1.14",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "npm-watch": "^0.5.0",
     "popper.js": "^1.15.0",
     "vue": "^2.6.10",
     "vue-template-compiler": "^2.6.10"
   },
   "dependencies": {
-    "ace-builds": "^1.4.4",
+    "ace-builds": "^1.4.6",
     "bootstrap": ">=4.3.1",
     "bootstrap3": "^3.3.5",
-    "ckeditor": "^4.11.4",
-    "codemirror": "^5.46.0",
+    "ckeditor": "^4.12.1",
+    "codemirror": "^5.49.0",
     "font-awesome": "^4.7.0",
     "jquery-ui": "^1.12.1",
     "mousetrap": "^1.6.3",
     "mousetrap-global-bind": "^1.1.0",
-    "sortablejs": "^1.9.0",
-    "summernote": "^0.8.11",
+    "sortablejs": "^1.10.1",
+    "summernote": "^0.8.12",
     "toastr": "^2.1.4",
-    "vue-i18n": "^8.14.0"
+    "vue-i18n": "^8.14.1"
   }
 }
