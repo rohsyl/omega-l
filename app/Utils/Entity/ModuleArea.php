@@ -3,8 +3,10 @@ namespace Omega\Utils\Entity;
 
 use Omega\Facades\OmegaUtils;
 use Omega\Repositories\ModuleAreaRepository;
+use Omega\Utils\Path;
 use Omega\Utils\Plugin\Plugin;
 use Omega\Utils\Plugin\Type;
+use Omega\Utils\Theme\ComponentView;
 
 /**
  * Helper for ModuleArea.
@@ -86,6 +88,21 @@ class ModuleArea{
 
                         if(method_exists($plugin, 'display'))
                         {
+                            $defaultComponentView = new ComponentView(
+                                $position->module->plugin->name,
+                                'display',
+                                '*',
+                                Path::Combine($position->module->plugin->name, 'default'),
+                                'Theme Default'
+                            );
+                            $defaultComponentView->setThemeName(\Omega\Facades\Entity::Site()->template_name);
+
+                            // force using an other view defined in the settings of the component
+                            if(file_exists($defaultComponentView->buildPath())) {
+                                $plugin->forceView($defaultComponentView->getViewName(), $defaultComponentView->buildPath());
+                            }
+
+
                             $content = $plugin->display($plugin_param, $data);
 
                             $html .= view('public.module')->with([
