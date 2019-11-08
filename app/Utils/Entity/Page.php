@@ -280,7 +280,7 @@ class Page{
 
                 $views[] = [
                     'title' => $title,
-                    'html' => view('public.section')->with([
+                    'html' => view()->first(['theme::template.section', 'public.section'])->with([
                         'compId' => $compId,
                         'style' => $style,
                         'plugin' => $component->plugin,
@@ -351,7 +351,7 @@ class Page{
                 }
                 $style = $backgroundColor == 'transparent' ? null : 'style="background-color: ' . $backgroundColor . ';"';
 
-                $this->content .= view('public.section')->with([
+                $this->content .= view()->first(['theme::template.section', 'public.section'])->with([
                     'compId' => $compId,
                     'plugin' => $component->plugin,
                     'style' => $style,
