@@ -58,10 +58,14 @@ class User extends Authenticatable
     public function hasRight($ability, $force = false){
         // if force is true, then we check the perm from the database
         if($force) {
-            DB::statement('CALL om_UserHasRight(:ability, :id, @hasRight);', [
-                $ability,
-                $this->id
-            ]);
+            DB::statement('SET @rightId = 0');
+            DB::statement('SET @userId = :userId', ['userId' => $this->id]);
+            DB::statement('SET @hasRight = 0');
+            DB::statement('SELECT id INTO @rightId FROM rights WHERE name = :ability', ['ability' => $ability]);
+            DB::statement('SELECT COUNT(1) INTO @hasRight FROM (
+                    SELECT 1 FROM userrights WHERE fkUser = @userId AND fkRight = @rightId 
+                    UNION
+                    SELECT 1 FROM grouprights WHERE fkRight = @rightId AND fkGroup IN (SELECT fkGroup FROM usergroups WHERE fkUser = @userId)) as t');
             $results = DB::select('SELECT @hasRight as hasRight');
             return boolval($results[0]->hasRight);
         }
