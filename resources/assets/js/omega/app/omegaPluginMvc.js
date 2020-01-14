@@ -9,7 +9,7 @@
             //---- Public method ----//
             url: function(plugin, action, args){
                 if (typeof args === 'undefined') { args = {}; }
-                var url = this.root.abspath + 'plugin/ajax?plugin=' + plugin + '&action=' + action;
+                var url = this.root.abspath + 'plugin/run/' + plugin + '/' + action;
                 $.each( args, function(key, value){
                     url += '&' + key + '=' + value;
                 });

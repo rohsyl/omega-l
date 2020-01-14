@@ -21,10 +21,11 @@ $(function(){
         $('.sortable').each(function () {
             Sortable.create(this, {
                 group: 'sort-pages',
+                sort: true,
                 animation: 100,
                 ghostClass: 'sortable-ghost',  // Class name for the drop placeholder
                 // Changed sorting within list
-                onEnd: function (/**Event*/evt) {
+                onSort: function (/**Event*/evt) {
 
                     var array = [];
                     $('.sortable > .sortable-item').each(function(i) {
