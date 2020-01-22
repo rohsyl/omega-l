@@ -1,0 +1,194 @@
+
+.plugin-document{
+    margin: 15px 0;
+}
+
+@media all and (max-width: 786px){
+    .plugin-document{
+        margin: 15px;
+    }
+}
+
+.document-type
+{
+	font-size :40px;
+}
+.word{
+	color : #2A5699 ;
+}
+.excel{
+	color : #207245 ;
+}
+.powerpoint{
+	color : #D24625 ;
+}
+.adobe{
+	color : #C11E07 ;
+}
+.link{
+    color : #333 ;
+}
+
+.word:hover,
+.word:focus{
+	color : #1A345D ;
+}
+.excel:hover,
+.excel:focus{
+	color : #0F3621 ;
+}
+.powerpoint:hover,
+.powerpoint:focus{
+	color : #91301A ;
+}
+.adobe:hover,
+.adobe:focus{
+	color : #771304 ;
+}
+.link:hover,
+.link:focus{
+    color : #777 ;
+}
+.plugin-document-container a{
+	text-decoration : none;
+}
+.plugin-document-container[data-plugin-placement="modulearea"] h3
+{
+    margin-bottom : 10px;
+}
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item
+{
+	position : relative;
+	padding : 0px 0 0 25px;
+}
+.plugin-document-container[data-plugin-placement="modulearea"] .document-type
+{
+    font-size :18px;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item .doc-icon
+{
+	position : absolute;
+	left : 0px;
+	top : -2px;
+	font-size : 20px;
+}
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item .text
+{
+	font-size : 14px;
+	line-height : 10px;
+	color : #555;
+	word-wrap: break-word;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+        -ms-transition: all 0.5s;
+        -o-transition: all 0.5s;
+        transition: all 0.5s;
+}
+.plugin-document-container[data-plugin-placement="modulearea"] .document-item .text span
+{
+	font-size : 12px;
+	display : block;
+	color : #ccc;
+
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+.plugin-document-container .document-item a:hover .text
+{
+	color : #000;
+}
+.plugin-document-container .document-item a:hover .text span
+{
+	color : #aaa;
+}
+
+.plugin-document-container .document-item a:hover .word{
+	color : #1A345D ;
+}
+.plugin-document-container .document-item a:hover .excel{
+	color : #0F3621 ;
+}
+.plugin-document-container .document-item a:hover .powerpoint{
+	color : #91301A ;
+}
+.plugin-document-container .document-item a:hover .adobe{
+	color : #771304 ;
+}
+
+
+
+
+.plugin-document-container[data-plugin-placement="content"] .document-item
+{
+    position : relative;
+    padding : 0px 5px 25px 45px;
+}
+@media (max-width: 768px) {
+
+    .plugin-document-container[data-plugin-placement="content"] .document-item
+    {
+        position : relative;
+        padding : 0px 5px 25px 45px;
+        width : auto;
+    }
+}
+.plugin-document-container[data-plugin-placement="content"] .document-item .doc-icon
+{
+    position : absolute;
+    left : 0px;
+    top : 5px;
+}
+.plugin-document-container[data-plugin-placement="content"] .document-item .text
+{
+    font-size : 14px;
+    line-height : 10px;
+    color : #555;
+    word-wrap: break-word;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+.plugin-document-container[data-plugin-placement="content"] .document-item .text span
+{
+    font-size : 12px;
+    display : block;
+    color : #ccc;
+
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+/*
+.content-col-6 {
+    width: 50%;
+    float: left;
+    margin: 0px;
+}
+.content-row
+{
+    display: block;
+    width: 100%;
+}
+.content-row:before
+{
+    content: " ";
+    display: table;
+}
+.content-row:after {
+    clear: both;
+}
+/*

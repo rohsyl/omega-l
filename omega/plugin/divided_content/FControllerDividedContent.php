@@ -10,6 +10,7 @@ define('TYPE_COL_3', 2);
 define('TYPE_COL_4', 3);
 define('TYPE_TABS', 4);
 define('TYPE_COLLAPSE', 5);
+define('TYPE_SLIDER', 6);
 
 class FControllerDividedContent extends  FController {
 
@@ -45,6 +46,9 @@ class FControllerDividedContent extends  FController {
                 break;
             case TYPE_COLLAPSE:
                 return $this->view('display_collapse')->with($data);
+                break;
+            case TYPE_SLIDER:
+                return $this->view('display_slider')->with($data);
                 break;
         }
         return null;

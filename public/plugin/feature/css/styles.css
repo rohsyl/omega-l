@@ -1,0 +1,23 @@
+/*
+ * Plugin Feature
+ * Place your CSS here to style your plugin public views
+ */
+
+.plugin-feature .service-logo{
+    width:180px;
+    height: 180px;
+    border-radius: 100%;
+    background-color: #000;
+    margin: 0 auto;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    border: 8px solid #000;
+    transition: background-size .5s ease;
+    overflow: hidden;
+}
+
+.plugin-feature .service-logo:hover{
+    background-size: 110%;
+    background-position: center center;
+}

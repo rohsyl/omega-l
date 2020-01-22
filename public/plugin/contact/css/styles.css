@@ -1,0 +1,30 @@
+.contact-contactlogo{
+    width: 100%;
+    max-width: 300px;
+    margin-bottom : 30px;
+}
+
+
+
+.contact-contactinfo .center-icon{
+    width : 20px;
+    display: inline-block;
+
+    /*text-align: center;*/
+}
+
+.contact-contactinfo .center-icon.mobile i{
+    font-size: 25px;
+}
+
+.contact-contactinfo .center-icon.mail i{
+    font-size: 17px;
+}
+
+.contact-contactinfo .center-icon.fax i{
+    font-size: 16px;
+}
+
+.plugin-contact-container{
+    margin: 15px 0;
+}

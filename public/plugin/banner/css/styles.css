@@ -1,0 +1,36 @@
+/*
+ * Plugin Banner
+ * Place your CSS here to style your plugin public views
+ */
+
+.plugin-banner > div {
+    text-align: center;
+}
+
+.plugin-banner .banner-background:not(.no-background) {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.plugin-banner .banner-background {
+    padding: 3em 0 4em 0;
+}
+
+.plugin-banner .banner-background p,
+.plugin-banner .banner-background h2{
+    color: #fff;
+}
+
+.plugin-banner .banner-background h2 {
+    margin-top: 0;
+    margin-bottom: 1em
+}
+
+.plugin-banner .banner-background p {
+    margin: 0 auto;
+    margin-top: 0;
+    margin-bottom: 2em;
+    max-width: 300px;
+    text-align: center;
+}
