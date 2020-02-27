@@ -1,3 +1,10 @@
+@php
+    $format = 'LT';
+    if(isset($attributes['format'])) {
+        $format = $attributes['format'];
+        unset($attributes['format']);
+    }
+@endphp
 {{ Form::text($name, $value, array_merge(
     ['class' => 'form-control ' . ($errors->has($name) ? 'is-invalid' : ''),
     'id' => $name,
@@ -22,7 +29,7 @@
                 clear: 'fas fa-trash',
                 close: 'fas fa-times'
             },
-            format: 'LT',
+            format: @json($format),
             locale: '{{ App::getLocale() }}'
         });
     });
