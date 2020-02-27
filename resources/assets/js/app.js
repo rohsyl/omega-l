@@ -64,6 +64,8 @@ import Sortable from 'sortablejs';
 window.Sortable = Sortable;
 
 
+window.moment = require('moment');
+require('tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.min');
 
 require('./assets/metisMenu.min');
 require('./assets/sb-admin-2.min');

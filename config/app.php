@@ -159,9 +159,9 @@ return [
         // Omega\Providers\BroadcastServiceProvider::class,
         Omega\Providers\EventServiceProvider::class,
         Omega\Providers\RouteServiceProvider::class,
-
         Collective\Html\HtmlServiceProvider::class,
         Grimthorr\LaravelToast\ServiceProvider::class,
+        Omega\Providers\FormServiceProvider::class,
 
         //https://github.com/tightenco/ziggy
         Tightenco\Ziggy\ZiggyServiceProvider::class,

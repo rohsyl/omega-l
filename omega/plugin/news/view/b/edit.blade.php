@@ -41,7 +41,7 @@
         <div class="col-sm-4">
 
             {{ Form::label('published_at', __('Publish date'), ['class' => 'control-label']) }}
-            {{ Form::date('published_at', isset($item->published_at) ? date('Y-m-d', strtotime($item->published_at)) : null, ['class' => 'form-control', 'id' => 'published_at']) }}
+            {{ Form::omdate('published_at', isset($item->published_at) ? date('Y-m-d', strtotime($item->published_at)) : null, ['class' => 'form-control', 'id' => 'published_at']) }}
             @if($errors->has('published_at'))
                 <span class="text-danger">
                 {{ $errors->first('published_at') }}

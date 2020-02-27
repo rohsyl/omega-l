@@ -25,8 +25,8 @@ class SeoSettingsRequest extends FormRequest
     public function rules()
     {
         return [
-            'keywords' => 'string|nullable|regex:/^[a-zA-Z0-9-]*[a-zA-Z0-9]+(?:,[a-zA-Z0-9-]*[a-zA-Z0-9]+)*$/',
-            'description' => 'string|nullable|regex:/^[a-zA-Z0-9-]*[a-zA-Z0-9]+(?:,[a-zA-Z0-9-]*[a-zA-Z0-9]+)*$/'
+            'keywords' => 'string|nullable',
+            'description' => 'string|nullable/'
         ];
     }
 }
