@@ -17,6 +17,12 @@
 		"color": "#3f729b",
 		"colorHover": "#144065"
 	},
+	"spotify": {
+		"name": "Spotify",
+		"class": "fa fa-spotify",
+		"color": "#1ed760",
+		"colorHover": "#1db954"
+	},
 	"googleplus": {
 		"name": "Google+",
 		"class": "fa fa-google-plus",

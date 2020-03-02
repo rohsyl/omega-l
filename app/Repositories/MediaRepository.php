@@ -343,7 +343,7 @@ class MediaRepository implements InterfaceMediaConstant {
         $newName = strip_tags($newName);
         $oldName = $media->name;
         $media->name = $newName;
-        if($media->getType() === self::MEDIA){
+        if($media->type === self::MEDIA){
             $newName = str_slug($newName);
 
             // rename the file
