@@ -341,28 +341,23 @@ class MediaRepository implements InterfaceMediaConstant {
         $media = $this->GetMedia($mediaId);
 
         $newName = strip_tags($newName);
-
-        if($media->getType() != self::T_FOLDER){
-            $newName = str_slug($newName);
-        }
-
         $oldName = $media->name;
-
         $media->name = $newName;
-        $media->path = Url::Combine('media', $media->id, $newName.'.'.$media->ext);
+        if($media->getType() === self::MEDIA){
+            $newName = str_slug($newName);
 
-        $result = self::Save($media);
-        if(!$result) return false;
-
-        if($media->type == self::MEDIA)
-        {
+            // rename the file
             $old = Path::Combine(media_path(), $media->id, $oldName .'.'. $media->ext);
-
             $new = Path::Combine(media_path(), $media->id, $newName .'.'. $media->ext);
             $result = rename($old, $new);
             if(!$result) return false;
+
+            // update in database
+            $media->path = Url::Combine('media', $media->id, $newName.'.'.$media->ext);
         }
-        return true;
+        // save
+        $result = self::Save($media);
+        if(!$result) return false;
     }
 
     public static function GetMimeType($filename) {
