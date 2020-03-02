@@ -64,11 +64,11 @@ class Media extends Model implements InterfaceMediaConstant
         }*/
 
     public function getTitle($lang = null){
-        return $this->getMeta($lang, 'title');
+        return $this->getMeta($lang, 'title') ?? $this->title;
     }
 
     public function getDescription($lang = null){
-        return $this->getMeta($lang, 'description');
+        return $this->getMeta($lang, 'description') ?? $this->description;
     }
 
     public function setTitle($title, $lang = null){
@@ -90,7 +90,7 @@ class Media extends Model implements InterfaceMediaConstant
                 return $l[$meta];
             }
         }
-        return '';
+        return null;
     }
 
     private function setMeta($lang, $meta, $value){
