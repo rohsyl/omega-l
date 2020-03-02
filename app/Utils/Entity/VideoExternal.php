@@ -38,9 +38,8 @@ class VideoExternal
     public function readUrl(){
         $url = $this->media->path;
         if($this->is(self::TYPE_YOUTUBE, $url)){
-            $queryString = parse_url($url, PHP_URL_QUERY);
-            parse_str($queryString, $params);
-            $this->videoId = $params['v'];
+            $urlParts = explode("/", parse_url($url, PHP_URL_PATH));
+            $this->videoId =$urlParts[count($urlParts)-1];
             $this->plateform = self::TYPE_YOUTUBE;
         } else if ($this->is(self::TYPE_VIMEO, $url)) {
             $urlParts = explode("/", parse_url($url, PHP_URL_PATH));
