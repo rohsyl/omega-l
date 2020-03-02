@@ -1,6 +1,7 @@
 <?php
 namespace Omega\Utils\Plugin;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\View;
 use Omega\Utils\Path;
 
@@ -67,7 +68,10 @@ abstract class FController extends AbstractController {
      */
     public function view($name){
 
-        if(isset($this->forceView[$name])){
+        if(isset($this->forceView['default'])) {
+            $path = $this->forceView['default'];
+        }
+        elseif(isset($this->forceView[$name])){
             $path = $this->forceView[$name];
         }
         else{
@@ -90,7 +94,7 @@ abstract class FController extends AbstractController {
     /**
      * Return json
      * @param $data array The data that will be encoded
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     protected function json($data){
         return response()->json($data);
