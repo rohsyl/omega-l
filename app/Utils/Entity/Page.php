@@ -247,7 +247,7 @@ class Page{
 
             $defaultComponentView = new ComponentView(
                 $component->plugin->name,
-                'display',
+                'default',
                 '*',
                 Path::Combine($component->plugin->name, 'default'),
                 'Theme Default'
@@ -314,7 +314,7 @@ class Page{
 
             $defaultComponentView = new ComponentView(
                 $component->plugin->name,
-                'display',
+                'default',
                 '*',
                 Path::Combine($component->plugin->name, 'default'),
                 'Theme Default'
