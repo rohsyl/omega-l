@@ -68,11 +68,12 @@ abstract class FController extends AbstractController {
      */
     public function view($name){
 
-        if(isset($this->forceView['default'])) {
-            $path = $this->forceView['default'];
-        }
-        elseif(isset($this->forceView[$name])){
+
+        if(isset($this->forceView[$name])){
             $path = $this->forceView[$name];
+        }
+        else if(isset($this->forceView['default'])) {
+            $path = $this->forceView['default'];
         }
         else{
             $path = $this->root . DS . 'view' . DS . $name . '.blade.php';
