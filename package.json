@@ -30,7 +30,7 @@
     }
   },
   "devDependencies": {
-    "axios": "^0.18",
+    "axios": "^0.21",
     "cross-env": "^5.1",
     "jquery": "^3.5.0",
     "laravel-mix": "^2.1.14",
